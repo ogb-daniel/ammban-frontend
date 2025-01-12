@@ -1,6 +1,6 @@
-export const LOGIN = {
+export const HOME = {
   url: "/",
-  description: "Login",
+  description: "",
 };
 export const SIGNUP = {
   url: "/signup",
@@ -9,4 +9,12 @@ export const SIGNUP = {
 export const FORGOT_PASSWORD = {
   url: "/forgot-password",
   description: "Forgot password",
+};
+
+export const FAQS = {
+  url: "/faqs",
+  description: "Faqs",
+};
+export const VERIFY_ACCOUNT = {
+  url: "/verify-account",
 };

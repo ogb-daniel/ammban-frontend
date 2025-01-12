@@ -1,8 +1,11 @@
 import LoginForm from "../ui/auth/login-form";
-
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Login",
+};
 export default function Login() {
   return (
-    <main className="mt-10">
+    <main className=" p-6">
       <h1 className="text-primary text-[40px] font-bold text-center">
         Welcome!
       </h1>

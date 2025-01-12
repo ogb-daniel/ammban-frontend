@@ -5,7 +5,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { MdOutlineLock } from "react-icons/md";
 import { states } from "@/app/lib/static-data";
-import { LOGIN } from "@/app/lib/routes";
+import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
 
 const formSchema = z
@@ -65,7 +65,7 @@ export default function RegistrationForm() {
         e.stopPropagation();
         form.handleSubmit();
       }}
-      className="max-w-lg mx-auto p-4 space-y-4 mt-9"
+      className="max-w-lg mx-auto  space-y-4 mt-9"
     >
       <div>
         <form.Field
@@ -80,6 +80,7 @@ export default function RegistrationForm() {
                 value={field.state.value}
                 className={`form-input-field`}
                 onBlur={field.handleBlur}
+                placeholder="Enter your referral code"
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldInfo field={field} />
@@ -108,6 +109,7 @@ export default function RegistrationForm() {
                   value={field.state.value}
                   className={`form-input-field`}
                   onBlur={field.handleBlur}
+                  placeholder="Enter your first name"
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 <FieldInfo field={field} />
@@ -136,6 +138,7 @@ export default function RegistrationForm() {
                   name={field.name}
                   className={`form-input-field`}
                   value={field.state.value}
+                  placeholder="Enter your last name"
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -164,6 +167,7 @@ export default function RegistrationForm() {
                   id={field.name}
                   name={field.name}
                   className={`form-input-field`}
+                  placeholder="Enter your phone number"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -195,6 +199,7 @@ export default function RegistrationForm() {
                   name={field.name}
                   value={field.state.value}
                   type="email"
+                  placeholder="Enter your email address"
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -224,6 +229,7 @@ export default function RegistrationForm() {
                   name={field.name}
                   value={field.state.value}
                   className={`form-input-field`}
+                  placeholder="Enter your house address"
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -357,6 +363,7 @@ export default function RegistrationForm() {
                   name={field.name}
                   value={field.state.value}
                   className={`form-input-field`}
+                  placeholder="Create a secure password"
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -385,6 +392,7 @@ export default function RegistrationForm() {
                   id={field.name}
                   type="password"
                   name={field.name}
+                  placeholder="Re-enter your password"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -402,7 +410,7 @@ export default function RegistrationForm() {
       </button>
       <p className="mt-3 text-center">
         Alredy have an account?
-        <Link className="text-primary ml-1 font-medium" href={LOGIN.url}>
+        <Link className="text-primary ml-1 font-medium" href={HOME.url}>
           Sign in
         </Link>
       </p>

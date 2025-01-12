@@ -3,10 +3,12 @@ import "./ui/globals.css";
 import { montserrat } from "./ui/fonts";
 
 export const metadata: Metadata = {
-  title: "Cubecover",
+  title: {
+    template: "%s | Cubecover",
+    default: "Cubecover",
+  },
   description: "Cubecover",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

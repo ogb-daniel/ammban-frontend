@@ -29,5 +29,8 @@ body {
 }
 
 .btn-primary {
-  @apply bg-primary text-white p-2 w-full hover:opacity-90 rounded-xl;
+  @apply bg-primary font-medium  text-white p-2 w-full hover:opacity-90 rounded-xl;
+}
+.btn {
+  @apply font-medium  p-2 w-full hover:opacity-90 rounded-xl;
 }

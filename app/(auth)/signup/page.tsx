@@ -1,8 +1,11 @@
 import RegistrationForm from "@/app/ui/auth/register-form";
-
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Signup",
+};
 export default function Signup() {
   return (
-    <main className="mt-10">
+    <main className=" p-6">
       <h1 className="text-primary text-[40px] font-bold text-center">
         Welcome!
       </h1>
