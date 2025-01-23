@@ -3,8 +3,9 @@ import React from "react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import Link from "next/link";
-import { FORGOT_PASSWORD, SIGNUP } from "@/app/lib/routes";
+import { ADMIN_DASHBOARD, FORGOT_PASSWORD, SIGNUP } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
+import { useRouter } from "next/navigation";
 
 // Email and phone number validation schema
 const emailOrPhoneSchema = z.union([
@@ -24,6 +25,7 @@ const formSchema = z.object({
     ),
 });
 export default function LoginForm() {
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       contact: "",
@@ -31,6 +33,7 @@ export default function LoginForm() {
     },
     onSubmit: (values) => {
       console.log(values);
+      router.push(ADMIN_DASHBOARD.url);
       // Handle form submission
     },
     validators: {

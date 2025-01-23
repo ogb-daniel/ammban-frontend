@@ -7,13 +7,14 @@ import { MdOutlineLock } from "react-icons/md";
 import { states } from "@/app/lib/static-data";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
     referralCode: z.string().nonempty("Referral code is required"),
     firstName: z.string().nonempty("First name is required"),
     lastName: z.string().nonempty("Last name is required"),
-    phoneNumber: z.string().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+    phoneNumber: z.string().regex(/^\d{10,12}$/, "Invalid phone number"),
     email: z.string().email("Invalid email address"),
     address: z.string().nonempty("Address is required"),
     state: z.string().nonempty("State is required"),
@@ -35,6 +36,8 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 export default function RegistrationForm() {
+  const router = useRouter();
+
   const form = useForm({
     defaultValues: {
       referralCode: "",
@@ -52,6 +55,7 @@ export default function RegistrationForm() {
     onSubmit: (values) => {
       console.log(values);
       // Handle form submission
+      router.push(HOME.url);
     },
     validators: {
       onChange: formSchema,

@@ -18,3 +18,6 @@ export const FAQS = {
 export const VERIFY_ACCOUNT = {
   url: "/verify-account",
 };
+export const ADMIN_DASHBOARD = {
+  url: "/admin/dashboard",
+};
