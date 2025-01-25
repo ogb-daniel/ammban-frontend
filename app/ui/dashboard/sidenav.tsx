@@ -7,7 +7,13 @@ import SearchBar from "../search-bar";
 import { RiHomeFill, RiWallet3Fill } from "react-icons/ri";
 import clsx from "clsx";
 import { FaUsers } from "react-icons/fa";
-import { ADMIN_DASHBOARD } from "@/app/lib/routes";
+import {
+  ADMIN_DASHBOARD,
+  ADMIN_DASHBOARD_COMMISSION,
+  ADMIN_DASHBOARD_PRODUCTS,
+  ADMIN_DASHBOARD_PROFILE,
+  ADMIN_DASHBOARD_USERS,
+} from "@/app/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUser } from "react-icons/fa6";
@@ -16,18 +22,18 @@ const links = [
   { name: "Dashboard", href: ADMIN_DASHBOARD.url, icon: RiHomeFill },
   {
     name: "Profile",
-    href: `${ADMIN_DASHBOARD.url}/profile`,
+    href: `${ADMIN_DASHBOARD_PROFILE.url}`,
     icon: FaUser,
   },
-  { name: "Users", href: `${ADMIN_DASHBOARD.url}/users`, icon: FaUsers },
+  { name: "Users", href: `${ADMIN_DASHBOARD_USERS.url}`, icon: FaUsers },
   {
     name: "Products",
-    href: `${ADMIN_DASHBOARD.url}/products`,
+    href: `${ADMIN_DASHBOARD_PRODUCTS.url}`,
     icon: AiFillProduct,
   },
   {
     name: "Commission",
-    href: `${ADMIN_DASHBOARD.url}/commission`,
+    href: `${ADMIN_DASHBOARD_COMMISSION.url}`,
     icon: RiWallet3Fill,
   },
 ];

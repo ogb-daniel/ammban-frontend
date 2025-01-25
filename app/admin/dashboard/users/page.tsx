@@ -2,7 +2,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Dashboard",
 };
-export default function Login() {
+export default function Users() {
   return (
     <main>
       <div className="bg-white px-10 pt-7 pb-3 border-b-2 border-gray-100">

@@ -36,7 +36,7 @@ const Table = <T extends object>({
   });
 
   return (
-    <div>
+    <section>
       <div className=" bg-white border-2 border-gray-100 rounded-lg">
         <h2 className="text-xl font-semibold mb-4 border-b-2 border-gray-100 py-[14px] px-8">
           {title}
@@ -133,13 +133,7 @@ const Table = <T extends object>({
           </button>
         </div>
       </div>
-      <div className="flex max-w-3xl mx-auto gap-6 mt-4">
-        <button className="btn text-primary border border-primary">
-          Create Category
-        </button>
-        <button className="btn-primary">Create Product</button>
-      </div>
-    </div>
+    </section>
   );
 };
 
