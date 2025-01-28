@@ -1,22 +1,9 @@
 "use client";
 import React from "react";
-import Table from "../../table";
+import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
-
-type Product = {
-  name: string;
-  category: string;
-  price: string;
-  description: string;
-};
-
-const productsData: Product[] = Array(10).fill({
-  name: "AXA PASS",
-  category: "INSURANCE",
-  price: "15,000.00",
-  description:
-    "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-});
+import { Price, Product } from "@/stores/admin-store";
+import { useAdminStore } from "@/providers/admin-store-provider";
 
 const productColumns: ColumnDef<Product>[] = [
   {
@@ -32,7 +19,11 @@ const productColumns: ColumnDef<Product>[] = [
   {
     accessorKey: "price",
     header: "Price",
-    cell: (info) => `₦${info.getValue()}`,
+    cell: (info) =>
+      (info.getValue() as Price).amount.toLocaleString("en", {
+        style: "currency",
+        currency: (info.getValue() as Price).currency,
+      }),
   },
   {
     accessorKey: "description",
@@ -42,9 +33,12 @@ const productColumns: ColumnDef<Product>[] = [
 ];
 
 const ProductsTable = () => {
+  const { products } = useAdminStore((state) => state);
+  console.log(products);
+
   return (
     <Table<Product>
-      data={productsData}
+      data={products}
       columns={productColumns}
       title="All Products"
     />

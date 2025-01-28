@@ -6,13 +6,14 @@ import { IoIosMenu } from "react-icons/io";
 import SearchBar from "../search-bar";
 import { RiHomeFill, RiWallet3Fill } from "react-icons/ri";
 import clsx from "clsx";
-import { FaUsers } from "react-icons/fa";
+import { FaUserLock, FaUsers } from "react-icons/fa";
 import {
   ADMIN_DASHBOARD,
-  ADMIN_DASHBOARD_COMMISSION,
-  ADMIN_DASHBOARD_PRODUCTS,
-  ADMIN_DASHBOARD_PROFILE,
-  ADMIN_DASHBOARD_USERS,
+  ADMIN_COMMISSION,
+  ADMIN_PRODUCTS,
+  ADMIN_PROFILE,
+  ADMIN_USERS,
+  ADMIN_ROLES,
 } from "@/app/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,18 +23,23 @@ const links = [
   { name: "Dashboard", href: ADMIN_DASHBOARD.url, icon: RiHomeFill },
   {
     name: "Profile",
-    href: `${ADMIN_DASHBOARD_PROFILE.url}`,
+    href: `${ADMIN_PROFILE.url}`,
     icon: FaUser,
   },
-  { name: "Users", href: `${ADMIN_DASHBOARD_USERS.url}`, icon: FaUsers },
+  { name: "Users", href: `${ADMIN_USERS.url}`, icon: FaUsers },
+  {
+    name: "Roles and Permissions",
+    href: `${ADMIN_ROLES.url}`,
+    icon: FaUserLock,
+  },
   {
     name: "Products",
-    href: `${ADMIN_DASHBOARD_PRODUCTS.url}`,
+    href: `${ADMIN_PRODUCTS.url}`,
     icon: AiFillProduct,
   },
   {
     name: "Commission",
-    href: `${ADMIN_DASHBOARD_COMMISSION.url}`,
+    href: `${ADMIN_COMMISSION.url}`,
     icon: RiWallet3Fill,
   },
 ];
@@ -75,7 +81,7 @@ export default function SideNav() {
               className={clsx(
                 "flex h-[48px] grow items-center  gap-2 rounded-md py-3 text-sm font-medium hover:text-primary md:flex-none md:justify-start",
                 {
-                  " text-primary": pathname === link.href,
+                  "text-primary": pathname.includes(link.href),
                 }
               )}
             >
@@ -98,7 +104,7 @@ export default function SideNav() {
                 className={clsx(
                   "flex h-[48px] grow items-center justify-center gap-2 rounded-md py-3 text-sm font-medium hover:text-primary md:flex-none md:justify-start",
                   {
-                    " text-primary": pathname === link.href,
+                    " text-primary": pathname.includes(link.href),
                   }
                 )}
               >

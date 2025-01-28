@@ -1,5 +1,5 @@
-import ProductsAction from "@/app/ui/dashboard/products/products-action";
-import ProductsTable from "@/app/ui/dashboard/products/products-table";
+import ProductsAction from "@/app/ui/products/products-action";
+import ProductsTable from "@/app/ui/products/products-table";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Dashboard",

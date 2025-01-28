@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "../../table";
+import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
 type User = {
   name: string;

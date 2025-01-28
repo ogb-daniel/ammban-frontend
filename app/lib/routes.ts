@@ -21,15 +21,18 @@ export const VERIFY_ACCOUNT = {
 export const ADMIN_DASHBOARD = {
   url: "/admin/dashboard",
 };
-export const ADMIN_DASHBOARD_PROFILE = {
-  url: `${ADMIN_DASHBOARD.url}/profile`,
+export const ADMIN_PROFILE = {
+  url: `/admin/profile`,
 };
-export const ADMIN_DASHBOARD_USERS = {
-  url: `${ADMIN_DASHBOARD.url}/users`,
+export const ADMIN_ROLES = {
+  url: `/admin/roles`,
 };
-export const ADMIN_DASHBOARD_PRODUCTS = {
-  url: `${ADMIN_DASHBOARD.url}/products`,
+export const ADMIN_USERS = {
+  url: `/admin/users`,
 };
-export const ADMIN_DASHBOARD_COMMISSION = {
-  url: `${ADMIN_DASHBOARD.url}/commission`,
+export const ADMIN_PRODUCTS = {
+  url: `/admin/products`,
+};
+export const ADMIN_COMMISSION = {
+  url: `/admin/commission`,
 };
