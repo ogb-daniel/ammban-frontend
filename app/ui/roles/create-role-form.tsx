@@ -14,7 +14,7 @@ const permissionsList = [
   "Modify Insurance Policies",
 ];
 export default function CreateRoleForm() {
-  const {} = useAdminStore((state) => state);
+  const { roles, createRole } = useAdminStore((state) => state);
   const router = useRouter();
   // State for permission toggles
   const [permissions, setPermissions] = useState(
@@ -40,7 +40,7 @@ export default function CreateRoleForm() {
       description: "",
       color: "",
       permissions: [],
-      id: 1,
+      id: (roles.length + 1).toString(),
     },
     onSubmit: (values) => {
       const roleData = {
@@ -53,6 +53,7 @@ export default function CreateRoleForm() {
 
       console.log("Role Data:", roleData);
       // Handle form submission
+      createRole(roleData);
       router.back();
     },
   });
@@ -117,7 +118,14 @@ export default function CreateRoleForm() {
             Color
           </label>
           <div className="mt-2 flex space-x-3">
-            {["red", "orange", "blue", "green", "purple"].map((color) => (
+            {[
+              "#F7CE46",
+              "#EF4444",
+              "#FF8328",
+              "#10B981",
+              "#48A7FF",
+              "#6F00FD",
+            ].map((color) => (
               <button
                 key={color}
                 type="button"
@@ -170,7 +178,7 @@ export default function CreateRoleForm() {
           type="submit"
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Product
+          Create Role
         </button>
       </div>
     </form>

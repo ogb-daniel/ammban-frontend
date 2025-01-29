@@ -15,6 +15,14 @@ export type Product = {
   id: string;
 };
 
+export type Role = {
+  title: string;
+  description: string;
+  color: string;
+  permissions: string[];
+  id: string;
+};
+
 export type Price = {
   amount: number;
   currency: string;
@@ -23,11 +31,13 @@ export type Price = {
 export type AdminState = {
   categories: Category[];
   products: Product[];
+  roles: Role[];
 };
 
 export type AdminActions = {
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
+  createRole: (role: Role) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
@@ -45,11 +55,59 @@ export const initAdminStore = (): AdminState => {
       description:
         "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
     }),
+    roles: [
+      {
+        title: "Admin",
+        description: "Full access to all features",
+        color: "#CC9600",
+        permissions: [
+          "View Customer’s Information",
+          "Edit Customer’s Information",
+        ],
+        id: "1",
+      },
+      {
+        title: "Agent",
+        description: "Limited access to features",
+        color: "#0033CC",
+        permissions: ["View Customer’s Information"],
+        id: "2",
+      },
+      {
+        title: "Aggregators",
+        description: "Limited access to features",
+        color: "#CC0048",
+        permissions: ["View Customer’s Information"],
+        id: "3",
+      },
+      {
+        title: "Agent",
+        description: "Limited access to features",
+        color: "#1AB2A8",
+        permissions: ["View Customer’s Information"],
+        id: "4",
+      },
+      {
+        title: "Agent",
+        description: "Limited access to features",
+        color: "#030940",
+        permissions: ["View Customer’s Information"],
+        id: "5",
+      },
+      {
+        title: "Agent",
+        description: "Limited access to features",
+        color: "#1AB2A8",
+        permissions: ["View Customer’s Information"],
+        id: "6",
+      },
+    ],
   };
 };
 export const defaultInitState: AdminState = {
   categories: [],
   products: [],
+  roles: [],
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {
@@ -62,6 +120,10 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     createProduct: (product) =>
       set((state) => ({
         products: [...state.products, product],
+      })),
+    createRole: (role) =>
+      set((state) => ({
+        roles: [...state.roles, role],
       })),
   }));
 };
