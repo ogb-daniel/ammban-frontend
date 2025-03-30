@@ -102,7 +102,7 @@ export default function SideNav() {
                 key={link.name}
                 href={link.href}
                 className={clsx(
-                  "flex h-[48px] grow items-center justify-center gap-2 rounded-md py-3 text-sm font-medium hover:text-primary md:flex-none md:justify-start",
+                  "grid grid-cols-[auto,1fr] gap-2 h-[48px] items-center rounded-md py-3 text-sm font-medium hover:text-primary",
                   {
                     " text-primary": pathname.includes(link.href),
                   }

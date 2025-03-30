@@ -16,7 +16,9 @@ export default function AllRoles({}) {
           title={role.title}
           description={role.description}
           color={role.color}
-          onClick={() => {}}
+          onClick={() => {
+            router.push(`${ADMIN_ROLES.url}/${role.id}`);
+          }}
         />
       ))}
       <div className="md:w-1/2 mx-auto mt-10">

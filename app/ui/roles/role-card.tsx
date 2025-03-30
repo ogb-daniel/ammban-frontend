@@ -16,7 +16,7 @@ export default function RoleCard({
   onClick,
 }: Props) {
   return (
-    <div className="rounded-[20px] bg-white p-4 flex items-center justify-between gap-4">
+    <div className="rounded-[20px] bg-white p-4 grid grid-cols-1  lg:grid-cols-3 items-center justify-between gap-4">
       <div className="flex items-center gap-5">
         <div
           className="w-[60px] h-[60px] p-4 flex items-center justify-center rounded-[20px]"

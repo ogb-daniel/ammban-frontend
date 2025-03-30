@@ -1,3 +1,4 @@
+import AdminDashboard from "@/app/ui/dashboard/admin-dashboard";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -10,9 +11,7 @@ export default function Dashboard() {
         <p className="text-blue-500">(AXA Agent)</p>
       </div>
       <div className=" p-6">
-        <h1 className="text-primary text-[40px] font-bold text-center">
-          Dashboard
-        </h1>
+        <AdminDashboard />
       </div>
     </main>
   );

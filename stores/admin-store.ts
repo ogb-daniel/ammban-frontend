@@ -38,23 +38,49 @@ export type AdminActions = {
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
   createRole: (role: Role) => void;
+  editRole: (role: Role) => void;
+  editProduct: (product: Product) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
 export const initAdminStore = (): AdminState => {
   return {
     categories: [],
-    products: Array<Product>(10).fill({
-      id: "1",
-      name: "AXA PASS",
-      category: "INSURANCE",
-      price: {
-        currency: "NGN",
-        amount: 10000,
+    products: [
+      {
+        id: "1",
+        name: "AXA PASS",
+        category: "INSURANCE",
+        price: {
+          currency: "NGN",
+          amount: 10000,
+        },
+        description:
+          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
       },
-      description:
-        "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-    }),
+      {
+        id: "2",
+        name: "BAXA PASS",
+        category: "ANDURANCE",
+        price: {
+          currency: "NGN",
+          amount: 1000,
+        },
+        description:
+          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
+      },
+      {
+        id: "3",
+        name: "CAXA PASS",
+        category: "ENDURANCE",
+        price: {
+          currency: "NGN",
+          amount: 5000,
+        },
+        description:
+          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
+      },
+    ],
     roles: [
       {
         title: "Admin",
@@ -124,6 +150,16 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     createRole: (role) =>
       set((state) => ({
         roles: [...state.roles, role],
+      })),
+    editRole: (role) =>
+      set((state) => ({
+        roles: state.roles.map((r) => (r.id === role.id ? role : r)),
+      })),
+    editProduct: (product) =>
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === product.id ? product : p
+        ),
       })),
   }));
 };
