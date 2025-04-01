@@ -63,14 +63,14 @@ const ProductsTable = () => {
   const router = useRouter();
   const actions = [
     {
-      icon: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
+      element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
       onClick: (product: Product) => {
         router.push(`${ADMIN_PRODUCTS.url}/${product.id}`);
       },
       label: "Edit Product",
     },
     {
-      icon: <FaTrash className="w-4 h-4 text-red-500" />,
+      element: <FaTrash className="w-4 h-4 text-red-500" />,
       onClick: (product: Product) => {
         // Handle delete action
         if (confirm("Are you sure you want to delete this product?")) {

@@ -14,6 +14,23 @@ export type Product = {
   price: Price;
   id: string;
 };
+export type User = {
+  name: string;
+  email: string;
+  phone: string;
+  state: string;
+  gender: string;
+  status: string;
+  id: string;
+};
+
+export type Commission = {
+  productName: string;
+  description: string;
+  role: string;
+  percentage: number;
+  id: string;
+};
 
 export type Role = {
   title: string;
@@ -32,14 +49,17 @@ export type AdminState = {
   categories: Category[];
   products: Product[];
   roles: Role[];
+  commissions: Commission[];
 };
 
 export type AdminActions = {
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
   createRole: (role: Role) => void;
+  createCommission: (commission: Commission) => void;
   editRole: (role: Role) => void;
   editProduct: (product: Product) => void;
+  editCommission: (commission: Commission) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
@@ -128,12 +148,22 @@ export const initAdminStore = (): AdminState => {
         id: "6",
       },
     ],
+    commissions: [
+      {
+        productName: "AXA PASS",
+        description: "Provides coverage for medical expenses",
+        role: "Admin",
+        percentage: 25,
+        id: "1",
+      },
+    ],
   };
 };
 export const defaultInitState: AdminState = {
   categories: [],
   products: [],
   roles: [],
+  commissions: [],
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {
@@ -159,6 +189,16 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
       set((state) => ({
         products: state.products.map((p) =>
           p.id === product.id ? product : p
+        ),
+      })),
+    createCommission: (commission) =>
+      set((state) => ({
+        commissions: [...state.commissions, commission],
+      })),
+    editCommission: (commission) =>
+      set((state) => ({
+        commissions: state.commissions.map((c) =>
+          c.id === commission.id ? commission : c
         ),
       })),
   }));

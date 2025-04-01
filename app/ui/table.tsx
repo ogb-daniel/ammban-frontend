@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 type Action<T> = {
-  icon: React.ReactNode;
+  element: React.ReactNode;
   onClick: (row: T) => void;
   label: string;
 };
@@ -58,7 +58,7 @@ const Table = <T extends object>({
                 className="p-2 text-gray-600 hover:text-gray-900"
                 title={action.label}
               >
-                {action.icon}
+                {action.element}
               </button>
             ))}
           </div>
@@ -209,13 +209,13 @@ const Table = <T extends object>({
                           className="p-2 text-gray-600 hover:text-gray-900"
                           title={action.label}
                         >
-                          {action.icon}
+                          {action.element}
                         </button>
                       ))}
                     </div>
                   )}
                 </div>
-                {row.getVisibleCells().map((cell, index) => {
+                {row.getVisibleCells().map((cell) => {
                   // Skip the actions column in mobile view
                   if (cell.column.id === "actions") return null;
 
