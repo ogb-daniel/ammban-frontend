@@ -48,12 +48,29 @@ export type Price = {
   currency: string;
 };
 
+export type Admin = {
+  firstName: string;
+  lastName: string;
+  description: string;
+  position: string;
+  location: string;
+  website: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  state: string;
+  gender: string;
+  id: string;
+  role?: string;
+};
+
 export type AdminState = {
   categories: Category[];
   products: Product[];
   roles: Role[];
   commissions: Commission[];
   users: User[];
+  admin: Admin;
 };
 
 export type AdminActions = {
@@ -177,6 +194,21 @@ export const initAdminStore = (): AdminState => {
         role: "Admin",
       },
     ],
+    admin: {
+      firstName: "David",
+      lastName: "Ogbe",
+      description: "Full access to all features",
+      position: "Software Engineer",
+      location: "Lagos, Nigeria",
+      website: "https://www.google.com",
+      email: "david@google.com",
+      phoneNumber: "(234) 907 - 1274 - 515",
+      state: "Lagos (Nigeria)",
+      address: "12, Opebi Street, Lagos",
+      gender: "male",
+      id: "1",
+      role: "Admin",
+    },
   };
 };
 export const defaultInitState: AdminState = {
@@ -185,6 +217,21 @@ export const defaultInitState: AdminState = {
   roles: [],
   users: [],
   commissions: [],
+  admin: {
+    firstName: "",
+    lastName: "",
+    description: "",
+    position: "",
+    location: "",
+    website: "",
+    email: "",
+    phoneNumber: "",
+    state: "",
+    address: "",
+    gender: "",
+    id: "",
+    role: "",
+  },
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {
