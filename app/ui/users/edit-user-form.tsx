@@ -8,51 +8,39 @@ import { states } from "@/app/lib/static-data";
 import { ADMIN_USERS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import FieldInfo from "../auth/field-info";
+import { User } from "@/stores/admin-store";
+import { useAdminStore } from "@/providers/admin-store-provider";
 
-const formSchema = z
-  .object({
-    firstName: z.string().nonempty("First name is required"),
-    lastName: z.string().nonempty("Last name is required"),
-    phoneNumber: z.string().nonempty("Phone number is required"),
-    email: z.string().email("Invalid email address"),
-    address: z.string().nonempty("Address is required"),
-    state: z.string().nonempty("State is required"),
-    dateOfBirth: z.string().nonempty("Date of birth is required"),
-    gender: z.string().nonempty("Gender is required"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
-    confirmPassword: z.string().nonempty("Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-export default function CreateUserForm() {
+const formSchema = z.object({
+  firstName: z.string().nonempty("First name is required"),
+  lastName: z.string().nonempty("Last name is required"),
+  phoneNumber: z.string().nonempty("Phone number is required"),
+  email: z.string().email("Invalid email address"),
+  address: z.string().nonempty("Address is required"),
+  state: z.string().nonempty("State is required"),
+  dateOfBirth: z.string().nonempty("Date of birth is required"),
+  gender: z.string().nonempty("Gender is required"),
+});
+
+export default function EditUserForm({ user }: { user: User }) {
+  const { editUser } = useAdminStore((state) => state);
   const router = useRouter();
 
   const form = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      email: "",
-      address: "",
-      state: "",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      address: user.address,
+      state: user.state,
       dateOfBirth: "",
-      gender: "",
-      password: "",
-      confirmPassword: "",
+      gender: user.gender,
     },
     onSubmit: (values) => {
       console.log(values);
       // Handle form submission
+      editUser(user.id, { ...user, ...values.value });
       router.push(ADMIN_USERS.url);
     },
     validators: {
@@ -134,34 +122,28 @@ export default function CreateUserForm() {
           />
         </div>
         <div>
-          {/* A type-safe field component*/}
-          <form.Field
-            name="phoneNumber"
-            // eslint-disable-next-line react/no-children-prop
-            children={(field) => {
-              // Avoid hasty abstractions. Render props are great!
-              return (
-                <>
-                  <label
-                    className="block text-sm font-medium"
-                    htmlFor={field.name}
-                  >
-                    Phone Number
-                  </label>
-                  <PhoneInput
-                    country={"ng"}
-                    value={field.state.value}
-                    onChange={(phone) => field.handleChange(phone)}
-                    inputClass="!w-full !h-auto !p-2 !pl-14 !border !rounded focus:!outline-none focus:!ring-2 focus:!ring-blue-500"
-                    containerClass="w-full"
-                    buttonClass="!border-r-0 !rounded-l !p-2"
-                    dropdownClass="!rounded"
-                  />
-                  <FieldInfo field={field} />
-                </>
-              );
-            }}
-          />
+          <form.Field name="phoneNumber">
+            {(field) => (
+              <>
+                <label
+                  className="block text-sm font-medium"
+                  htmlFor={field.name}
+                >
+                  Phone Number
+                </label>
+                <PhoneInput
+                  country={"ng"}
+                  value={field.state.value}
+                  onChange={(phone) => field.handleChange(phone)}
+                  inputClass="!w-full !h-auto !p-2 !pl-14 !border !rounded focus:!outline-none focus:!ring-2 focus:!ring-blue-500"
+                  containerClass="w-full"
+                  buttonClass="!border-r-0 !rounded-l !p-2"
+                  dropdownClass="!rounded"
+                />
+                <FieldInfo field={field} />
+              </>
+            )}
+          </form.Field>
         </div>
         <div>
           {/* A type-safe field component*/}
@@ -327,71 +309,9 @@ export default function CreateUserForm() {
             }}
           />
         </div>
-        <div>
-          {/* A type-safe field component*/}
-          <form.Field
-            name="password"
-            // eslint-disable-next-line react/no-children-prop
-            children={(field) => {
-              // Avoid hasty abstractions. Render props are great!
-              return (
-                <>
-                  <label
-                    className="block text-sm font-medium"
-                    htmlFor={field.name}
-                  >
-                    Password
-                  </label>
-                  <input
-                    id={field.name}
-                    type="password"
-                    name={field.name}
-                    value={field.state.value}
-                    className={`form-input-field`}
-                    placeholder="Create a secure password"
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldInfo field={field} />
-                </>
-              );
-            }}
-          />
-        </div>
-        <div>
-          {/* A type-safe field component*/}
-          <form.Field
-            name="confirmPassword"
-            // eslint-disable-next-line react/no-children-prop
-            children={(field) => {
-              // Avoid hasty abstractions. Render props are great!
-              return (
-                <>
-                  <label
-                    className="block text-sm font-medium"
-                    htmlFor={field.name}
-                  >
-                    Confirm Password
-                  </label>
-                  <input
-                    id={field.name}
-                    type="password"
-                    name={field.name}
-                    placeholder="Re-enter your password"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className={`form-input-field`}
-                  />
-                  <FieldInfo field={field} />
-                </>
-              );
-            }}
-          />
-        </div>
 
         <button type="submit" className="btn-primary mt-10">
-          Create User
+          Update
         </button>
       </div>
     </form>

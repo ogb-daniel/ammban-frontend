@@ -20,6 +20,7 @@ export default function RootLayout({
         className={`${montserrat.className} antialiased text-black bg-white`}
       >
         {children}
+        <div id="modals"></div>
       </body>
     </html>
   );

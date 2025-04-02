@@ -15,13 +15,16 @@ export type Product = {
   id: string;
 };
 export type User = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
+  address: string;
   state: string;
   gender: string;
-  status: string;
+  status?: string;
   id: string;
+  role?: string;
 };
 
 export type Commission = {
@@ -50,6 +53,7 @@ export type AdminState = {
   products: Product[];
   roles: Role[];
   commissions: Commission[];
+  users: User[];
 };
 
 export type AdminActions = {
@@ -57,9 +61,11 @@ export type AdminActions = {
   createProduct: (product: Product) => void;
   createRole: (role: Role) => void;
   createCommission: (commission: Commission) => void;
-  editRole: (role: Role) => void;
-  editProduct: (product: Product) => void;
-  editCommission: (commission: Commission) => void;
+  createUser: (user: User) => void;
+  editRole: (id: string, role: Role) => void;
+  editProduct: (id: string, product: Product) => void;
+  editCommission: (id: string, commission: Commission) => void;
+  editUser: (id: string, user: User) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
@@ -157,12 +163,27 @@ export const initAdminStore = (): AdminState => {
         id: "1",
       },
     ],
+    users: [
+      {
+        firstName: "David",
+        lastName: "Ogbe",
+        email: "david@google.com",
+        phoneNumber: "(234) 907 - 1274 - 515",
+        state: "Lagos (Nigeria)",
+        address: "12, Opebi Street, Lagos",
+        gender: "male",
+        status: "Active",
+        id: "1",
+        role: "Admin",
+      },
+    ],
   };
 };
 export const defaultInitState: AdminState = {
   categories: [],
   products: [],
   roles: [],
+  users: [],
   commissions: [],
 };
 
@@ -181,25 +202,32 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
       set((state) => ({
         roles: [...state.roles, role],
       })),
-    editRole: (role) =>
+    editRole: (id, role) =>
       set((state) => ({
-        roles: state.roles.map((r) => (r.id === role.id ? role : r)),
+        roles: state.roles.map((r) => (r.id === id ? role : r)),
       })),
-    editProduct: (product) =>
+    editProduct: (id, product) =>
       set((state) => ({
-        products: state.products.map((p) =>
-          p.id === product.id ? product : p
+        products: state.products.map((p) => (p.id === id ? product : p)),
+      })),
+    editCommission: (id, commission) =>
+      set((state) => ({
+        commissions: state.commissions.map((c) =>
+          c.id === id ? commission : c
         ),
       })),
     createCommission: (commission) =>
       set((state) => ({
         commissions: [...state.commissions, commission],
       })),
-    editCommission: (commission) =>
+
+    createUser: (user) =>
       set((state) => ({
-        commissions: state.commissions.map((c) =>
-          c.id === commission.id ? commission : c
-        ),
+        users: [...state.users, user],
+      })),
+    editUser: (id, user) =>
+      set((state) => ({
+        users: state.users.map((u) => (u.id === id ? user : u)),
       })),
   }));
 };

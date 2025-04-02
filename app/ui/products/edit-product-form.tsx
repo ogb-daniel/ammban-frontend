@@ -20,7 +20,7 @@ export default function EditProductForm({ product }: { product: Product }) {
     },
     onSubmit: (values) => {
       console.log(values);
-      editProduct(values.value);
+      editProduct(product.id, { ...product, ...values.value });
       // Handle form submission
       router.back();
     },

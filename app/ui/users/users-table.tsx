@@ -17,22 +17,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { UserCog, UserCheck, ChevronDown } from "lucide-react";
-const usersData: User[] = Array(10).fill({
-  name: "David Abolaji",
-  email: "david@google.com",
-  phone: "(234) 907 - 1274 - 515",
-  state: "Lagos (Nigeria)",
-  gender: "Male",
-  status: "Active",
-});
+import RoleAssignmentModal from "../roles/role-assign-modal";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { toTitleCase } from "@/lib/utils";
 
 const userColumns: ColumnDef<User>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "",
     header: "Name",
     cell: (info) => (
       <div>
-        <p className="font-medium">{info.getValue() as string}</p>
+        <p className="text-sm font-medium">
+          {info.row.original.firstName} {info.row.original.lastName}
+        </p>
         <p className="text-xs font-medium text-gray-500">
           {info.row.original.email}
         </p>
@@ -44,7 +41,7 @@ const userColumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "phone",
+    accessorKey: "phoneNumber",
     header: "Phone",
     cell: (info) => info.getValue(),
     enableSorting: true,
@@ -64,7 +61,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "gender",
     header: "Gender",
-    cell: (info) => info.getValue(),
+    cell: (info) => toTitleCase(info.getValue() as string),
     enableSorting: true,
     meta: {
       icon: <FaTransgender className="text-gray-500" />,
@@ -143,8 +140,10 @@ function ManageUsersDropdown({
 
 const UsersTable = () => {
   const router = useRouter();
+  const { users } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const actions =
     selected === "Manage Users"
       ? [
@@ -175,16 +174,22 @@ const UsersTable = () => {
               </span>
             ),
             onClick: (user: User) => {
-              router.push(`${ADMIN_USERS.url}/${user.id}`);
+              setSelectedUser(user);
+              setIsOpen(true);
             },
             label: "Edit User",
           },
         ];
   return (
     <div className="space-y-2">
+      <RoleAssignmentModal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        user={selectedUser as User}
+      />
       <ManageUsersDropdown selected={selected} setSelected={setSelected} />
       <Table<User>
-        data={usersData}
+        data={users}
         columns={userColumns}
         title="All Users"
         actions={actions}

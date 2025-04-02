@@ -25,7 +25,8 @@ export default function EditCommissionForm({
     },
     onSubmit: (values) => {
       console.log(values);
-      editCommission(values.value);
+
+      editCommission(commission.id, { ...commission, ...values.value });
       // Handle form submission
       router.back();
     },

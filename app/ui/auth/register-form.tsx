@@ -8,13 +8,14 @@ import { states } from "@/app/lib/static-data";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
 import { useRouter } from "next/navigation";
-
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 const formSchema = z
   .object({
     referralCode: z.string().nonempty("Referral code is required"),
     firstName: z.string().nonempty("First name is required"),
     lastName: z.string().nonempty("Last name is required"),
-    phoneNumber: z.string().regex(/^\d{10,12}$/, "Invalid phone number"),
+    phoneNumber: z.string().nonempty("Phone number is required"),
     email: z.string().email("Invalid email address"),
     address: z.string().nonempty("Address is required"),
     state: z.string().nonempty("State is required"),
@@ -167,14 +168,14 @@ export default function RegistrationForm() {
                 >
                   Phone Number
                 </label>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  className={`form-input-field`}
-                  placeholder="Enter your phone number"
+                <PhoneInput
+                  country={"ng"}
                   value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(phone) => field.handleChange(phone)}
+                  inputClass="!w-full !h-auto !p-2 !pl-14 !border !rounded focus:!outline-none focus:!ring-2 focus:!ring-blue-500"
+                  containerClass="w-full"
+                  buttonClass="!border-r-0 !rounded-l !p-2"
+                  dropdownClass="!rounded"
                 />
                 <FieldInfo field={field} />
               </>

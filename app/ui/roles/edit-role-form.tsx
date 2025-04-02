@@ -43,7 +43,7 @@ export default function EditRoleForm({ role }: { role: Role }) {
 
       console.log("Role Data:", roleData);
       // Handle form submission
-      editRole(roleData);
+      editRole(role.id, roleData);
       router.back();
     },
   });

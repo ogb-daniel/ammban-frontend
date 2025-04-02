@@ -10,8 +10,9 @@ import { useRouter } from "next/navigation";
 // Email and phone number validation schema
 const emailOrPhoneSchema = z.union([
   z.string().email("Invalid email address"), // Validate email
-  z.string().regex(/^\d{10,12}$/, "Invalid phone number"), // Validate phone number (10 digits)
+  z.string().nonempty("Phone number is required"),
 ]);
+
 const formSchema = z.object({
   contact: emailOrPhoneSchema,
   password: z
