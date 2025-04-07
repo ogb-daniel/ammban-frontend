@@ -6,9 +6,8 @@ type TransactionCardProps = {
   id: string | number;
   icon: JSX.Element;
   change: string;
-  iconColor: string;
-  bgColor: string;
   date: Date;
+  baseColor: string; // Hex color code like "#094794"
 };
 
 const TransactionCard: React.FC<TransactionCardProps> = ({
@@ -16,14 +15,17 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   icon,
   change,
   id,
-  iconColor,
   date,
-  bgColor,
+  baseColor,
 }) => {
   return (
-    <div className={`flex items-center gap-4`}>
+    <div className="flex items-center gap-4">
       <div
-        className={`${iconColor} ${bgColor} flex items-center justify-center w-12 p-4  rounded-full`}
+        className="flex items-center justify-center w-12 p-4 rounded-full"
+        style={{
+          backgroundColor: `${baseColor}33`, // 20% opacity
+          color: baseColor,
+        }}
       >
         {icon}
       </div>

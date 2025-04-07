@@ -36,3 +36,11 @@ export const ADMIN_PRODUCTS = {
 export const ADMIN_COMMISSION = {
   url: `/admin/commission`,
 };
+
+export const ADMIN_TRANSACTIONS = {
+  url: "/admin/transactions",
+};
+
+export const AGENT_DASHBOARD = {
+  url: "/agent/dashboard",
+};

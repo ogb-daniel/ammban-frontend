@@ -1,43 +1,20 @@
 "use client";
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
 import Link from "next/link";
 import { MdOutlineLock } from "react-icons/md";
 import { states } from "@/app/lib/static-data";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
-import { useRouter } from "next/navigation";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-const formSchema = z
-  .object({
-    referralCode: z.string().nonempty("Referral code is required"),
-    firstName: z.string().nonempty("First name is required"),
-    lastName: z.string().nonempty("Last name is required"),
-    phoneNumber: z.string().nonempty("Phone number is required"),
-    email: z.string().email("Invalid email address"),
-    address: z.string().nonempty("Address is required"),
-    state: z.string().nonempty("State is required"),
-    dateOfBirth: z.string().nonempty("Date of birth is required"),
-    gender: z.string().nonempty("Gender is required"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
-    confirmPassword: z.string().nonempty("Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+import { signup } from "@/app/actions/auth";
+import { SignupFormSchema } from "@/app/lib/definitions";
+import { toast } from "react-toastify";
+
 export default function RegistrationForm() {
-  const router = useRouter();
+  const [state, action, pending] = useActionState(signup, undefined);
+  console.log(state);
 
   const form = useForm({
     defaultValues: {
@@ -45,33 +22,40 @@ export default function RegistrationForm() {
       firstName: "",
       lastName: "",
       phoneNumber: "",
-      email: "",
+      emailAddress: "",
       address: "",
-      state: "",
+      stateId: 0,
       dateOfBirth: "",
-      gender: "",
+      userName: "",
+      gender: 0,
       password: "",
       confirmPassword: "",
     },
     onSubmit: (values) => {
       console.log(values);
+
       // Handle form submission
-      router.push(HOME.url);
     },
     validators: {
-      onChange: formSchema,
+      onChange: SignupFormSchema,
     },
   });
 
+  useEffect(() => {
+    if (state?.error) {
+      toast(state.error, { type: "error", position: "bottom-right" });
+    }
+  }, [state]);
+  const handleAction = async (formData: FormData) => {
+    Object.entries(form.state.values).forEach(([key, value]) => {
+      formData.append(key, String(value));
+    });
+
+    return action(formData);
+  };
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        form.handleSubmit();
-      }}
-      className="max-w-lg mx-auto  space-y-4 mt-9"
-    >
+    <form action={handleAction} className="max-w-lg mx-auto  space-y-4 mt-9">
       <div>
         <form.Field
           name="referralCode"
@@ -156,6 +140,36 @@ export default function RegistrationForm() {
       <div>
         {/* A type-safe field component*/}
         <form.Field
+          name="userName"
+          // eslint-disable-next-line react/no-children-prop
+          children={(field) => {
+            // Avoid hasty abstractions. Render props are great!
+            return (
+              <>
+                <label
+                  className="block text-sm font-medium"
+                  htmlFor={field.name}
+                >
+                  Username
+                </label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  className={`form-input-field`}
+                  value={field.state.value}
+                  placeholder="Enter your username"
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldInfo field={field} />
+              </>
+            );
+          }}
+        />
+      </div>
+      <div>
+        {/* A type-safe field component*/}
+        <form.Field
           name="phoneNumber"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
@@ -186,7 +200,7 @@ export default function RegistrationForm() {
       <div>
         {/* A type-safe field component*/}
         <form.Field
-          name="email"
+          name="emailAddress"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
             // Avoid hasty abstractions. Render props are great!
@@ -247,7 +261,7 @@ export default function RegistrationForm() {
       <div>
         {/* A type-safe field component*/}
         <form.Field
-          name="state"
+          name="stateId"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
             // Avoid hasty abstractions. Render props are great!
@@ -264,12 +278,12 @@ export default function RegistrationForm() {
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e) => field.handleChange(Number(e.target.value))}
                   className={`form-input-field`}
                 >
                   <option value="">Select your state</option>
-                  {states.map((state) => (
-                    <option key={state} value={state}>
+                  {states.map((state, index) => (
+                    <option key={state} value={index}>
                       {state}
                     </option>
                   ))}
@@ -333,12 +347,12 @@ export default function RegistrationForm() {
                   className={`form-input-field`}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e) => field.handleChange(Number(e.target.value))}
                 >
                   <option value="">Select your gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value={0}>Male</option>
+                  <option value={1}>Female</option>
+                  <option value={2}>Other</option>
                 </select>
 
                 <FieldInfo field={field} />
@@ -410,7 +424,7 @@ export default function RegistrationForm() {
         />
       </div>
 
-      <button type="submit" className="btn-primary mt-10">
+      <button className="btn-primary mt-10" disabled={pending}>
         Create Account
       </button>
       <p className="mt-3 text-center">

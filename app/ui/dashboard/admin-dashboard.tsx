@@ -1,4 +1,5 @@
 "use client";
+import useResponsive from "@/app/lib/hooks/useResponsive";
 import DashboardCard from "@/app/ui/dashboard/dashboard-card";
 import RecentProducts from "@/app/ui/dashboard/recent-product";
 import RecentTransactions from "@/app/ui/dashboard/recent-transaction";
@@ -11,6 +12,10 @@ import {
   FiTrendingUp,
   FiUsers,
 } from "react-icons/fi";
+import TabSlider from "../tab-slider";
+import AllTransactions from "../transactions/all-transactions";
+import Income from "../transactions/income";
+import Outflow from "../transactions/outflow";
 
 const cards = [
   {
@@ -59,8 +64,14 @@ const mockData = [
   { date: "1 Jan", users: 20000 },
 ];
 const totalUsers = 56589;
+const tabs = [
+  { key: "all", label: "All Transactions", component: <AllTransactions /> },
+  { key: "income", label: "Income", component: <Income /> },
+  { key: "outflow", label: "Outflow", component: <Outflow /> },
+];
 
 export default function AdminDashboard() {
+  const isMobile = useResponsive();
   return (
     <main className="">
       <SearchBar placeholder="Search..." onChange={() => {}} />
@@ -70,9 +81,18 @@ export default function AdminDashboard() {
           <DashboardCard key={index} {...card} />
         ))}
       </div>
-      <SalesInsights data={mockData} totalUsers={totalUsers} />
-      <RecentTransactions />
-      <RecentProducts />
+      {isMobile ? (
+        <>
+          <SalesInsights data={mockData} totalUsers={totalUsers} />
+          <RecentTransactions />
+          <RecentProducts />
+        </>
+      ) : (
+        <div className="mt-10">
+          <h2 className="text-[22px]  font-semibold">Recent Transactions</h2>
+          <TabSlider tabs={tabs} />
+        </div>
+      )}
     </main>
   );
 }

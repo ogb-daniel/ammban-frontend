@@ -7,6 +7,16 @@ type Category = {
   industry: string;
   id: string;
 };
+export type Transaction = {
+  description: string;
+  type: string;
+  date: Date;
+  amount: Price;
+  receipt: string;
+  id: string;
+  source: string;
+};
+
 export type Product = {
   name: string;
   description: string;
@@ -71,6 +81,7 @@ export type AdminState = {
   commissions: Commission[];
   users: User[];
   admin: Admin;
+  transactions: Transaction[];
 };
 
 export type AdminActions = {
@@ -209,6 +220,32 @@ export const initAdminStore = (): AdminState => {
       id: "1",
       role: "Admin",
     },
+    transactions: [
+      {
+        description: "AXA PASS",
+        type: "AXA PASS",
+        date: new Date(),
+        amount: {
+          currency: "NGN",
+          amount: 10000,
+        },
+        receipt: "https://www.google.com",
+        id: "1",
+        source: "income",
+      },
+      {
+        description: "AXA PASS",
+        type: "AXA PASS",
+        date: new Date(),
+        amount: {
+          currency: "NGN",
+          amount: 10000,
+        },
+        receipt: "https://www.google.com",
+        id: "2",
+        source: "outflow",
+      },
+    ],
   };
 };
 export const defaultInitState: AdminState = {
@@ -232,6 +269,7 @@ export const defaultInitState: AdminState = {
     id: "",
     role: "",
   },
+  transactions: [],
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {

@@ -19,6 +19,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUser } from "react-icons/fa6";
 import { useState } from "react";
+import LogoutButton from "../auth/logout-button";
 const links = [
   { name: "Dashboard", href: ADMIN_DASHBOARD.url, icon: RiHomeFill },
   {
@@ -67,7 +68,7 @@ export default function SideNav() {
       </div>
 
       <div
-        className={clsx("px-3 text-gray-400 font-medium md:hidden", {
+        className={clsx("px-3 pb-3 text-gray-400 font-medium md:hidden", {
           "h-auto": showDropdownMenu,
           "h-0 overflow-hidden": !showDropdownMenu,
         })}
@@ -90,9 +91,12 @@ export default function SideNav() {
             </Link>
           );
         })}
+        <div className="mt-5">
+          <LogoutButton />
+        </div>
       </div>
       {/* <NavLinks /> */}
-      <div className="hidden h-auto w-full grow rounded-md  md:block px-7 mt-10">
+      <div className="hidden w-full grow rounded-md  md:block px-7 mt-10">
         <SearchBar placeholder="Search for..." onChange={() => {}} />
         <div className="space-y-1 mt-8 text-gray-400 font-medium">
           {links.map((link) => {
@@ -113,6 +117,9 @@ export default function SideNav() {
               </Link>
             );
           })}
+        </div>
+        <div className="mt-6">
+          <LogoutButton />
         </div>
       </div>
     </div>

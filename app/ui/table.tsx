@@ -10,7 +10,8 @@ import {
   getSortedRowModel,
 } from "@tanstack/react-table";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
-type Action<T> = {
+import { CardLayout, CompactLayout, ListLayout } from "./table/mobile-layouts";
+export type Action<T> = {
   element: React.ReactNode;
   onClick: (row: T) => void;
   label: string;
@@ -22,6 +23,8 @@ type TableProps<T> = {
   rowsPerPageOptions?: number[];
   onSelectedRowsChange?: (rows: T[]) => void;
   actions?: Action<T>[]; // New prop for actions
+  mobileLayout?: "list" | "card" | "compact" | "custom"; // Add this prop
+  customMobileComponent?: React.ReactNode; // Add this for fully custom mobile layouts
 };
 
 type ColumnMeta = {
@@ -34,6 +37,8 @@ const Table = <T extends object>({
   rowsPerPageOptions = [10, 20, 50],
   onSelectedRowsChange,
   actions,
+  mobileLayout = "list",
+  customMobileComponent,
 }: TableProps<T>) => {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -92,7 +97,29 @@ const Table = <T extends object>({
       onSelectedRowsChange(selectedRows);
     }
   }, [rowSelection, onSelectedRowsChange, table]);
-
+  const renderMobileLayout = (row: Row<T>, visualIndex: number) => {
+    switch (mobileLayout) {
+      case "card":
+        return <CardLayout key={visualIndex} row={row} actions={actions} />;
+      case "compact":
+        return <CompactLayout key={visualIndex} row={row} actions={actions} />;
+      case "custom":
+        if (customMobileComponent) {
+          const CustomComponent =
+            customMobileComponent as unknown as React.ComponentType<{
+              row: Row<T>;
+              actions?: Action<T>[];
+            }>;
+          return (
+            <CustomComponent key={visualIndex} row={row} actions={actions} />
+          );
+        }
+        return null;
+      case "list":
+      default:
+        return <ListLayout key={visualIndex} row={row} actions={actions} />;
+    }
+  };
   return (
     <section>
       <div className="bg-white border-2 border-gray-100 rounded-lg">
@@ -186,55 +213,11 @@ const Table = <T extends object>({
             </tbody>
           </table>
           <div className="md:hidden">
-            {table.getRowModel().rows.map((row, visualIndex) => (
-              <div
-                key={row.id}
-                className={`p-4 ${
-                  visualIndex % 2 === 0 ? "bg-[#F1F7FE]" : "bg-white"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <input
-                    type="checkbox"
-                    checked={row.getIsSelected()}
-                    onChange={row.getToggleSelectedHandler()}
-                    className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  {actions && (
-                    <div className="flex items-center gap-2">
-                      {actions.map((action, index) => (
-                        <button
-                          key={index}
-                          onClick={() => action.onClick(row.original)}
-                          className="p-2 text-gray-600 hover:text-gray-900"
-                          title={action.label}
-                        >
-                          {action.element}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {row.getVisibleCells().map((cell) => {
-                  // Skip the actions column in mobile view
-                  if (cell.column.id === "actions") return null;
-
-                  return (
-                    <div key={cell.id} className="py-2">
-                      <div className="text-xs text-gray-500 font-medium">
-                        {cell.column.columnDef.header as string}
-                      </div>
-                      <div className="mt-1">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+            {table
+              .getRowModel()
+              .rows.map((row, visualIndex) =>
+                renderMobileLayout(row, visualIndex)
+              )}
           </div>
         </div>
       </div>
