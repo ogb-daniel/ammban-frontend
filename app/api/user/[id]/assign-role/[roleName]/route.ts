@@ -5,16 +5,15 @@ const baseUrl = process.env.API_URL;
 
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string; roleName: string } }
+  { params }: { params: Promise<{ id: string; roleName: string }> }
 ) {
   try {
-    const { params } = context;
     const session = await getSession();
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id, roleName } = params;
+    const { id, roleName } = await params;
 
     if (!id || !roleName) {
       return NextResponse.json(
