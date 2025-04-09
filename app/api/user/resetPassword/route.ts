@@ -7,14 +7,17 @@ export async function POST(request: NextRequest) {
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const response = await fetch(`${baseUrl}/api/services/app/User/Approve`, {
-      method: "POST",
-      body: await request.json(),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `${baseUrl}/api/services/app/User/ResetPassword`,
+      {
+        method: "POST",
+        body: await request.json(),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {

@@ -46,6 +46,19 @@ export type FormState =
     }
   | undefined;
 
+export type User = {
+  userName: string;
+  name: string;
+  surname: string;
+  emailAddress: string;
+  isActive: true;
+  fullName: string;
+  lastLoginTime: string;
+  creationTime: string;
+  roleNames: string[];
+  id: number | null;
+};
+
 export interface IRegisterBody {
   name: string;
   surename: string;
@@ -109,15 +122,58 @@ export interface GetUserResponse {
   unAuthorizedRequest: boolean;
   __abp: boolean;
 }
-export type User = {
+export interface GetAllUsersResponse {
+  result: {
+    items: User[];
+    totalCount: number;
+  };
+  targetUrl: null;
+  success: boolean;
+  error: {
+    code: number;
+    message: string;
+    details: string[];
+  } | null;
+  unAuthorizedRequest: boolean;
+  __abp: boolean;
+}
+
+export interface CreateUserBody {
   userName: string;
   name: string;
-  surname: string;
+  sureName: string;
   emailAddress: string;
-  isActive: true;
-  fullName: string;
-  lastLoginTime: string;
-  creationTime: string;
-  roleNames: string[];
-  id: number | null;
-};
+  password: string;
+  phoneNumber: string;
+  address: string;
+  gender: number;
+  dateOfBirth: string;
+  referralCode: string;
+  stateId: number;
+}
+
+export interface CreateUserResponse {
+  result: User;
+  targetUrl: null;
+  success: boolean;
+  error: {
+    code: number;
+    message: string;
+    details: string[];
+  };
+  unAuthorizedRequest: boolean;
+  __abp: boolean;
+}
+
+export interface DeleteUserResponse {
+  result: null;
+  targetUrl: null;
+  success: boolean;
+  error: {
+    code: number;
+    message: string;
+    details: string[];
+  };
+  unAuthorizedRequest: boolean;
+  __abp: boolean;
+}
