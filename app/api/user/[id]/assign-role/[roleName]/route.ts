@@ -3,10 +3,12 @@ import { getSession } from "@/app/lib/session";
 
 const baseUrl = process.env.API_URL;
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string; roleName: string } }
-) {
+type Params = {
+  id: string;
+  roleName: string;
+};
+
+export async function POST(request: NextRequest, params: Params) {
   try {
     const session = await getSession();
     if (!session.accessToken) {
