@@ -3,13 +3,12 @@ import { getSession } from "@/app/lib/session";
 
 const baseUrl = process.env.API_URL;
 
-type Params = {
-  id: string;
-  roleName: string;
-};
-
-export async function POST(request: NextRequest, params: Params) {
+export async function POST(
+  request: NextRequest,
+  context: { params: { id: string; roleName: string } }
+) {
   try {
+    const { params } = context;
     const session = await getSession();
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
