@@ -28,17 +28,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Display Next.js info
-        run: |
-          echo "Node.js version: $(node -v)"
-          echo "Next.js version: $(node -e "console.log(require('next/package.json').version)")"
-
       - name: Build the app
-        run: |
-          pnpm build
-          ls -la .next/
+        run: pnpm build
 
-      - name: Create web.config
+      - name: Create updated web.config
         run: |
           cat > web.config << 'EOL'
           <?xml version="1.0" encoding="utf-8"?>
@@ -64,77 +57,43 @@ jobs:
                   <remove name="X-Powered-By" />
                 </customHeaders>
               </httpProtocol>
-              <!-- Enable detailed logging -->
               <iisnode 
-                 loggingEnabled="true"
-                 logDirectory="iisnode"
-                 debuggingEnabled="true"
-                 devErrorsEnabled="true"
+                nodeProcessCommandLine="%ProgramFiles%\nodejs\node.exe"
+                loggingEnabled="true"
+                logDirectory="iisnode"
+                debuggingEnabled="true"
+                devErrorsEnabled="true"
               />
             </system.webServer>
           </configuration>
           EOL
 
-      - name: Create improved server.js
+      - name: Create server.js
         run: |
           cat > server.js << 'EOL'
           // server.js
           const { createServer } = require('http');
           const { parse } = require('url');
           const next = require('next');
-          const path = require('path');
-          const fs = require('fs');
-
-          // Log the environment for debugging
-          console.log('Starting server...');
-          console.log('Current directory:', __dirname);
-          console.log('Files in current directory:', fs.readdirSync(__dirname));
-          console.log('Node version:', process.version);
-          console.log('Environment:', process.env.NODE_ENV);
-          console.log('PORT:', process.env.PORT);
-
-          // Set production environment if not set
-          if (!process.env.NODE_ENV) {
-            process.env.NODE_ENV = 'production';
-          }
 
           const dev = process.env.NODE_ENV !== 'production';
           const hostname = '0.0.0.0';
           const port = process.env.PORT || 3000;
 
-          // Try to load next.config.js
-          let nextConfig = {};
-          try {
-            const configPath = path.join(__dirname, 'next.config.js');
-            if (fs.existsSync(configPath)) {
-              console.log('Loading next.config.js');
-              nextConfig = require(configPath);
-              console.log('Config loaded successfully');
-            } else {
-              console.log('next.config.js not found');
-            }
-          } catch (err) {
-            console.error('Error loading next.config.js:', err);
-          }
-
           // Create the Next.js app
           const app = next({ 
             dev,
-            dir: __dirname,
-            conf: nextConfig
+            dir: __dirname
           });
 
           const handle = app.getRequestHandler();
 
           app.prepare()
             .then(() => {
-              console.log('Next.js app prepared successfully');
-              
               createServer(async (req, res) => {
                 try {
                   // Parse request URL
                   const parsedUrl = parse(req.url, true);
-                  console.log(`Request: ${req.method} ${parsedUrl.pathname}`);
                   
                   // Let Next.js handle the request
                   await handle(req, res, parsedUrl);
@@ -145,10 +104,7 @@ jobs:
                 }
               })
               .listen(port, hostname, (err) => {
-                if (err) {
-                  console.error('Failed to start server:', err);
-                  throw err;
-                }
+                if (err) throw err;
                 console.log(`> Ready on http://${hostname}:${port}`);
               });
             })
@@ -156,24 +112,6 @@ jobs:
               console.error('Failed to prepare Next.js app:', err);
               process.exit(1);
             });
-          EOL
-
-      - name: Create iisnode.yml for debugging
-        run: |
-          cat > iisnode.yml << 'EOL'
-          nodeProcessCommandLine: "D:\Program Files\nodejs\20.0.0\node.exe"
-          loggingEnabled: true
-          logDirectory: iisnode
-          debuggingEnabled: true
-          debuggerPortRange: 5058-6058
-          debuggerPathSegment: debug
-          maxLogFileSizeInKB: 128
-          maxTotalLogFileSizeInKB: 1024
-          maxLogFiles: 20
-          devErrorsEnabled: true
-          flushResponse: false
-          watchedFiles: *.js;iisnode.yml;web.config
-          nodeProcessCountPerApplication: 1
           EOL
 
       - name: Prepare deployment package
@@ -213,14 +151,7 @@ jobs:
           fi
 
           # Copy server files
-          cp server.js web.config iisnode.yml deploy/
-
-          # Create an empty .env file for environment variables
-          touch deploy/.env
-
-          # List final deployment files
-          echo "Deployment package contents:"
-          find deploy -type f | sort
+          cp server.js web.config deploy/
 
           # Create zip file
           cd deploy && zip -r ../app.zip . && cd ..
