@@ -28,8 +28,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Display Next.js info
+        run: |
+          echo "Node.js version: $(node -v)"
+          echo "Next.js version: $(node -e "console.log(require('next/package.json').version)")"
+
       - name: Build the app
-        run: pnpm build
+        run: |
+          pnpm build
+          ls -la .next/
 
       - name: Create web.config
         run: |
@@ -57,60 +64,141 @@ jobs:
                   <remove name="X-Powered-By" />
                 </customHeaders>
               </httpProtocol>
+              <!-- Enable detailed logging -->
+              <iisnode 
+                 loggingEnabled="true"
+                 logDirectory="iisnode"
+                 debuggingEnabled="true"
+                 devErrorsEnabled="true"
+              />
             </system.webServer>
           </configuration>
           EOL
 
-      - name: Create server.js
+      - name: Create improved server.js
         run: |
           cat > server.js << 'EOL'
+          // server.js
           const { createServer } = require('http');
           const { parse } = require('url');
           const next = require('next');
+          const path = require('path');
+          const fs = require('fs');
+
+          // Log the environment for debugging
+          console.log('Starting server...');
+          console.log('Current directory:', __dirname);
+          console.log('Files in current directory:', fs.readdirSync(__dirname));
+          console.log('Node version:', process.version);
+          console.log('Environment:', process.env.NODE_ENV);
+          console.log('PORT:', process.env.PORT);
+
+          // Set production environment if not set
+          if (!process.env.NODE_ENV) {
+            process.env.NODE_ENV = 'production';
+          }
 
           const dev = process.env.NODE_ENV !== 'production';
           const hostname = '0.0.0.0';
           const port = process.env.PORT || 3000;
 
+          // Try to load next.config.js
+          let nextConfig = {};
+          try {
+            const configPath = path.join(__dirname, 'next.config.js');
+            if (fs.existsSync(configPath)) {
+              console.log('Loading next.config.js');
+              nextConfig = require(configPath);
+              console.log('Config loaded successfully');
+            } else {
+              console.log('next.config.js not found');
+            }
+          } catch (err) {
+            console.error('Error loading next.config.js:', err);
+          }
+
           // Create the Next.js app
-          const app = next({ dev });
+          const app = next({ 
+            dev,
+            dir: __dirname,
+            conf: nextConfig
+          });
+
           const handle = app.getRequestHandler();
 
-          app.prepare().then(() => {
-            createServer((req, res) => {
-              // Parse request URL
-              const parsedUrl = parse(req.url, true);
+          app.prepare()
+            .then(() => {
+              console.log('Next.js app prepared successfully');
               
-              // Let Next.js handle the request
-              handle(req, res, parsedUrl);
-            }).listen(port, hostname, (err) => {
-              if (err) throw err;
-              console.log(`> Ready on http://${hostname}:${port}`);
+              createServer(async (req, res) => {
+                try {
+                  // Parse request URL
+                  const parsedUrl = parse(req.url, true);
+                  console.log(`Request: ${req.method} ${parsedUrl.pathname}`);
+                  
+                  // Let Next.js handle the request
+                  await handle(req, res, parsedUrl);
+                } catch (err) {
+                  console.error('Error occurred handling request:', err);
+                  res.statusCode = 500;
+                  res.end('Internal Server Error');
+                }
+              })
+              .listen(port, hostname, (err) => {
+                if (err) {
+                  console.error('Failed to start server:', err);
+                  throw err;
+                }
+                console.log(`> Ready on http://${hostname}:${port}`);
+              });
+            })
+            .catch((err) => {
+              console.error('Failed to prepare Next.js app:', err);
+              process.exit(1);
             });
-          });
+          EOL
+
+      - name: Create iisnode.yml for debugging
+        run: |
+          cat > iisnode.yml << 'EOL'
+          nodeProcessCommandLine: "D:\Program Files\nodejs\20.0.0\node.exe"
+          loggingEnabled: true
+          logDirectory: iisnode
+          debuggingEnabled: true
+          debuggerPortRange: 5058-6058
+          debuggerPathSegment: debug
+          maxLogFileSizeInKB: 128
+          maxTotalLogFileSizeInKB: 1024
+          maxLogFiles: 20
+          devErrorsEnabled: true
+          flushResponse: false
+          watchedFiles: *.js;iisnode.yml;web.config
+          nodeProcessCountPerApplication: 1
           EOL
 
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
 
-          # Copy standalone build if it exists
+          # Use standalone output if available
           if [ -d ".next/standalone" ]; then
+            echo "Using standalone output"
             cp -r .next/standalone/* deploy/
-          else
-            # Fallback if standalone output doesn't exist
-            mkdir -p deploy/.next
-            cp -r .next/server deploy/.next/ || true
-            cp -r .next/required-server-files.json deploy/.next/ || true
-            cp package.json deploy/
-          fi
-
-          # Create .next/static directory in the deployment
-          mkdir -p deploy/.next/static
-
-          # Copy static files
-          if [ -d ".next/static" ]; then
+            
+            # Ensure static files are correctly copied
+            mkdir -p deploy/.next/static
             cp -r .next/static deploy/.next/
+          else
+            echo "Standalone output not found, using regular build"
+            # Copy minimum required files for a regular Next.js app
+            cp -r .next deploy/
+            cp package.json deploy/
+            
+            # Add production dependencies only
+            cd deploy
+            echo "Installing production dependencies"
+            pnpm install --prod
+            cd ..
           fi
 
           # Copy public directory if it exists
@@ -118,11 +206,21 @@ jobs:
             cp -r public deploy/
           fi
 
-          # Copy next.config.js
-          cp next.config.js deploy/ || echo "next.config.js not found, skipping"
+          # Copy config files
+          cp next.config.js deploy/ || echo "next.config.js not found, creating minimal version"
+          if [ ! -f "deploy/next.config.js" ]; then
+            echo "module.exports = { output: 'standalone' };" > deploy/next.config.js
+          fi
 
-          # Copy server.js and web.config
-          cp server.js web.config deploy/
+          # Copy server files
+          cp server.js web.config iisnode.yml deploy/
+
+          # Create an empty .env file for environment variables
+          touch deploy/.env
+
+          # List final deployment files
+          echo "Deployment package contents:"
+          find deploy -type f | sort
 
           # Create zip file
           cd deploy && zip -r ../app.zip . && cd ..
