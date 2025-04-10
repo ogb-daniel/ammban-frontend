@@ -47,11 +47,36 @@ jobs:
 
       - name: Prepare deployment package
         run: |
-          mkdir deploy
-          cp -r .next/standalone/* deploy/
-          cp -r .next/static deploy/.next/static
-          cp -r public deploy/public
-          cp next.config.js package.json deploy/
+          mkdir -p deploy
+
+          # Copy standalone build (if it exists)
+          if [ -d ".next/standalone" ]; then
+            cp -r .next/standalone/* deploy/
+          else
+            # Fallback if standalone output doesn't exist
+            mkdir -p deploy/.next
+            cp -r .next/server deploy/.next/ || true
+            cp -r .next/required-server-files.json deploy/.next/ || true
+            cp package.json deploy/
+          fi
+
+          # Create .next/static directory in the deployment
+          mkdir -p deploy/.next/static
+
+          # Copy static files
+          if [ -d ".next/static" ]; then
+            cp -r .next/static deploy/.next/
+          fi
+
+          # Copy public directory if it exists
+          if [ -d "public" ]; then
+            cp -r public deploy/
+          fi
+
+          # Copy next.config.js
+          cp next.config.js deploy/ || echo "next.config.js not found, skipping"
+
+          # Create zip file
           cd deploy && zip -r ../app.zip . && cd ..
 
       - name: Deploy to Azure Web App
