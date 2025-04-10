@@ -29,9 +29,62 @@ jobs:
         run: pnpm install
 
       - name: Build the app
-        run: pnpm build
+        run: |
+          # Check if next.config.js has output: 'standalone'
+          if grep -q "output.*standalone" next.config.js; then
+            echo "Standalone output is configured."
+          else
+            echo "Adding standalone output to next.config.js"
+            # Create temporary file with standalone output
+            cp next.config.js next.config.js.bak || echo "// next.config.js" > next.config.js.bak
+            echo "const nextConfig = require('./next.config.js.bak') || {};" > next.config.js
+            echo "nextConfig.output = 'standalone';" >> next.config.js
+            echo "module.exports = nextConfig;" >> next.config.js
+          fi
 
-      - name: Create updated web.config
+          # Build the app
+          pnpm build
+
+          # Check if standalone output was created
+          if [ -d ".next/standalone" ]; then
+            echo "Standalone build created successfully."
+          else
+            echo "Warning: Standalone build directory not found."
+          fi
+
+      - name: Create simplified server.js
+        run: |
+          cat > server.js << 'EOL'
+          // server.js - Simplified version
+          const next = require('next');
+          const http = require('http');
+          const url = require('url');
+
+          // Set production mode
+          process.env.NODE_ENV = 'production';
+
+          // Initialize Next.js
+          const app = next({ dev: false });
+          const handle = app.getRequestHandler();
+
+          // Prepare the app
+          app.prepare()
+            .then(() => {
+              // Create HTTP server
+              http.createServer((req, res) => {
+                const parsedUrl = url.parse(req.url, true);
+                handle(req, res, parsedUrl);
+              }).listen(process.env.PORT || 3000, () => {
+                console.log(`> Ready on port ${process.env.PORT || 3000}`);
+              });
+            })
+            .catch(err => {
+              console.error('Error starting server:', err);
+              process.exit(1);
+            });
+          EOL
+
+      - name: Create web.config
         run: |
           cat > web.config << 'EOL'
           <?xml version="1.0" encoding="utf-8"?>
@@ -43,115 +96,64 @@ jobs:
               </handlers>
               <rewrite>
                 <rules>
-                  <rule name="DynamicContent">
-                    <match url="/*" />
+                  <rule name="StaticContent">
+                    <action type="Rewrite" url="public{REQUEST_URI}"/>
+                  </rule>
+                  <rule name="DynamicContent" patternSyntax="ECMAScript">
+                    <match url=".*" />
                     <action type="Rewrite" url="server.js" />
                   </rule>
                 </rules>
               </rewrite>
-              <security>
-                <requestFiltering removeServerHeader="true" />
-              </security>
-              <httpProtocol>
-                <customHeaders>
-                  <remove name="X-Powered-By" />
-                </customHeaders>
-              </httpProtocol>
               <iisnode 
                 nodeProcessCommandLine="%ProgramFiles%\nodejs\node.exe"
-                loggingEnabled="true"
-                logDirectory="iisnode"
-                debuggingEnabled="true"
+                loggingEnabled="false"
+                debuggingEnabled="false"
                 devErrorsEnabled="true"
               />
             </system.webServer>
           </configuration>
           EOL
 
-      - name: Create server.js
-        run: |
-          cat > server.js << 'EOL'
-          // server.js
-          const { createServer } = require('http');
-          const { parse } = require('url');
-          const next = require('next');
-
-          const dev = process.env.NODE_ENV !== 'production';
-          const hostname = '0.0.0.0';
-          const port = process.env.PORT || 3000;
-
-          // Create the Next.js app
-          const app = next({ 
-            dev,
-            dir: __dirname
-          });
-
-          const handle = app.getRequestHandler();
-
-          app.prepare()
-            .then(() => {
-              createServer(async (req, res) => {
-                try {
-                  // Parse request URL
-                  const parsedUrl = parse(req.url, true);
-                  
-                  // Let Next.js handle the request
-                  await handle(req, res, parsedUrl);
-                } catch (err) {
-                  console.error('Error occurred handling request:', err);
-                  res.statusCode = 500;
-                  res.end('Internal Server Error');
-                }
-              })
-              .listen(port, hostname, (err) => {
-                if (err) throw err;
-                console.log(`> Ready on http://${hostname}:${port}`);
-              });
-            })
-            .catch((err) => {
-              console.error('Failed to prepare Next.js app:', err);
-              process.exit(1);
-            });
-          EOL
-
       - name: Prepare deployment package
         run: |
+          # Create deployment directory
           mkdir -p deploy
 
-          # Use standalone output if available
+          # Copy the standalone build if available
           if [ -d ".next/standalone" ]; then
             echo "Using standalone output"
             cp -r .next/standalone/* deploy/
             
-            # Ensure static files are correctly copied
+            # Copy static files
             mkdir -p deploy/.next/static
             cp -r .next/static deploy/.next/
           else
             echo "Standalone output not found, using regular build"
-            # Copy minimum required files for a regular Next.js app
+            # Copy the entire .next folder
             cp -r .next deploy/
             cp package.json deploy/
             
-            # Add production dependencies only
+            # Install production dependencies 
             cd deploy
-            echo "Installing production dependencies"
-            pnpm install --prod
+            echo "Installing production dependencies..."
+            pnpm install --prod 
             cd ..
           fi
 
-          # Copy public directory if it exists
+          # Copy public directory
           if [ -d "public" ]; then
             cp -r public deploy/
+          else 
+            mkdir -p deploy/public
           fi
 
-          # Copy config files
-          cp next.config.js deploy/ || echo "next.config.js not found, creating minimal version"
-          if [ ! -f "deploy/next.config.js" ]; then
-            echo "module.exports = { output: 'standalone' };" > deploy/next.config.js
-          fi
-
-          # Copy server files
+          # Add required files
           cp server.js web.config deploy/
+
+          # List all files in the deployment package
+          echo "Files in deployment package:"
+          find deploy -type f | grep -v "node_modules" | sort
 
           # Create zip file
           cd deploy && zip -r ../app.zip . && cd ..
