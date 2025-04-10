@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch: # Allows manual triggering of the workflow
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -25,31 +25,76 @@ jobs:
           version: 8
           run_install: false
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install
 
       - name: Build the app
         run: pnpm build
 
+      - name: Create web.config
+        run: |
+          cat > web.config << 'EOL'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <system.webServer>
+              <webSocket enabled="false" />
+              <handlers>
+                <add name="iisnode" path="server.js" verb="*" modules="iisnode" />
+              </handlers>
+              <rewrite>
+                <rules>
+                  <rule name="DynamicContent">
+                    <match url="/*" />
+                    <action type="Rewrite" url="server.js" />
+                  </rule>
+                </rules>
+              </rewrite>
+              <security>
+                <requestFiltering removeServerHeader="true" />
+              </security>
+              <httpProtocol>
+                <customHeaders>
+                  <remove name="X-Powered-By" />
+                </customHeaders>
+              </httpProtocol>
+            </system.webServer>
+          </configuration>
+          EOL
+
+      - name: Create server.js
+        run: |
+          cat > server.js << 'EOL'
+          const { createServer } = require('http');
+          const { parse } = require('url');
+          const next = require('next');
+
+          const dev = process.env.NODE_ENV !== 'production';
+          const hostname = '0.0.0.0';
+          const port = process.env.PORT || 3000;
+
+          // Create the Next.js app
+          const app = next({ dev });
+          const handle = app.getRequestHandler();
+
+          app.prepare().then(() => {
+            createServer((req, res) => {
+              // Parse request URL
+              const parsedUrl = parse(req.url, true);
+              
+              // Let Next.js handle the request
+              handle(req, res, parsedUrl);
+            }).listen(port, hostname, (err) => {
+              if (err) throw err;
+              console.log(`> Ready on http://${hostname}:${port}`);
+            });
+          });
+          EOL
+
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
 
-          # Copy standalone build (if it exists)
+          # Copy standalone build if it exists
           if [ -d ".next/standalone" ]; then
             cp -r .next/standalone/* deploy/
           else
@@ -76,12 +121,15 @@ jobs:
           # Copy next.config.js
           cp next.config.js deploy/ || echo "next.config.js not found, skipping"
 
+          # Copy server.js and web.config
+          cp server.js web.config deploy/
+
           # Create zip file
           cd deploy && zip -r ../app.zip . && cd ..
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ammban-frontend # Your Azure Web App name
+          app-name: ammban-frontend
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: app.zip

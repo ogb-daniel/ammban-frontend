@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/app/lib/session";
-const baseUrl = process.env.API_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export async function GET() {
   try {
     const session = await getSession();

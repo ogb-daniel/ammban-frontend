@@ -1,7 +1,7 @@
 import { getSession } from "@/app/lib/session";
 import { NextRequest, NextResponse } from "next/server";
 
-const baseUrl = process.env.API_URL;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
