@@ -1,30 +1,28 @@
-name: Deploy Next.js to Azure Web App
+name: Deploy Next.js app to Azure Web App
 
 on:
   push:
-    branches: ["master"]
-  workflow_dispatch:
-
-env:
-  NODE_VERSION: "18.x" # Set this to your Node.js version
-  AZURE_WEBAPP_NAME: ammban-frontend # Set this to your Azure Web App name
-  PNPM_VERSION: "8.x" # Set this to your pnpm version
+    branches:
+      - master
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: "20.x"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: ${{ env.PNPM_VERSION }}
+          version: 8
           run_install: false
 
       - name: Get pnpm store directory
@@ -41,72 +39,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Check for pnpm-lock.yaml
-        id: check-lockfile
-        run: |
-          if [ -f "pnpm-lock.yaml" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Install dependencies with frozen lockfile
-        if: steps.check-lockfile.outputs.exists == 'true'
-        run: pnpm install --frozen-lockfile
-
-      - name: Install dependencies without lockfile
-        if: steps.check-lockfile.outputs.exists == 'false'
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Build Next.js app
+      - name: Build the app
         run: pnpm build
 
-      - name: Prepare for deployment
+      - name: Prepare deployment package
         run: |
-          # Create a directory for the deployment artifacts
-          mkdir -p deployment
-          # Copy build output
-          cp -r .next deployment/
-          cp -r public deployment/
-          cp package.json deployment/
-          if [ -f "pnpm-lock.yaml" ]; then
-            cp pnpm-lock.yaml deployment/
-          fi
-          cp next.config.js deployment/
-          # Optional: Create a server.js file for custom server setup
-          echo 'const { createServer } = require("http");
-          const { parse } = require("url");
-          const next = require("next");
-
-          const dev = process.env.NODE_ENV !== "production";
-          const hostname = process.env.HOST || "0.0.0.0";
-          const port = process.env.PORT || 3000;
-
-          const app = next({ dev });
-          const handle = app.getRequestHandler();
-
-          app.prepare().then(() => {
-            createServer(async (req, res) => {
-              try {
-                const parsedUrl = parse(req.url, true);
-                await handle(req, res, parsedUrl);
-              } catch (err) {
-                console.error("Error occurred handling", req.url, err);
-                res.statusCode = 500;
-                res.end("Internal Server Error");
-              }
-            }).listen(port, hostname, (err) => {
-              if (err) throw err;
-              console.log(`> Ready on http://${hostname}:${port}`);
-            });
-          });' > deployment/server.js
+          mkdir deploy
+          cp -r .next/standalone/* deploy/
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          cp next.config.js package.json deploy/
+          cd deploy && zip -r ../app.zip . && cd ..
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ammban-frontend # Your Azure Web App name
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./deployment
-
-      - name: Post-deploy cleanup
-        run: rm -rf deployment
+          package: app.zip
