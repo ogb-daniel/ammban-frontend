@@ -1,44 +1,70 @@
-name: Deploy Next.js app to Azure Web App
+name: Deploy Next.js to Azure Web App
 
 on:
   push:
-    branches:
-      - master
+    branches: ["master"]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "18.x" # Set this to your Node.js version
+  AZURE_WEBAPP_NAME: ammban-frontend # Set this to your Azure Web App name
+  PNPM_VERSION: "8.x" # Set this to your pnpm version
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.x"
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Build the app
+      - name: Build Next.js app
         run: pnpm build
 
-      - name: Prepare deployment package
+      - name: Prepare for deployment
         run: |
-          mkdir deploy
-          cp -r .next/standalone/* deploy/
-          cp -r .next/static deploy/.next/static
-          cp -r public deploy/public
-          cp next.config.js package.json deploy/
-          cd deploy && zip -r ../app.zip . && cd ..
+          # Create a directory for the deployment artifacts
+          mkdir -p deployment
+          # Copy build output
+          cp -r .next deployment/
+          cp -r public deployment/
+          cp package.json deployment/
+          cp pnpm-lock.yaml deployment/
+          cp next.config.js deployment/
+          # If using standalone output (Next.js v12+)
+          # cp -r .next/standalone/* deployment/
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ammban-frontend # 👈 Change this to match your Azure Web App name
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: app.zip
+          package: ./deployment
+
+      - name: Post-deploy cleanup
+        run: rm -rf deployment
