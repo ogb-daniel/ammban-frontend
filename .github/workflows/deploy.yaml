@@ -27,9 +27,14 @@ jobs:
       - name: Build the app
         run: pnpm build
 
-      - name: Zip the build output
+      - name: Prepare deployment package
         run: |
-          zip -r app.zip .next static public package.json next.config.js node_modules
+          mkdir deploy
+          cp -r .next/standalone/* deploy/
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          cp next.config.js package.json deploy/
+          cd deploy && zip -r ../app.zip . && cd ..
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
