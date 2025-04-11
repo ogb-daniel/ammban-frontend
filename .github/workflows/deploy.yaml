@@ -1,166 +1,39 @@
-name: Deploy Next.js app to Azure Web App
+name: Build and deploy Next.js app to Azure Web App
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
+env:
+  APPLICATION_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+  WEBAPP_NAME: "ammban-frontend"
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js version
+        uses: actions/setup-node@v4
         with:
           node-version: "20.x"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build
+          mv ./build/static ./build/standalone/build
+          mv ./public ./build/standalone
+
+      - name: "Deploy to Azure Web App"
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
-          version: 8
-          run_install: false
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build the app
-        run: |
-          # Check if next.config.js has output: 'standalone'
-          if grep -q "output.*standalone" next.config.js; then
-            echo "Standalone output is configured."
-          else
-            echo "Adding standalone output to next.config.js"
-            # Create temporary file with standalone output
-            cp next.config.js next.config.js.bak || echo "// next.config.js" > next.config.js.bak
-            echo "const nextConfig = require('./next.config.js.bak') || {};" > next.config.js
-            echo "nextConfig.output = 'standalone';" >> next.config.js
-            echo "module.exports = nextConfig;" >> next.config.js
-          fi
-
-          # Build the app
-          pnpm build
-
-          # Check if standalone output was created
-          if [ -d ".next/standalone" ]; then
-            echo "Standalone build created successfully."
-          else
-            echo "Warning: Standalone build directory not found."
-          fi
-
-      - name: Create simplified server.js
-        run: |
-          cat > server.js << 'EOL'
-          // server.js - Simplified version
-          const next = require('next');
-          const http = require('http');
-          const url = require('url');
-
-          // Set production mode
-          process.env.NODE_ENV = 'production';
-
-          // Initialize Next.js
-          const app = next({ dev: false });
-          const handle = app.getRequestHandler();
-
-          // Prepare the app
-          app.prepare()
-            .then(() => {
-              // Create HTTP server
-              http.createServer((req, res) => {
-                const parsedUrl = url.parse(req.url, true);
-                handle(req, res, parsedUrl);
-              }).listen(process.env.PORT || 3000, () => {
-                console.log(`> Ready on port ${process.env.PORT || 3000}`);
-              });
-            })
-            .catch(err => {
-              console.error('Error starting server:', err);
-              process.exit(1);
-            });
-          EOL
-
-      - name: Create web.config
-        run: |
-          cat > web.config << 'EOL'
-          <?xml version="1.0" encoding="utf-8"?>
-          <configuration>
-            <system.webServer>
-              <webSocket enabled="false" />
-              <handlers>
-                <add name="iisnode" path="server.js" verb="*" modules="iisnode" />
-              </handlers>
-              <rewrite>
-                <rules>
-                  <rule name="StaticContent">
-                    <action type="Rewrite" url="public{REQUEST_URI}"/>
-                  </rule>
-                  <rule name="DynamicContent" patternSyntax="ECMAScript">
-                    <match url=".*" />
-                    <action type="Rewrite" url="server.js" />
-                  </rule>
-                </rules>
-              </rewrite>
-              <iisnode 
-                nodeProcessCommandLine="%ProgramFiles%\nodejs\node.exe"
-                loggingEnabled="false"
-                debuggingEnabled="false"
-                devErrorsEnabled="true"
-              />
-            </system.webServer>
-          </configuration>
-          EOL
-
-      - name: Prepare deployment package
-        run: |
-          # Create deployment directory
-          mkdir -p deploy
-
-          # Copy the standalone build if available
-          if [ -d ".next/standalone" ]; then
-            echo "Using standalone output"
-            cp -r .next/standalone/* deploy/
-            
-            # Copy static files
-            mkdir -p deploy/.next/static
-            cp -r .next/static deploy/.next/
-          else
-            echo "Standalone output not found, using regular build"
-            # Copy the entire .next folder
-            cp -r .next deploy/
-            cp package.json deploy/
-            
-            # Install production dependencies 
-            cd deploy
-            echo "Installing production dependencies..."
-            pnpm install --prod 
-            cd ..
-          fi
-
-          # Copy public directory
-          if [ -d "public" ]; then
-            cp -r public deploy/
-          else 
-            mkdir -p deploy/public
-          fi
-
-          # Add required files
-          cp server.js web.config deploy/
-
-          # List all files in the deployment package
-          echo "Files in deployment package:"
-          find deploy -type f | grep -v "node_modules" | sort
-
-          # Create zip file
-          cd deploy && zip -r ../app.zip . && cd ..
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ammban-frontend
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: app.zip
+          app-name: ${{ env.WEBAPP_NAME }}
+          slot-name: "Production"
+          publish-profile: ${{ env.APPLICATION_PUBLISH_PROFILE }}
+          package: ./build/standalone
