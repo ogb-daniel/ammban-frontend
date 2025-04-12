@@ -1,40 +1,38 @@
 trigger:
-  branches:
-    include:
-      - Ruky
+- main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
-  - group: AzureSecrets
+  build_dir: 'dist' # change this if your build folder is different
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '18.x'
-  displayName: 'Use Node.js'
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - checkout: self
 
-- script: |
-    npm ci
-    npm run build
-  displayName: 'Install & Build'
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
 
-- script: |
-    mkdir deploy
-    cp -r .next public package.json next.config.js deploy/
-    cd deploy
-    zip -r ../app.zip .
-  displayName: 'Package app.zip'
+    - script: |
+        npm install
+        npm run build
+      displayName: 'Install dependencies and build app'
 
-- script: |
-    echo "$(PUBLISH_PROFILE)" > publish-profile.xml
-  displayName: 'Write Publish Profile'
+    - script: |
+        cd $(build_dir)
+        zip -r ../app.zip .
+      displayName: 'Zip build folder'
 
-- task: AzureWebApp@1
-  inputs:
-    appName: 'ammban-frontend'
-    package: 'app.zip'
-    deploymentMethod: 'zipDeploy'
-    publishProfile: 'publish-profile.xml'
-  displayName: 'Deploy to Azure App Service'
+    - task: CmdLine@2
+      displayName: 'Deploy using ZipDeploy'
+      inputs:
+        script: |
+          curl -X POST -u $(AZURE_PUBLISH_USERNAME):$(AZURE_PUBLISH_PASSWORD) \
+            --data-binary @app.zip \
+            https://ammban-frontend-d3ate5f4h4h5h3gx.scm.uksouth-01.azurewebsites.net/api/zipdeploy
