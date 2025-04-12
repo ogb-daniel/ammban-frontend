@@ -26,11 +26,8 @@ jobs:
         run: |
           npm install
           npm run build
-
-      - name: Zip all files for upload between jobs
-        # IMPORTANT: .next is a hidden folder and will NOT be included in the zip unless we specify it
-        # To fix: /home/site/wwwroot/node_modules/.bin/next: 1: ../next/dist/bin/next: not found
-        run: zip next.zip ./* .next .env -qr
+          mv ./build/static ./build/standalone/build
+          mv ./public ./build/standalone
 
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
@@ -39,4 +36,4 @@ jobs:
           app-name: ${{ env.WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ env.APPLICATION_PUBLISH_PROFILE }}
-          package: next.zip
+          package: ./build/standalone
