@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - Ruky
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: AzureSecrets
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Use Node.js'
+
+- script: |
+    npm ci
+    npm run build
+  displayName: 'Install & Build'
+
+- script: |
+    mkdir deploy
+    cp -r .next public package.json next.config.js deploy/
+    cd deploy
+    zip -r ../app.zip .
+  displayName: 'Package app.zip'
+
+- script: |
+    echo "$(PUBLISH_PROFILE)" > publish-profile.xml
+  displayName: 'Write Publish Profile'
+
+- task: AzureWebApp@1
+  inputs:
+    appName: 'ammban-frontend'
+    package: 'app.zip'
+    deploymentMethod: 'zipDeploy'
+    publishProfile: 'publish-profile.xml'
+  displayName: 'Deploy to Azure App Service'
