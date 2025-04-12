@@ -24,7 +24,9 @@ export default function LogoutButton({
       const result = await logout();
       if (result.success) {
         clearUser();
-        window.location.href = HOME.url;
+        if (typeof window !== "undefined") {
+          window.location.href = HOME.url;
+        }
       } else {
         console.error("Logout failed:", result.error);
       }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const useResponsive = (width?: number, height?: number) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleResize = () => {
     if (width && height)
@@ -10,12 +10,16 @@ const useResponsive = (width?: number, height?: number) => {
   };
 
   useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (typeof window !== "undefined") {
+      // Only add event listener on the client-side
+      handleResize();
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, [width, height]);
 
   return isMobile;
 };

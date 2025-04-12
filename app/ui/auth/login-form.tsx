@@ -46,7 +46,9 @@ export default function LoginForm() {
       showLoader(); // Show progress bar before navigation
       const redirectUrl =
         state.role === "admin" ? ADMIN_DASHBOARD.url : AGENT_DASHBOARD.url;
-      window.location.href = redirectUrl;
+      if (typeof window !== "undefined") {
+        window.location.href = redirectUrl;
+      }
     }
   }, [state]);
 

@@ -1,49 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/app/lib/session";
-
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
-export async function POST(
+export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; roleName: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getSession();
+    const { id } = await params;
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id, roleName } = await params;
-
-    if (!id || !roleName) {
-      return NextResponse.json(
-        { error: "id and roleName are required" },
-        { status: 400 }
-      );
-    }
-
     const response = await fetch(
-      `${baseUrl}/api/services/app/User/AssignRole`,
+      `${baseUrl}/api/services/app/ProductCategoryService/GetById?id=${id}`,
       {
-        method: "POST",
-        body: JSON.stringify({
-          userId: parseInt(id),
-          roleName: roleName,
-        }),
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.accessToken}`,
         },
       }
     );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json(
-        { error: errorData.error?.message || "Failed to assign role" },
-        { status: response.status }
-      );
-    }
 
     const data = await response.json();
     return NextResponse.json(data);

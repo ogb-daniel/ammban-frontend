@@ -8,7 +8,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const response = await fetch(
-      `${baseUrl}/api/services/app/User/GetAllStates`,
+      `${baseUrl}/api/services/app/CommissionService/getAllCommissionPercentages`,
       {
         method: "GET",
         headers: {

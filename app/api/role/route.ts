@@ -1,6 +1,5 @@
-import { getSession } from "@/app/lib/session";
 import { NextRequest, NextResponse } from "next/server";
-
+import { getSession } from "@/app/lib/session";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +7,7 @@ export async function POST(request: NextRequest) {
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const response = await fetch(`${baseUrl}/api/services/app/User/Create`, {
+    const response = await fetch(`${baseUrl}/api/services/app/Role/Create`, {
       method: "POST",
       body: await request.json(),
       headers: {
@@ -26,13 +25,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const response = await fetch(`${baseUrl}/api/services/app/User/GetAll`, {
+
+    const searchParams = request.nextUrl.searchParams;
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `${baseUrl}/api/services/app/Role/GetAll?${queryString}`
+      : `${baseUrl}/api/services/app/Role/GetAll`;
+
+    const response = await fetch(endpoint, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -55,9 +61,46 @@ export async function PUT(request: NextRequest) {
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const response = await fetch(`${baseUrl}/api/services/app/User/Update`, {
+
+    const searchParams = request.nextUrl.searchParams;
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `${baseUrl}/api/services/app/Role/Update?${queryString}`
+      : `${baseUrl}/api/services/app/Role/Update`;
+
+    const response = await fetch(endpoint, {
       method: "PUT",
       body: await request.json(),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getSession();
+    if (!session.accessToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const searchParams = request.nextUrl.searchParams;
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `${baseUrl}/api/services/app/Role/Delete?${queryString}`
+      : `${baseUrl}/api/services/app/Role/Delete`;
+
+    const response = await fetch(endpoint, {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,

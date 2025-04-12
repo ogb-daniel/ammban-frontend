@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/app/lib/session";
+
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session.accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const response = await fetch(`${baseUrl}/api/services/app/User/Approve`, {
+
+    const searchParams = request.nextUrl.searchParams;
+    const queryString = searchParams.toString();
+    const endpoint = queryString
+      ? `${baseUrl}/api/services/app/UserTransactionLimit/SetTransactionLimit?${queryString}`
+      : `${baseUrl}/api/services/app/UserTransactionLimit/SetTransactionLimit`;
+
+    const response = await fetch(endpoint, {
       method: "POST",
-      body: await request.json(),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.accessToken}`,
