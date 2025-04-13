@@ -26,7 +26,7 @@ stages:
 
     - script: |
         cd $(build_dir)
-        zip -r ../app.zip .
+        zip -r $(System.DefaultWorkingDirectory)/app.zip .
       displayName: 'Zip build folder'
 
     - task: CmdLine@2
@@ -35,11 +35,8 @@ stages:
         script: |
           echo "Current directory: $(pwd)"
           echo "Listing files:"
-          ls -lh
+          ls -lh $(System.DefaultWorkingDirectory)
           echo "Uploading app.zip..."
           curl -X POST -u "$AZURE_PUBLISH_USERNAME:$AZURE_PUBLISH_PASSWORD" \
             --data-binary @$(System.DefaultWorkingDirectory)/app.zip \
             https://ammban-frontend-d3ate5f4h4h5h3gx.scm.uksouth-01.azurewebsites.net/api/zipdeploy
-
-
-
