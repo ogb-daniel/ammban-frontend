@@ -33,8 +33,13 @@ stages:
       displayName: 'Deploy using ZipDeploy'
       inputs:
         script: |
-          cd ..
+          echo "Current directory: $(pwd)"
+          echo "Listing files:"
+          ls -lh
+          echo "Uploading app.zip..."
           curl -X POST -u "$AZURE_PUBLISH_USERNAME:$AZURE_PUBLISH_PASSWORD" \
-            --data-binary @app.zip \
+            --data-binary @$(System.DefaultWorkingDirectory)/app.zip \
             https://ammban-frontend-d3ate5f4h4h5h3gx.scm.uksouth-01.azurewebsites.net/api/zipdeploy
+
+
 
