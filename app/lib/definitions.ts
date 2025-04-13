@@ -59,6 +59,73 @@ export type User = {
   id: number | null;
 };
 
+export type Role = {
+  name: string;
+  displayName: string;
+  normalizedName: string;
+  description: string;
+  grantedPermissions: string[];
+  id: number;
+};
+
+export type CommissionPercentage = {
+  roleId: number;
+  percentage: number;
+  roleName: string;
+  customerType: number;
+};
+
+export type Commission = {
+  transactionReference: string;
+  policyCost: number;
+  amount: number;
+  roleName: string;
+  customerType: number;
+  userId: number;
+};
+
+export type Product = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  categoryName: string;
+};
+
+export type ProductCategory = {
+  id: number;
+  name: string;
+  description: string;
+  industry: string;
+};
+
+export type TransactionLimit = {
+  id: number;
+  userId: number;
+  dailyLimit: number;
+  currentDayTransaction: number;
+  creationTime: string;
+  creatorUserId: number;
+  lastModificationTime: string;
+  lastModifierUserId: number;
+  isDeleted: boolean;
+  deleterUserId: number;
+  deletionTime: string;
+};
+
+export interface ApiResponse<T> {
+  result: T;
+  targetUrl: null;
+  success: boolean;
+  error: {
+    code: number;
+    message: string;
+    details: string[];
+  };
+  unAuthorizedRequest: boolean;
+  __abp: boolean;
+}
 export interface IRegisterBody {
   name: string;
   surename: string;
@@ -71,19 +138,10 @@ export interface IRegisterBody {
   gender: number;
   referralCode: string;
 }
-export interface RegisterResponse {
+export interface RegisterResponse extends ApiResponse<{ canLogin: boolean }> {
   result: {
     canLogin: boolean;
   };
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
-  };
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
 }
 
 export interface ILoginBody {
@@ -92,50 +150,30 @@ export interface ILoginBody {
   rememberClient: boolean;
 }
 
-export interface LoginResponse {
+export interface LoginResponse
+  extends ApiResponse<{
+    accessToken: string;
+    encryptedAccessToken: string;
+    expireInSeconds: number;
+    userId: number;
+  }> {
   result: {
     accessToken: string;
     encryptedAccessToken: string;
     expireInSeconds: number;
     userId: number;
   };
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
-  } | null;
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
 }
 
-export interface GetUserResponse {
+export interface GetUserResponse extends ApiResponse<User> {
   result: User;
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
-  } | null;
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
 }
-export interface GetAllUsersResponse {
+export interface GetAllUsersResponse
+  extends ApiResponse<{ items: User[]; totalCount: number }> {
   result: {
     items: User[];
     totalCount: number;
   };
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
-  } | null;
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
 }
 
 export interface CreateUserBody {
@@ -152,28 +190,304 @@ export interface CreateUserBody {
   stateId: number;
 }
 
-export interface CreateUserResponse {
+export interface CreateUserResponse extends ApiResponse<User> {
   result: User;
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
-  };
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
 }
 
-export interface DeleteUserResponse {
+export interface DeleteUserResponse extends ApiResponse<null> {
   result: null;
-  targetUrl: null;
-  success: boolean;
-  error: {
-    code: number;
-    message: string;
-    details: string[];
+}
+
+export interface ApproveUserBody {
+  id: number;
+}
+
+export interface AssignRoleBody {
+  id: number;
+  roleName: string;
+}
+
+export interface GetUserRolesResponse extends ApiResponse<{ items: Role[] }> {
+  result: {
+    items: Role[];
   };
-  unAuthorizedRequest: boolean;
-  __abp: boolean;
+}
+
+export interface ChangePasswordBody {
+  userName: string;
+}
+
+export interface ResetPasswordBody {
+  resetCode: string;
+  userName: string;
+  newPassword: string;
+}
+
+export interface SetupCommissionPercentageBody {
+  roleId: number;
+  percentage: number;
+  roleName: string;
+  customerType: number;
+}
+
+export interface GetAllCommissionPercentagesResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: { totalCount: number; items: CommissionPercentage[] };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: CommissionPercentage[];
+    };
+  };
+}
+
+export interface GetAllCommissionsResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: { totalCount: number; items: Commission[] };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: Commission[];
+    };
+  };
+}
+
+export interface CreateProductBody {
+  name: string;
+  description: string;
+  categoryId: number;
+  price: number;
+  quantity: number;
+}
+
+export interface CreateProductResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: Product;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: Product;
+  };
+}
+export interface DeleteProductResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: null;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: null;
+  };
+}
+
+export interface GetAllProductsResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: { totalCount: number; items: Product[] };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: Product[];
+    };
+  };
+}
+
+export interface GetProductResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: Product;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: Product;
+  };
+}
+
+export interface CreateProductCategoryBody {
+  name: string;
+  description: string;
+  industry: string;
+}
+
+export interface CreateProductCategoryResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: ProductCategory;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: ProductCategory;
+  };
+}
+
+export interface DeleteProductCategoryResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: null;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: null;
+  };
+}
+
+export interface GetAllProductCategoriesResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: { totalCount: number; items: ProductCategory[] };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: ProductCategory[];
+    };
+  };
+}
+
+export interface GetProductCategoryResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: ProductCategory;
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: ProductCategory;
+  };
+}
+
+export interface GetRolesResponse
+  extends ApiResponse<{
+    items: {
+      name: string;
+      displayName: string;
+      isStatic: boolean;
+      isDefault: boolean;
+      creationTime: string;
+      id: number;
+    }[];
+  }> {
+  result: {
+    items: {
+      name: string;
+      displayName: string;
+      isStatic: boolean;
+      isDefault: boolean;
+      creationTime: string;
+      id: number;
+    }[];
+  };
+}
+
+export interface GetPermissionsResponse
+  extends ApiResponse<{
+    items: {
+      name: string;
+      displayName: string;
+      description: string;
+      id: number;
+    }[];
+  }> {
+  result: {
+    items: {
+      name: string;
+      displayName: string;
+      description: string;
+      id: number;
+    }[];
+  };
+}
+
+export interface GetRoleForEditResponse
+  extends ApiResponse<{
+    role: {
+      id: number;
+      name: string;
+      displayName: string;
+      description: string;
+      isStatic: boolean;
+    };
+    permissions: {
+      name: string;
+      displayName: string;
+      description: string;
+    }[];
+    grantedPermissionNames: string[];
+  }> {
+  result: {
+    role: {
+      id: number;
+      name: string;
+      displayName: string;
+      description: string;
+      isStatic: boolean;
+    };
+    permissions: {
+      name: string;
+      displayName: string;
+      description: string;
+    }[];
+    grantedPermissionNames: string[];
+  };
+}
+
+export interface GetAllRolesResponse
+  extends ApiResponse<{
+    items: Role[];
+    totalCount: number;
+  }> {
+  result: {
+    items: Role[];
+    totalCount: number;
+  };
+}
+
+export interface GetAllTransactionLimitsResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: { totalCount: number; items: TransactionLimit[] };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: TransactionLimit[];
+    };
+  };
+}
+
+export interface ValidateTransactionBody {
+  userId: number;
+  transactionAmount: number;
 }

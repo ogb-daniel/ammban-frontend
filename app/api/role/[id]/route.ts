@@ -13,7 +13,7 @@ export async function GET(
     }
 
     const response = await fetch(
-      `${baseUrl}/api/services/app/Role/GetById?Id=${id}`,
+      `${baseUrl}/api/services/app/Role/Get?Id=${id}`,
       {
         method: "GET",
         headers: {
