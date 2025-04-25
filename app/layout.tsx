@@ -23,8 +23,10 @@ export default function RootLayout({
         className={`${montserrat.className} antialiased text-black bg-white`}
       >
         <LoadingProvider>
-          <UserStoreProvider>{children}</UserStoreProvider>
-          <div id="modals"></div>
+          <UserStoreProvider>
+            {children}
+            <div id="modals"></div>
+          </UserStoreProvider>
           <ToastContainer />
         </LoadingProvider>
       </body>

@@ -14,7 +14,7 @@ export default function ViewProduct({
 }) {
   const id = use(params).id;
   const { products } = useAdminStore((state) => state);
-  const product = products.find((product) => product.id === id);
+  const product = products.find((product) => product.id === parseInt(id));
 
   if (!product) {
     notFound();

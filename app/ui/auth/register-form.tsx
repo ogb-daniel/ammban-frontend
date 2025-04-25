@@ -3,19 +3,26 @@ import React, { useActionState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { MdOutlineLock } from "react-icons/md";
-import { states } from "@/app/lib/static-data";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { signup } from "@/app/actions/auth";
-import { SignupFormSchema } from "@/app/lib/definitions";
+import { signup } from "@/app/lib/actions/auth";
+import { SignupFormSchema, States } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
+import { getAllStates } from "@/app/lib/actions/user";
 
 export default function RegistrationForm() {
   const [state, action, pending] = useActionState(signup, undefined);
-  console.log(state);
-
+  const [states, setStates] = React.useState<States[] | null>([]);
+  React.useEffect(() => {
+    (async () => {
+      const response = await getAllStates();
+      if (response.success) {
+        setStates(response.result);
+      }
+    })();
+  }, []);
   const form = useForm({
     defaultValues: {
       referralCode: "",
@@ -282,9 +289,9 @@ export default function RegistrationForm() {
                   className={`form-input-field`}
                 >
                   <option value="">Select your state</option>
-                  {states.map((state, index) => (
-                    <option key={state} value={index}>
-                      {state}
+                  {states?.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.stateName}
                     </option>
                   ))}
                 </select>

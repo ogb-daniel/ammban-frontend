@@ -11,7 +11,7 @@ import {
 import FieldInfo from "./field-info";
 import { SignInSchema } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
-import { login } from "@/app/actions/auth";
+import { login } from "@/app/lib/actions/auth";
 import { useUserStore } from "@/providers/user-store-provider";
 import { useLoading } from "@/app/providers/loading-provider";
 import CircleLoader from "../circle-loader";
@@ -42,7 +42,7 @@ export default function LoginForm() {
         toast(state.error, { type: "error", position: "bottom-right" });
       }
     } else if (state?.success) {
-      setUser(state.user);
+      setUser({ ...state.user, role: state.role });
       showLoader(); // Show progress bar before navigation
       const redirectUrl =
         state.role === "admin" ? ADMIN_DASHBOARD.url : AGENT_DASHBOARD.url;

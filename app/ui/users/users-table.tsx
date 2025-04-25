@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MdCheckBox, MdEdit } from "react-icons/md";
 import { FaTransgender, FaTrash, FaUser } from "react-icons/fa";
 import { ADMIN_USERS } from "@/app/lib/routes";
-import { User } from "@/stores/admin-store";
 import { useRouter } from "next/navigation";
 import { PiPhoneFill } from "react-icons/pi";
 import { FaLocationDot } from "react-icons/fa6";
@@ -18,8 +17,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserCog, UserCheck, ChevronDown } from "lucide-react";
 import RoleAssignmentModal from "../roles/role-assign-modal";
-import { useAdminStore } from "@/providers/admin-store-provider";
 import { toTitleCase } from "@/lib/utils";
+import { User } from "@/app/lib/definitions";
+import Swal from "sweetalert2";
+import { deleteUser } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
 
 const userColumns: ColumnDef<User>[] = [
   {
@@ -27,11 +30,9 @@ const userColumns: ColumnDef<User>[] = [
     header: "Name",
     cell: (info) => (
       <div>
-        <p className="text-sm font-medium">
-          {info.row.original.firstName} {info.row.original.lastName}
-        </p>
+        <p className="text-sm font-medium">{info.row.original.fullName}</p>
         <p className="text-xs font-medium text-gray-500">
-          {info.row.original.email}
+          {info.row.original.emailAddress}
         </p>
       </div>
     ),
@@ -61,43 +62,37 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "gender",
     header: "Gender",
-    cell: (info) => toTitleCase(info.getValue() as string),
+    cell: (info) => info.getValue() && toTitleCase(info.getValue() as string),
     enableSorting: true,
     meta: {
       icon: <FaTransgender className="text-gray-500" />,
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isActive",
     header: "Status",
-    cell: (info) => <Status value={info.getValue() as string} />,
+    cell: (info) => <Status value={info.getValue() as boolean} />,
     enableSorting: true,
     meta: {
       icon: <MdCheckBox className="text-gray-500" />,
     },
   },
 ];
-const Status = ({ value }: { value: string }) => {
+const Status = ({ value }: { value: boolean }) => {
   return (
     <span
       className={`text-sm font-medium min-w-[80px] justify-center w-full  broder py-1 px-2 flex items-center gap-1 rounded-sm ${
-        value === "Active"
+        value
           ? "text-[#14CA74] bg-[#05C16833] border-[#05C16880]"
-          : value === "Pending"
-          ? "text-[#A3A3A3] bg-[#AEB9E133] border-[#AEB9E133]"
           : "text-[#FF5A65] bg-[#FF5A6533] border-[#FF5A6533]"
       }`}
     >
       <span
         className={`w-1 h-1 inline-block rounded-full ${
-          value === "Active"
-            ? "bg-[#14CA74]"
-            : value === "Pending"
-            ? "bg-[#A3A3A3]"
-            : "bg-[#FF5A65]"
+          value ? "bg-[#14CA74]" : "bg-[#FF5A65]"
         } `}
       ></span>
-      {value as string}
+      {value ? "Active" : "Inactive"}
     </span>
   );
 };
@@ -138,9 +133,9 @@ function ManageUsersDropdown({
   );
 }
 
-const UsersTable = () => {
+const UsersTable = ({ users }: { users: User[] }) => {
   const router = useRouter();
-  const { users } = useAdminStore((state) => state);
+  const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -157,11 +152,34 @@ const UsersTable = () => {
           {
             element: <FaTrash className="w-4 h-4 text-red-500" />,
             onClick: (user: User) => {
-              // Handle delete action
-              if (confirm("Are you sure you want to delete this User?")) {
-                // Add delete logic here
-                console.log("Delete User:", user);
-              }
+              Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm your action.",
+                showCancelButton: true,
+                cancelButtonText: "No, Cancel",
+                confirmButtonColor: "#094794",
+                confirmButtonText: "Yes, Confirm",
+                reverseButtons: true,
+                customClass: {
+                  cancelButton: "text-primary bg-white border border-primary",
+                  actions: "flex-row gap-2",
+                },
+                buttonsStyling: true,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                  return deleteUser(user.id);
+                },
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const response = result.value;
+                  if (response.success) {
+                    deleteUserFromStore(user.id);
+                    toast.success("User deleted successfully");
+                  } else {
+                    toast.error(response.error.message);
+                  }
+                }
+              });
             },
             label: "Delete User",
           },

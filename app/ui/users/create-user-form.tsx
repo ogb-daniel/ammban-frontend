@@ -1,62 +1,63 @@
 "use client";
 import React from "react";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { states } from "@/app/lib/static-data";
 import { ADMIN_USERS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import FieldInfo from "../auth/field-info";
+import { SignupFormSchema, States } from "@/app/lib/definitions";
+import { createUser, getAllStates } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
 
-const formSchema = z
-  .object({
-    firstName: z.string().nonempty("First name is required"),
-    lastName: z.string().nonempty("Last name is required"),
-    phoneNumber: z.string().nonempty("Phone number is required"),
-    email: z.string().email("Invalid email address"),
-    address: z.string().nonempty("Address is required"),
-    state: z.string().nonempty("State is required"),
-    dateOfBirth: z.string().nonempty("Date of birth is required"),
-    gender: z.string().nonempty("Gender is required"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters long")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
-    confirmPassword: z.string().nonempty("Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 export default function CreateUserForm() {
+  const [states, setStates] = React.useState<States[] | null>([]);
+  const [submitting, setSubmitting] = React.useState(false);
+  React.useEffect(() => {
+    (async () => {
+      const response = await getAllStates();
+      if (response.success) {
+        setStates(response.result);
+      }
+    })();
+  }, []);
   const router = useRouter();
 
   const form = useForm({
     defaultValues: {
+      referralCode: "",
       firstName: "",
       lastName: "",
       phoneNumber: "",
-      email: "",
+      emailAddress: "",
       address: "",
-      state: "",
+      stateId: 0,
       dateOfBirth: "",
-      gender: "",
+      userName: "",
+      gender: 0,
       password: "",
       confirmPassword: "",
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      setSubmitting(true);
       console.log(values);
-      // Handle form submission
+      try {
+        const response = await createUser({
+          ...values.value,
+          sureName: values.value.lastName,
+          name: values.value.firstName,
+        });
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+      } finally {
+        setSubmitting(false);
+      }
       router.push(ADMIN_USERS.url);
     },
     validators: {
-      onChange: formSchema,
+      onChange: SignupFormSchema,
     },
   });
 
@@ -73,6 +74,29 @@ export default function CreateUserForm() {
         flex flex-col bg-white md:p-8 rounded-3xl gap-6
         "
       >
+        <div>
+          <form.Field
+            name="referralCode"
+            // eslint-disable-next-line react/no-children-prop
+            children={(field) => (
+              <>
+                <label className="block text-sm font-medium">
+                  Referral Code
+                </label>
+                <input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  className={`form-input-field`}
+                  onBlur={field.handleBlur}
+                  placeholder="Enter your referral code"
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+                <FieldInfo field={field} />
+              </>
+            )}
+          />
+        </div>
         <div>
           {/* A type-safe field component*/}
           <form.Field
@@ -136,6 +160,36 @@ export default function CreateUserForm() {
         <div>
           {/* A type-safe field component*/}
           <form.Field
+            name="userName"
+            // eslint-disable-next-line react/no-children-prop
+            children={(field) => {
+              // Avoid hasty abstractions. Render props are great!
+              return (
+                <>
+                  <label
+                    className="block text-sm font-medium"
+                    htmlFor={field.name}
+                  >
+                    Username
+                  </label>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    className={`form-input-field`}
+                    value={field.state.value}
+                    placeholder="Enter your username"
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  <FieldInfo field={field} />
+                </>
+              );
+            }}
+          />
+        </div>
+        <div>
+          {/* A type-safe field component*/}
+          <form.Field
             name="phoneNumber"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => {
@@ -166,7 +220,7 @@ export default function CreateUserForm() {
         <div>
           {/* A type-safe field component*/}
           <form.Field
-            name="email"
+            name="emailAddress"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => {
               // Avoid hasty abstractions. Render props are great!
@@ -212,6 +266,7 @@ export default function CreateUserForm() {
                   <input
                     id={field.name}
                     name={field.name}
+                    type="text"
                     value={field.state.value}
                     className={`form-input-field`}
                     placeholder="Enter your house address"
@@ -227,7 +282,7 @@ export default function CreateUserForm() {
         <div>
           {/* A type-safe field component*/}
           <form.Field
-            name="state"
+            name="stateId"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => {
               // Avoid hasty abstractions. Render props are great!
@@ -244,13 +299,13 @@ export default function CreateUserForm() {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                     className={`form-input-field`}
                   >
                     <option value="">Select your state</option>
-                    {states.map((state) => (
-                      <option key={state} value={state}>
-                        {state}
+                    {states?.map((state) => (
+                      <option key={state.id} value={state.id}>
+                        {state.stateName}
                       </option>
                     ))}
                   </select>
@@ -313,12 +368,12 @@ export default function CreateUserForm() {
                     className={`form-input-field`}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
                   >
                     <option value="">Select your gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value={0}>Male</option>
+                    <option value={1}>Female</option>
+                    <option value={2}>Other</option>
                   </select>
 
                   <FieldInfo field={field} />
@@ -390,7 +445,11 @@ export default function CreateUserForm() {
           />
         </div>
 
-        <button type="submit" className="btn-primary mt-10">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-primary mt-10"
+        >
           Create User
         </button>
       </div>

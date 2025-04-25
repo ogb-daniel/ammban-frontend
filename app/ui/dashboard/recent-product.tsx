@@ -2,14 +2,21 @@ import Link from "next/link";
 import React from "react";
 import { BiCard } from "react-icons/bi";
 import CircleIcon from "../circle-icon";
-import { ADMIN_PRODUCTS } from "@/app/lib/routes";
+import { ADMIN_PRODUCTS, AGENT_PRODUCTS } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function RecentProducts() {
+  const { user } = useUserStore((state) => state);
   return (
     <section className="mt-9">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Recent Products</h2>
-        <Link className="text-primary font-semibold" href={ADMIN_PRODUCTS.url}>
+        <Link
+          className="text-primary font-semibold"
+          href={
+            user?.role === "admin" ? ADMIN_PRODUCTS.url : AGENT_PRODUCTS.url
+          }
+        >
           View All
         </Link>
       </div>

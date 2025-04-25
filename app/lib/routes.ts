@@ -44,3 +44,19 @@ export const ADMIN_TRANSACTIONS = {
 export const AGENT_DASHBOARD = {
   url: "/agent/dashboard",
 };
+
+export const AGENT_PROFILE = {
+  url: `/agent/profile`,
+};
+
+export const AGENT_PRODUCTS = {
+  url: `/agent/sell-products`,
+};
+
+export const AGENT_REPORTS = {
+  url: `/agent/reports`,
+};
+
+export const AGENT_TRANSACTIONS = {
+  url: `/agent/transactions`,
+};

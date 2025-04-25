@@ -37,6 +37,16 @@ export const SignInSchema = z.object({
   userNameOrEmailAddress: userNameOrEmailAddrezssSchema,
   password: z.string(),
 });
+export const EditUserInformationSchema = z.object({
+  firstName: z.string().nonempty("First name is required"),
+  lastName: z.string().nonempty("Last name is required"),
+  // phoneNumber: z.string().nonempty("Phone number is required"),
+  email: z.string().email("Invalid email address"),
+  // address: z.string().nonempty("Address is required"),
+  // state: z.string().nonempty("State is required"),
+  dateOfBirth: z.string().nonempty("Date of birth is required"),
+  // gender: z.string().nonempty("Gender is required"),
+});
 export type FormState =
   | {
       errors?: {
@@ -56,7 +66,8 @@ export type User = {
   lastLoginTime: string;
   creationTime: string;
   roleNames: string[];
-  id: number | null;
+  role?: string;
+  id: number;
 };
 
 export type Role = {
@@ -67,7 +78,12 @@ export type Role = {
   grantedPermissions: string[];
   id: number;
 };
-
+export type Permission = {
+  name: string;
+  displayName: string;
+  description: string;
+  id: number;
+};
 export type CommissionPercentage = {
   roleId: number;
   percentage: number;
@@ -114,6 +130,19 @@ export type TransactionLimit = {
   deletionTime: string;
 };
 
+export type States = {
+  id: number;
+  creationTime: string;
+  creatorUserId: number;
+  lastModificationTime: string;
+  lastModifierUserId: number;
+  isDeleted: boolean;
+  deleterUserId: number;
+  deletionTime: string;
+  stateName: string;
+  regionId: number;
+};
+
 export interface ApiResponse<T> {
   result: T;
   targetUrl: null;
@@ -128,7 +157,7 @@ export interface ApiResponse<T> {
 }
 export interface IRegisterBody {
   name: string;
-  surename: string;
+  sureName: string;
   emailAddress: string;
   phoneNumber: string;
   password: string;

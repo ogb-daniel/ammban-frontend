@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="w-full flex-none md:w-1/4 border-2 border-gray-100">
           <SideNav />
         </div>
-        <div className="flex-grow  md:overflow-y-auto  md:bg-[#F1F7FE]">
+        <div className="flex-grow  md:overflow-y-auto  md:bg-[#F1F7FE] relative">
           <div className="">{children}</div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import CreateUserForm from "@/app/ui/users/create-user-form";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Create User",
 };
 export default function CreateUser() {
   return (

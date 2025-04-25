@@ -1,4 +1,4 @@
-import { ADMIN_ROLES } from "@/app/lib/routes";
+import { ADMIN_PRODUCTS } from "@/app/lib/routes";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -8,7 +8,7 @@ export default function NotFound() {
       <h2 className="text-xl font-semibold">404 Not Found</h2>
       <p>Could not find the requested product.</p>
       <Link
-        href={`${ADMIN_ROLES.url}`}
+        href={`${ADMIN_PRODUCTS.url}`}
         className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
       >
         Go Back

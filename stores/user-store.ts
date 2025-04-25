@@ -2,7 +2,7 @@ import { User } from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 import { persist } from "zustand/middleware";
 
-export type UserState = { user: (User & { role: string }) | null };
+export type UserState = { user: User | null };
 type UserActions = {
   setUser: (user: User) => void;
   clearUser: () => void;
@@ -18,12 +18,13 @@ export const createUserStore = (initState: UserState = defaultInitState) => {
     persist(
       (set) => ({
         ...initState,
-        setUser: (user) => set({ user: { ...user, role: "" } }),
+        setUser: (user) => set({ user: user }),
         clearUser: () => set({ user: null }),
       }),
       {
-        name: "user-storage", // unique name for localStorage key
-        skipHydration: true, // important for Next.js
+        name: "user-storage",
+        skipHydration: true, // We'll handle hydration manually
+        partialize: (state) => ({ user: state.user }), // Only persist the user data
       }
     )
   );

@@ -1,6 +1,12 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useRef,
+  useContext,
+  useEffect,
+} from "react";
 import { useStore } from "zustand";
 
 import {
@@ -24,6 +30,10 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
   if (!storeRef.current) {
     storeRef.current = createUserStore(defaultInitState);
   }
+
+  useEffect(() => {
+    storeRef.current?.persist.rehydrate();
+  }, []);
 
   return (
     <UserStoreContext.Provider value={storeRef.current}>

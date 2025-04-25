@@ -14,7 +14,9 @@ export default function ViewCommission({
 }) {
   const id = use(params).id;
   const { commissions } = useAdminStore((state) => state);
-  const commission = commissions.find((commission) => commission.id === id);
+  const commission = commissions.find(
+    (commission) => commission.id === parseInt(id)
+  );
   console.log(commissions);
 
   if (!commission) {
