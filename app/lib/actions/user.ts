@@ -255,12 +255,21 @@ export const changePassword = async (
 
 export const resetPassword = async (
   body: ResetPasswordBody
-): Promise<ApiResponse<string>> => {
+): Promise<
+  ApiResponse<{
+    success: boolean;
+    message: string;
+    errors: string[];
+  }>
+> => {
   try {
-    const response = await api.post<ApiResponse<string>>(
-      `/api/services/app/User/ResetPassword`,
-      body
-    );
+    const response = await api.post<
+      ApiResponse<{
+        success: boolean;
+        message: string;
+        errors: string[];
+      }>
+    >(`/api/services/app/User/ResetPassword`, body);
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

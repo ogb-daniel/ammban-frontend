@@ -248,8 +248,8 @@ export interface ChangePasswordBody {
 }
 
 export interface ResetPasswordBody {
-  resetCode: string;
-  userName: string;
+  resetToken: string;
+  email: string;
   newPassword: string;
 }
 

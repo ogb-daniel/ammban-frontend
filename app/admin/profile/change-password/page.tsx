@@ -1,15 +1,29 @@
+import { changePassword } from "@/app/lib/actions/user";
+import { getSession } from "@/app/lib/session";
+import ChangePasswordContainer from "@/app/ui/profile/change-password-container";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Dashboard",
 };
-export default function ChangePassword() {
+export default async function ChangePassword() {
+  const user = (await getSession()).user;
+  if (user) {
+    const parsedUser = JSON.parse(user);
+    if (!parsedUser?.userName) {
+      throw new Error("User not found");
+    }
+    console.log(parsedUser?.userName);
+    await changePassword({ userName: parsedUser?.userName });
+  }
   return (
     <main>
       {/* <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
         <h1 className="font-semibold ">Welcome Jacob</h1>
         <p className="text-blue-500">AXA Admin</p>
       </div> */}
-      <div className=" p-6"></div>
+      <div className=" p-6">
+        <ChangePasswordContainer />
+      </div>
     </main>
   );
 }
