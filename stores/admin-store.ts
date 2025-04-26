@@ -1,5 +1,5 @@
 // src/stores/counter-store.ts
-import { Product, Role, User } from "@/app/lib/definitions";
+import { Commission, Product, Role, User } from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 
 type Category = {
@@ -16,14 +16,6 @@ export type Transaction = {
   receipt: string;
   id: number;
   source: string;
-};
-
-export type Commission = {
-  productName: string;
-  description: string;
-  role: string;
-  percentage: number;
-  id: number;
 };
 
 export type Price = {
@@ -84,15 +76,7 @@ export const initAdminStore = (): AdminState => {
     roles: [],
     products: [],
 
-    commissions: [
-      {
-        productName: "AXA PASS",
-        description: "Provides coverage for medical expenses",
-        role: "Admin",
-        percentage: 25,
-        id: 1,
-      },
-    ],
+    commissions: [],
     users: [],
     admin: {
       firstName: "David",

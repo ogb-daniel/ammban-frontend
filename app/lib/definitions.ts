@@ -98,6 +98,7 @@ export type Commission = {
   roleName: string;
   customerType: number;
   userId: number;
+  id: number;
 };
 
 export type Product = {

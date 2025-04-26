@@ -1,5 +1,10 @@
 "use server";
-import { ApiResponse, SetupCommissionPercentageBody } from "../definitions";
+import {
+  ApiResponse,
+  GetAllCommissionPercentagesResponse,
+  GetAllCommissionsResponse,
+  SetupCommissionPercentageBody,
+} from "../definitions";
 import api from "../api/axios";
 
 export const setupCommissionPercentage = async (
@@ -7,7 +12,7 @@ export const setupCommissionPercentage = async (
 ): Promise<ApiResponse<string>> => {
   try {
     const response = await api.post<ApiResponse<string>>(
-      `/api/services/app/Commission/SetupCommissionPercentage`,
+      `/api/services/app/CommissionService/SetupCommissionPercentage`,
       body
     );
     return response.data;
@@ -30,11 +35,14 @@ export const setupCommissionPercentage = async (
 };
 
 export const getAllCommissionPercentages = async (
-  params: string
-): Promise<ApiResponse<string>> => {
+  params:
+    | { MaxResultCount?: number; SkipCount?: number }
+    | undefined = undefined
+): Promise<GetAllCommissionPercentagesResponse> => {
   try {
-    const response = await api.get<ApiResponse<string>>(
-      `/api/services/app/Commission/GetAllCommissionPercentages?${params}`
+    const response = await api.get<GetAllCommissionPercentagesResponse>(
+      `/api/services/app/CommissionService/GetAllCommissionPercentages`,
+      { params }
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,11 +64,14 @@ export const getAllCommissionPercentages = async (
 };
 
 export const getAllCommissions = async (
-  params: string
-): Promise<ApiResponse<string>> => {
+  params:
+    | { MaxResultCount?: number; SkipCount?: number }
+    | undefined = undefined
+): Promise<GetAllCommissionsResponse> => {
   try {
-    const response = await api.get<ApiResponse<string>>(
-      `/api/services/app/Commission/GetAllCommissions?${params}`
+    const response = await api.get<GetAllCommissionsResponse>(
+      `/api/services/app/CommissionService/GetAllCommissions`,
+      { params }
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

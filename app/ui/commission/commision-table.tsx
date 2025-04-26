@@ -2,7 +2,6 @@
 import React from "react";
 import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
-import { Commission } from "@/stores/admin-store";
 import { useAdminStore } from "@/providers/admin-store-provider";
 import { FaTrash, FaUser } from "react-icons/fa";
 
@@ -11,6 +10,7 @@ import { ADMIN_COMMISSION } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import { LiaUserShieldSolid } from "react-icons/lia";
 import { PiDivideFill } from "react-icons/pi";
+import { Commission } from "@/app/lib/definitions";
 
 const commissionColumns: ColumnDef<Commission>[] = [
   {
