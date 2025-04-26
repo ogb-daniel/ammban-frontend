@@ -1,3 +1,4 @@
+"use server";
 import {
   CreateProductBody,
   CreateProductCategoryBody,
@@ -10,175 +11,246 @@ import {
   GetProductCategoryResponse,
   GetProductResponse,
 } from "../definitions";
+import api from "../api/axios";
 
-export const getProduct = async (id: string): Promise<GetProductResponse> => {
-  const response = await fetch(`/api/productService?id=${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch product");
+export const getProduct = async (id: number): Promise<GetProductResponse> => {
+  try {
+    const response = await api.get<GetProductResponse>(
+      `/api/services/app/ProductService/GetById?id=${id}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching product:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
-export const getAllProducts = async (
-  params: string
-): Promise<GetAllProductsResponse> => {
-  const response = await fetch(`/api/productService?${params}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch products");
+export const getAllProducts = async (params: {
+  SkipCount?: number;
+  MaxResultCount?: number;
+}): Promise<GetAllProductsResponse> => {
+  try {
+    const response = await api.get<GetAllProductsResponse>(
+      `/api/services/app/ProductService/GetAll`,
+      {
+        params,
+      }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching products:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const createProduct = async (
   body: CreateProductBody
 ): Promise<CreateProductResponse> => {
-  const response = await fetch(`/api/productService`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create product");
+  try {
+    const response = await api.post<CreateProductResponse>(
+      `/api/services/app/ProductService/Create`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error creating product:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const updateProduct = async (
-  id: string,
+  id: number,
   body: CreateProductBody
 ): Promise<CreateProductResponse> => {
-  const response = await fetch(`/api/productService?id=${id}`, {
-    method: "PUT",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update product");
+  try {
+    const response = await api.put<CreateProductResponse>(
+      `/api/services/app/ProductService/Update?id=${id}`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error updating product:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const deleteProduct = async (
-  id: string
+  id: number
 ): Promise<DeleteProductResponse> => {
-  const response = await fetch(`/api/productService?id=${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete product");
+  try {
+    const response = await api.delete<DeleteProductResponse>(
+      `/api/services/app/ProductService/Delete?id=${id}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error deleting product:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-  return response.json();
 };
 
 export const getProductCategory = async (
   id: string
 ): Promise<GetProductCategoryResponse> => {
-  const response = await fetch(`/api/productCategory?id=${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch product category");
+  try {
+    const response = await api.get<GetProductCategoryResponse>(
+      `/api/services/app/ProductCategoryService/Get?id=${id}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching product category:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
-export const getAllProductCategories = async (
-  params: string
-): Promise<GetAllProductCategoriesResponse> => {
-  const response = await fetch(`/api/productCategory?${params}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch product categories");
+export const getAllProductCategories = async (params: {
+  SkipCount?: number;
+  MaxResultCount?: number;
+}): Promise<GetAllProductCategoriesResponse> => {
+  try {
+    const response = await api.get<GetAllProductCategoriesResponse>(
+      `/api/services/app/ProductCategoryService/GetAll`,
+      {
+        params,
+      }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching product categories:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const createProductCategory = async (
   body: CreateProductCategoryBody
 ): Promise<CreateProductCategoryResponse> => {
-  const response = await fetch(`/api/productCategory`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to create product category");
+  try {
+    const response = await api.post<CreateProductCategoryResponse>(
+      `/api/services/app/ProductCategoryService/Create`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error creating product category:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const updateProductCategory = async (
   id: string,
   body: CreateProductCategoryBody
 ): Promise<CreateProductCategoryResponse> => {
-  const response = await fetch(`/api/productCategory?id=${id}`, {
-    method: "PUT",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update product category");
+  try {
+    const response = await api.put<CreateProductCategoryResponse>(
+      `/api/services/app/ProductCategoryService/Update?id=${id}`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error updating product category:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-
-  return response.json();
 };
 
 export const deleteProductCategory = async (
   id: string
 ): Promise<DeleteProductCategoryResponse> => {
-  const response = await fetch(`/api/productCategory?id=${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to delete product category");
+  try {
+    const response = await api.delete<DeleteProductCategoryResponse>(
+      `/api/services/app/ProductCategoryService/Delete?id=${id}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error deleting product category:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-  return response.json();
 };

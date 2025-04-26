@@ -28,7 +28,7 @@ export default function UsersContainer({
     console.log(skip);
     if (skip > storeUsers.length || skip < storeUsers.length) return;
     getAllUsers({ MaxResultCount: limit, SkipCount: skip }).then((res) => {
-      initializeUsers([...storeUsers, ...res.result.items]);
+      if (res.success) initializeUsers([...storeUsers, ...res.result.items]);
       setSkip(skip + limit);
     });
   }, [initializeUsers, limit, skip, storeUsers]);

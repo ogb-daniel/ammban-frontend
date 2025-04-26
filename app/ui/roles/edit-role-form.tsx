@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { Permission, Role } from "@/app/lib/definitions";
 import { getPermissions, updateRole } from "@/app/lib/actions/role";
 import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { ADMIN_ROLES } from "@/app/lib/routes";
 
 export default function EditRoleForm({ role }: { role: Role }) {
+  const { editRole: updateRoleFromStore } = useAdminStore((state) => state);
   const [permissionsList, setPermissionsList] = useState<Permission[]>([]);
   const [permissions, setPermissions] = useState<Record<string, boolean>>(
     role.grantedPermissions.reduce(
@@ -52,10 +55,11 @@ export default function EditRoleForm({ role }: { role: Role }) {
           toast.error(response.error.message);
           return;
         }
+        updateRoleFromStore(role.id, response.result);
       } finally {
         setSubmitting(false);
       }
-      router.back();
+      router.replace(ADMIN_ROLES.url);
     },
   });
 

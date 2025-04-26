@@ -1,53 +1,79 @@
+"use server";
 import { ApiResponse, SetupCommissionPercentageBody } from "../definitions";
+import api from "../api/axios";
 
 export const setupCommissionPercentage = async (
   body: SetupCommissionPercentageBody
 ): Promise<ApiResponse<string>> => {
-  const response = await fetch(`/api/commission/setupCommissionPercentage`, {
-    method: "POST",
-    body: JSON.stringify(body),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to setup commission percentage");
+  try {
+    const response = await api.post<ApiResponse<string>>(
+      `/api/services/app/Commission/SetupCommissionPercentage`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error(
+      "Error setting up commission percentage:",
+      error?.response?.data
+    );
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-  return response.json();
 };
 
 export const getAllCommissionPercentages = async (
   params: string
 ): Promise<ApiResponse<string>> => {
-  const response = await fetch(
-    `/api/commission/getAllCommissionPercentages?${params}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to get all commission percentages");
+  try {
+    const response = await api.get<ApiResponse<string>>(
+      `/api/services/app/Commission/GetAllCommissionPercentages?${params}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error(
+      "Error getting all commission percentages:",
+      error?.response?.data
+    );
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-  return response.json();
 };
 
 export const getAllCommissions = async (
   params: string
 ): Promise<ApiResponse<string>> => {
-  const response = await fetch(`/api/commission/getAllCommissions?${params}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to get all commissions");
+  try {
+    const response = await api.get<ApiResponse<string>>(
+      `/api/services/app/Commission/GetAllCommissions?${params}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error getting all commissions:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
   }
-  return response.json();
 };

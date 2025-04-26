@@ -6,9 +6,12 @@ import Switch from "../switch";
 import { createRole, getPermissions } from "@/app/lib/actions/role";
 import { Permission } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { ADMIN_ROLES } from "@/app/lib/routes";
 // Sample Permissions Data
 
 export default function CreateRoleForm() {
+  const { createRole: createRoleFromStore } = useAdminStore((state) => state);
   const [permissionsList, setPermissionsList] = useState<Permission[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
@@ -54,10 +57,11 @@ export default function CreateRoleForm() {
           toast.error(response.error.message);
           return;
         }
+        createRoleFromStore(response.result);
       } finally {
         setSubmitting(false);
       }
-      router.back();
+      router.replace(ADMIN_ROLES.url);
     },
   });
   useEffect(() => {

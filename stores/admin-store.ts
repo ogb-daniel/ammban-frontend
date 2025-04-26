@@ -1,5 +1,5 @@
 // src/stores/counter-store.ts
-import { Role, User } from "@/app/lib/definitions";
+import { Product, Role, User } from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 
 type Category = {
@@ -16,14 +16,6 @@ export type Transaction = {
   receipt: string;
   id: number;
   source: string;
-};
-
-export type Product = {
-  name: string;
-  description: string;
-  category: string;
-  price: Price;
-  id: number;
 };
 
 export type Commission = {
@@ -82,6 +74,7 @@ export type AdminActions = {
   editCommission: (id: number, commission: Commission) => void;
   editUser: (id: number, user: User) => void;
   deleteUser: (id: number) => void;
+  deleteProduct: (id: number) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
@@ -89,41 +82,7 @@ export const initAdminStore = (): AdminState => {
   return {
     categories: [],
     roles: [],
-    products: [
-      {
-        id: 1,
-        name: "AXA PASS",
-        category: "INSURANCE",
-        price: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-      {
-        id: 2,
-        name: "BAXA PASS",
-        category: "ANDURANCE",
-        price: {
-          currency: "NGN",
-          amount: 1000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-      {
-        id: 3,
-        name: "CAXA PASS",
-        category: "ENDURANCE",
-        price: {
-          currency: "NGN",
-          amount: 5000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-    ],
+    products: [],
 
     commissions: [
       {
@@ -270,6 +229,10 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     deleteUser: (id) =>
       set((state) => ({
         users: state.users.filter((u) => u.id !== id),
+      })),
+    deleteProduct: (id) =>
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== id),
       })),
   }));
 };

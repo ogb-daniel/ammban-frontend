@@ -29,6 +29,7 @@ type TableProps<T> = {
 
 type ColumnMeta = {
   icon?: React.ReactNode;
+  className?: string;
 };
 const Table = <T extends object>({
   data,
@@ -200,12 +201,18 @@ const Table = <T extends object>({
                       key={cell.id}
                       className={`p-2 py-6 text-sm ${
                         index === row.getVisibleCells().length - 1 && "pr-8"
-                      }`}
+                      } `}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      <div
+                        className={`${
+                          (cell.column.columnDef.meta as ColumnMeta)?.className
+                        } overflow-hidden`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </div>
                     </td>
                   ))}
                 </tr>

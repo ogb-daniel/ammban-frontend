@@ -1,30 +1,72 @@
 "use client";
 import React from "react";
 import { useForm } from "@tanstack/react-form";
-import { useAdminStore } from "@/providers/admin-store-provider";
 import styles from "@/app/ui/products/products.module.css";
 import { useRouter } from "next/navigation";
-import { Product } from "@/stores/admin-store";
+import { Product, ProductCategory } from "@/app/lib/definitions";
+import {
+  getAllProductCategories,
+  updateProduct,
+} from "@/app/lib/actions/product";
+import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { ADMIN_PRODUCTS } from "@/app/lib/routes";
 
 export default function EditProductForm({ product }: { product: Product }) {
-  const { categories, editProduct } = useAdminStore((state) => state);
+  const { editProduct: updateProductFromStore } = useAdminStore(
+    (state) => state
+  );
+  const [submitting, setSubmitting] = React.useState(false);
+  const [categories, setCategories] = React.useState<ProductCategory[]>([]);
+  React.useEffect(() => {
+    (async () => {
+      const response = await getAllProductCategories({});
+      if (response.success) {
+        setCategories(response.result.payload.items);
+      }
+    })();
+  }, []);
   const router = useRouter();
 
   const form = useForm({
     defaultValues: {
       name: product.name,
       description: product.description,
-      category: product.category,
+      categoryId: 0,
       price: product.price,
+      quantity: product.quantity,
       id: product.id,
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      setSubmitting(true);
       console.log(values);
-      editProduct(product.id, { ...product, ...values.value });
+      try {
+        const response = await updateProduct(product.id, values.value);
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+        if (response.result.responseCode !== 200) {
+          toast.error(response.result.message);
+          return;
+        }
+        updateProductFromStore(product.id, response.result.payload);
+      } finally {
+        setSubmitting(false);
+      }
       // Handle form submission
-      router.back();
+      router.replace(ADMIN_PRODUCTS.url);
     },
   });
+
+  React.useEffect(() => {
+    if (categories.length > 0) {
+      const categoryId =
+        categories.find((category) => category.name === product.categoryName)
+          ?.id || 0;
+      form.setFieldValue("categoryId", categoryId);
+    }
+  }, [categories, form, product.categoryName]);
   return (
     <form
       onSubmit={(e) => {
@@ -82,7 +124,7 @@ export default function EditProductForm({ product }: { product: Product }) {
         </div>
         <div className="md:w-1/2 mt-6">
           <form.Field
-            name="category"
+            name="categoryId"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => (
               <>
@@ -94,14 +136,14 @@ export default function EditProductForm({ product }: { product: Product }) {
                   id={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
+                  onChange={(e) => field.handleChange(Number(e.target.value))}
                   className={`${styles.customSelect} mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                 >
                   <option className="" value="">
                     Select your Product’s Category{" "}
                   </option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
+                    <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
                   ))}
@@ -112,7 +154,7 @@ export default function EditProductForm({ product }: { product: Product }) {
         </div>
         <div className="mt-6 md:w-1/2 ">
           <form.Field
-            name="price.amount"
+            name="price"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => (
               <>
@@ -134,10 +176,35 @@ export default function EditProductForm({ product }: { product: Product }) {
             )}
           />
         </div>
+        <div className="mt-6 md:w-1/2 ">
+          <form.Field
+            name="quantity"
+            // eslint-disable-next-line react/no-children-prop
+            children={(field) => (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  name={field.name}
+                  placeholder="Quantity"
+                  id={field.name}
+                  min={0}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                />
+              </>
+            )}
+          />
+        </div>
       </div>
       <div className="md:w-1/2 mt-8 mx-auto">
         <button
           type="submit"
+          disabled={submitting}
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
           Edit Product
