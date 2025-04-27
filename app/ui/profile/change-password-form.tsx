@@ -39,7 +39,6 @@ export default function ChangePasswordForm() {
     },
     onSubmit: async (values) => {
       setSubmitting(true);
-      console.log(values);
       try {
         const response = await resetPassword(values.value);
         if (!response.success) {

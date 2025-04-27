@@ -252,6 +252,32 @@ export const changePassword = async (
     );
   }
 };
+export const generatePasswordResetToken = async (params: {
+  Email?: string;
+}): Promise<ApiResponse<string>> => {
+  try {
+    const response = await api.post<ApiResponse<string>>(
+      `/api/services/app/User/GeneratePasswordResetToken`,
+      {},
+      {
+        params,
+      }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error changing password:", error);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
 
 export const resetPassword = async (
   body: ResetPasswordBody
