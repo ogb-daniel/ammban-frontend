@@ -14,43 +14,72 @@ import {
   ADMIN_PROFILE,
   ADMIN_USERS,
   ADMIN_ROLES,
+  AGENT_DASHBOARD,
+  AGENT_PROFILE,
+  AGENT_PRODUCTS,
+  AGENT_REPORTS,
 } from "@/app/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUser } from "react-icons/fa6";
 import { useState } from "react";
 import LogoutButton from "../auth/logout-button";
-const links = [
-  { name: "Dashboard", href: ADMIN_DASHBOARD.url, icon: RiHomeFill },
-  {
-    name: "Profile",
-    href: `${ADMIN_PROFILE.url}`,
-    icon: FaUser,
-  },
-  { name: "Users", href: `${ADMIN_USERS.url}`, icon: FaUsers },
-  {
-    name: "Roles and Permissions",
-    href: `${ADMIN_ROLES.url}`,
-    icon: FaUserLock,
-  },
-  {
-    name: "Products",
-    href: `${ADMIN_PRODUCTS.url}`,
-    icon: AiFillProduct,
-  },
-  {
-    name: "Commission",
-    href: `${ADMIN_COMMISSION.url}`,
-    icon: RiWallet3Fill,
-  },
-];
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function SideNav() {
   const pathname = usePathname();
   const [showDropdownMenu, setShowDropdownMenu] = useState(false);
+  const { user } = useUserStore((state) => state);
+
+  const links =
+    user?.role === "admin"
+      ? [
+          { name: "Dashboard", href: ADMIN_DASHBOARD.url, icon: RiHomeFill },
+          {
+            name: "Profile",
+            href: `${ADMIN_PROFILE.url}`,
+            icon: FaUser,
+          },
+          { name: "Users", href: `${ADMIN_USERS.url}`, icon: FaUsers },
+          {
+            name: "Roles and Permissions",
+            href: `${ADMIN_ROLES.url}`,
+            icon: FaUserLock,
+          },
+          {
+            name: "Products",
+            href: `${ADMIN_PRODUCTS.url}`,
+            icon: AiFillProduct,
+          },
+          {
+            name: "Commission",
+            href: `${ADMIN_COMMISSION.url}`,
+            icon: RiWallet3Fill,
+          },
+        ]
+      : [
+          { name: "Dashboard", href: AGENT_DASHBOARD.url, icon: RiHomeFill },
+          {
+            name: "Profile",
+            href: AGENT_PROFILE.url,
+            icon: FaUser,
+          },
+          {
+            name: "Sell Product",
+            href: AGENT_PRODUCTS.url,
+            icon: AiFillProduct,
+          },
+          {
+            name: "Reports",
+            href: AGENT_REPORTS.url,
+            icon: RiWallet3Fill,
+          },
+        ];
+
   const handleDropdownMenu = () => {
     setShowDropdownMenu(!showDropdownMenu);
   };
+
   return (
     <div className="  h-full px-3 md:py-4 md:px-2">
       <div className="flex items-center justify-between">

@@ -13,22 +13,22 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "@tanstack/react-form";
-import { useAdminStore } from "@/providers/admin-store-provider";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function PersonalInformation() {
-  const { admin } = useAdminStore((state) => state);
+  const { user } = useUserStore((state) => state);
   const [editPersonalInfo, setEditPersonalInfo] = useState(false);
   const [image, setImage] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
-      fullName: admin.firstName + " " + admin.lastName,
-      email: admin.email,
-      description: admin.description,
-      phoneNumber: admin.phoneNumber,
-      position: admin.position,
-      location: admin.location,
-      website: admin.website,
+      fullName: user?.name + " " + user?.surname,
+      email: user?.emailAddress,
+      description: "",
+      phoneNumber: "",
+      position: "",
+      location: "",
+      website: "",
     },
     onSubmit: (values) => {
       console.log(values);

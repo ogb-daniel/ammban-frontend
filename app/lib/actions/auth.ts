@@ -2,6 +2,7 @@ import {
   SignupFormSchema,
   FormState,
   SignInSchema,
+  GetCurrentLoginInformationsResponse,
 } from "@/app/lib/definitions";
 
 import {
@@ -86,20 +87,21 @@ export async function login(state: FormState, formData: FormData) {
       };
     }
 
-    const user = await getUserByToken(
-      response.result.accessToken,
-      response.result.userId.toString()
+    const response2 = await getCurrentLoginInformation(
+      response.result.accessToken
     );
+    const user = response2.result.user;
     console.log(user);
-    const role = user.result.roleNames.includes("ADMIN") ? "admin" : "agent";
+    // user.roleNames.includes("ADMIN") ? "admin" : "agent";
+    const role = "agent";
     await createSession(
       response.result.accessToken,
       response.result.expireInSeconds,
       role,
-      user.result
+      user
     );
     return {
-      user: user.result,
+      user: user,
       success: true,
       role,
     };
@@ -148,10 +150,25 @@ const signin = async (body: ILoginBody): Promise<LoginResponse> => {
   return response.json();
 };
 
-async function getUserByToken(accessToken: string, userId: string) {
-  // Make API request using the token in the authorization header
+// async function getUserByToken(accessToken: string, userId: string) {
+//   // Make API request using the token in the authorization header
+//   const response = await fetch(
+//     `${baseUrl}/api/services/app/User/Get?Id=${userId}`,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     }
+//   );
+
+//   return response.json();
+// }
+
+export const getCurrentLoginInformation = async (
+  accessToken: string
+): Promise<GetCurrentLoginInformationsResponse> => {
   const response = await fetch(
-    `${baseUrl}/api/services/app/User/Get?Id=${userId}`,
+    `${baseUrl}//api/services/app/Session/GetCurrentLoginInformations`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -160,4 +177,4 @@ async function getUserByToken(accessToken: string, userId: string) {
   );
 
   return response.json();
-}
+};

@@ -1,25 +1,57 @@
 "use client";
-import { ADMIN_PROFILE, ADMIN_TRANSACTIONS } from "@/app/lib/routes";
+import {
+  ADMIN_PROFILE,
+  ADMIN_TRANSACTIONS,
+  AGENT_PROFILE,
+  AGENT_TRANSACTIONS,
+} from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-const links = [
-  {
-    title: "Personal Information",
-    href: ADMIN_PROFILE.url + "/personal-information",
-  },
-  { title: "Transaction History", href: ADMIN_TRANSACTIONS.url },
-  { title: "Account Limits", href: ADMIN_PROFILE.url + "/account-limits" },
-  { title: "Customer Support", href: ADMIN_PROFILE.url + "/customer-support" },
-  {
-    title: "Update Account Details",
-    href: ADMIN_PROFILE.url + "/update-account-details",
-  },
-  { title: "Change Password", href: ADMIN_PROFILE.url + "/change-password" },
-];
-
 export default function MobileProfile() {
   const router = useRouter();
+  const { user } = useUserStore((state) => state);
+  const links = [
+    {
+      title: "Personal Information",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/personal-information",
+    },
+    {
+      title: "Transaction History",
+      href:
+        user?.role === "admin"
+          ? ADMIN_TRANSACTIONS.url
+          : AGENT_TRANSACTIONS.url,
+    },
+    {
+      title: "Account Limits",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/account-limits",
+    },
+    {
+      title: "Customer Support",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/customer-support",
+    },
+    {
+      title: "Update Account Details",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/update-account-details",
+    },
+    {
+      title: "Change Password",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/change-password",
+    },
+  ];
+
   return (
     <div className="p-4 space-y-4">
       <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col items-center">
@@ -35,7 +67,9 @@ export default function MobileProfile() {
         <p className="text-sm text-gray-500">
           Date of Birth: December, 07, 2020
         </p>
-        <p className="text-green-500 font-medium">AXA Admin</p>
+        <p className="text-green-500 font-medium">
+          AXA {user?.role === "admin" ? "Admin" : "Agent"}
+        </p>
       </div>
 
       <div className="space-y-4">

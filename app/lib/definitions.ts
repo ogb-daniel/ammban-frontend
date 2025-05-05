@@ -521,3 +521,12 @@ export interface ValidateTransactionBody {
   userId: number;
   transactionAmount: number;
 }
+
+export interface GetCurrentLoginInformationsResponse
+  extends ApiResponse<{
+    user: User;
+  }> {
+  result: {
+    user: User;
+  };
+}
