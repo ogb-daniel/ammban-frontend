@@ -58,5 +58,5 @@ export const AGENT_REPORTS = {
 };
 
 export const AGENT_TRANSACTIONS = {
-  url: `/agent/transactions`,
+  url: `/agent/reports`,
 };
