@@ -1,4 +1,4 @@
-import { getAllCommissions } from "@/app/lib/actions/commission";
+import { getAllCommissionPercentages } from "@/app/lib/actions/commission";
 import CommissionContainer from "@/app/ui/commission/commission-container";
 import { Metadata } from "next";
 export const metadata: Metadata = {
@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 };
 export default async function Commission() {
   const limit = 100;
-  const products = await getAllCommissions({ MaxResultCount: limit });
+  const products = await getAllCommissionPercentages({ MaxResultCount: limit });
   return (
     <main>
       <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100 hidden md:block">

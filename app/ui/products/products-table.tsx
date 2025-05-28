@@ -13,6 +13,14 @@ import { Product } from "@/app/lib/definitions";
 import Swal from "sweetalert2";
 import { deleteProduct } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
+import { useUserStore } from "@/providers/user-store-provider";
+import { showAXATransactionConfirmation } from "@/app/lib/utils/transaction-confirmation";
+import { syncTransaction } from "@/app/lib/actions/payment";
+import {
+  showAXAFailureModal,
+  showAXASuccessModal,
+} from "@/app/lib/utils/transaction-result";
+import { showAXATransactionDetails } from "@/app/lib/utils/transaction-details";
 
 const productColumns: ColumnDef<Product>[] = [
   {
@@ -63,49 +71,109 @@ const ProductsTable = () => {
     (state) => state
   );
   const router = useRouter();
-  const actions = [
-    {
-      element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
-      onClick: (product: Product) => {
-        router.push(`${ADMIN_PRODUCTS.url}/${product.id}`);
-      },
-      label: "Edit Product",
-    },
-    {
-      element: <FaTrash className="w-4 h-4 text-red-500" />,
-      onClick: (product: Product) => {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "Please confirm your action.",
-          showCancelButton: true,
-          cancelButtonText: "No, Cancel",
-          confirmButtonColor: "#094794",
-          confirmButtonText: "Yes, Confirm",
-          reverseButtons: true,
-          customClass: {
-            cancelButton: "text-primary bg-white border border-primary",
-            actions: "flex-row gap-2",
+  const { user } = useUserStore((state) => state);
+  const actions =
+    user?.role === "admin"
+      ? [
+          {
+            element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
+            onClick: (product: Product) => {
+              router.push(`${ADMIN_PRODUCTS.url}/${product.id}`);
+            },
+            label: "Edit Product",
           },
-          buttonsStyling: true,
-          showLoaderOnConfirm: true,
-          preConfirm: () => {
-            return deleteProduct(product.id);
+          {
+            element: <FaTrash className="w-4 h-4 text-red-500" />,
+            onClick: (product: Product) => {
+              Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm your action.",
+                showCancelButton: true,
+                cancelButtonText: "No, Cancel",
+                confirmButtonColor: "#094794",
+                confirmButtonText: "Yes, Confirm",
+                reverseButtons: true,
+                customClass: {
+                  cancelButton: "text-primary bg-white border border-primary",
+                  actions: "flex-row gap-2",
+                },
+                buttonsStyling: true,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                  return deleteProduct(product.id);
+                },
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const response = result.value;
+                  if (response.success) {
+                    deleteProductFromStore(product.id);
+                    toast.success("Product deleted successfully");
+                  } else {
+                    toast.error(response.error.message);
+                  }
+                }
+              });
+            },
+            label: "Delete Product",
           },
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            const response = result.value;
-            if (response.success) {
-              deleteProductFromStore(product.id);
-              toast.success("Product deleted successfully");
-            } else {
-              toast.error(response.error.message);
-            }
-          }
-        });
-      },
-      label: "Delete Product",
-    },
-  ];
+        ]
+      : [
+          {
+            element: (
+              <button className="border rounded-md py-1 px-2 text-primary border-primary">
+                Purchase Product
+              </button>
+            ),
+            onClick: async (product: Product) => {
+              const result = await showAXATransactionConfirmation(
+                `₦${product.price}`, // cost (formatted)
+                "", // fee
+                user?.fullName || "", // seller
+                "", // buyer
+                "", // reference
+                async () => {
+                  return await syncTransaction({
+                    narration: `Purchase of ${product.name}`,
+                    amount: product.price,
+                    isTrial: false,
+                    productId: product.id,
+                  });
+                }
+              );
+              console.log(result);
+              if (result.isConfirmed) {
+                if (result.value?.success) {
+                  await showAXASuccessModal(
+                    async () => {
+                      await showAXATransactionDetails(
+                        `₦${product.price}`, // cost (formatted)
+                        "", // fee
+                        user?.fullName || "", // seller
+                        "", // buyer
+                        "", // reference
+                        result.value?.result.data.transactionID,
+                        result.value?.result.data.effectiveDate
+                      );
+                    },
+                    async () => {
+                      console.log("Navigating to new policy purchase");
+                    }
+                  );
+                } else {
+                  await showAXAFailureModal(
+                    async () => {
+                      console.log("Retrying transaction");
+                    },
+                    async () => {
+                      console.log("Opening support contact form");
+                    }
+                  );
+                }
+              }
+            },
+            label: "Purchase Product",
+          },
+        ];
   return (
     <Table<Product>
       data={products}

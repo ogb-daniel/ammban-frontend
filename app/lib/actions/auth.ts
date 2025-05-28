@@ -91,9 +91,7 @@ export async function login(state: FormState, formData: FormData) {
       response.result.accessToken
     );
     const user = response2.result.user;
-    console.log(user);
-    // user.roleNames.includes("ADMIN") ? "admin" : "agent";
-    const role = "agent";
+    const role = user.roleName.includes("Admin") ? "admin" : "agent";
     await createSession(
       response.result.accessToken,
       response.result.expireInSeconds,

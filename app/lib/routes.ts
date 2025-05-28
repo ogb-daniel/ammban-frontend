@@ -50,7 +50,7 @@ export const AGENT_PROFILE = {
 };
 
 export const AGENT_PRODUCTS = {
-  url: `/agent/sell-product`,
+  url: `/agent/products`,
 };
 
 export const AGENT_REPORTS = {

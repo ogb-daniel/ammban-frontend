@@ -1,5 +1,11 @@
 // src/stores/counter-store.ts
-import { Commission, Product, Role, User } from "@/app/lib/definitions";
+import {
+  Commission,
+  CommissionPercentage,
+  Product,
+  Role,
+  User,
+} from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 
 type Category = {
@@ -44,6 +50,7 @@ export type AdminState = {
   products: Product[];
   roles: Role[];
   commissions: Commission[];
+  commissionsPercentage: CommissionPercentage[];
   users: User[];
   admin: Admin;
   transactions: Transaction[];
@@ -55,6 +62,9 @@ export type AdminActions = {
   initializeProducts: (products: Product[]) => void;
   initializeRoles: (roles: Role[]) => void;
   initializeCommissions: (commissions: Commission[]) => void;
+  initializeCommissionsPercentage: (
+    commissionsPercentage: CommissionPercentage[]
+  ) => void;
   initializeTransactions: (transactions: Transaction[]) => void;
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
@@ -77,6 +87,7 @@ export const initAdminStore = (): AdminState => {
     products: [],
 
     commissions: [],
+    commissionsPercentage: [],
     users: [],
     admin: {
       firstName: "David",
@@ -127,6 +138,7 @@ export const defaultInitState: AdminState = {
   roles: [],
   users: [],
   commissions: [],
+  commissionsPercentage: [],
   admin: {
     firstName: "",
     lastName: "",
@@ -167,6 +179,12 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     initializeCommissions: (commissions: Commission[]) =>
       set(() => ({
         commissions: commissions,
+      })),
+    initializeCommissionsPercentage: (
+      commissionsPercentage: CommissionPercentage[]
+    ) =>
+      set(() => ({
+        commissionsPercentage: commissionsPercentage,
       })),
     initializeTransactions: (transactions: Transaction[]) =>
       set(() => ({

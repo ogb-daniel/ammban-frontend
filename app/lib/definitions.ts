@@ -66,6 +66,7 @@ export type User = {
   lastLoginTime: string;
   creationTime: string;
   roleNames: string[];
+  roleName: string;
   role?: string;
   id: number;
 };
@@ -528,5 +529,122 @@ export interface GetCurrentLoginInformationsResponse
   }> {
   result: {
     user: User;
+  };
+}
+
+export interface GetAccountBalanceResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: {
+      accountBalance: number;
+      accountNumber: string;
+      accountName: string;
+    };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      accountBalance: number;
+      accountNumber: string;
+      accountName: string;
+    };
+  };
+}
+
+export interface WithdrawFundsRequestBody {
+  amount: number;
+  beneficiaryAccountNumber: string;
+  beneficiaryBankName: string;
+  beneficiaryBankCode: string;
+  narration: string;
+}
+
+export interface WithdrawFundsResponse
+  extends ApiResponse<{
+    requestSuccessful: boolean;
+    responseMessage: string;
+    responseCode: number;
+    responseBody: {
+      reference: string;
+      amount: number;
+      status: string;
+      dateCreated: string;
+      totalFee: number;
+      destinationBankName: string;
+      destinationAccountNumber: string;
+      destinationAccountName: string;
+      destinationBankCode: string;
+    };
+  }> {
+  result: {
+    requestSuccessful: boolean;
+    responseMessage: string;
+    responseCode: number;
+    responseBody: {
+      reference: string;
+      amount: number;
+      status: string;
+      dateCreated: string;
+      totalFee: number;
+      destinationBankName: string;
+      destinationAccountNumber: string;
+      destinationAccountName: string;
+      destinationBankCode: string;
+    };
+  };
+}
+
+export interface DepositFundsResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: {
+      accountName: string;
+      accountNumber: string;
+      bankName: string;
+      bankCode: string;
+    };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      accountName: string;
+      accountNumber: string;
+      bankName: string;
+      bankCode: string;
+    };
+  };
+}
+
+export interface SyncTransactionBody {
+  narration: string;
+  amount: number;
+  isTrial: boolean;
+  productId: number;
+}
+
+export interface SyncTransactionResponse
+  extends ApiResponse<{
+    status: boolean;
+    message: string;
+    data: {
+      effectiveDate: string;
+      expiryDate: string;
+      customerID: string;
+      transactionID: string;
+    };
+  }> {
+  result: {
+    status: boolean;
+    message: string;
+    data: {
+      effectiveDate: string;
+      expiryDate: string;
+      customerID: string;
+      transactionID: string;
+    };
   };
 }

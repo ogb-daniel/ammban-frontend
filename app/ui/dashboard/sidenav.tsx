@@ -65,7 +65,7 @@ export default function SideNav() {
             icon: FaUser,
           },
           {
-            name: "Sell Product",
+            name: "Products",
             href: AGENT_PRODUCTS.url,
             icon: AiFillProduct,
           },

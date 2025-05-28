@@ -2,12 +2,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import {
-  ADMIN_PROFILE,
-  ADMIN_TRANSACTIONS,
-  AGENT_PROFILE,
-  AGENT_TRANSACTIONS,
-} from "@/app/lib/routes";
+import { ADMIN_PROFILE, AGENT_PROFILE } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 
 export default function DesktopProfileLayout({
@@ -24,37 +19,37 @@ export default function DesktopProfileLayout({
         (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
         "/personal-information",
     },
-    {
-      title: "Transaction History",
-      href:
-        user?.role === "admin"
-          ? ADMIN_TRANSACTIONS.url
-          : AGENT_TRANSACTIONS.url,
-    },
-    {
-      title: "Account Limits",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/account-limits",
-    },
-    {
-      title: "Customer Support",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/customer-support",
-    },
-    {
-      title: "Update Account Details",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/update-account-details",
-    },
-    {
-      title: "Change Password",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/change-password",
-    },
+    // {
+    //   title: "Transaction History",
+    //   href:
+    //     user?.role === "admin"
+    //       ? ADMIN_TRANSACTIONS.url
+    //       : AGENT_TRANSACTIONS.url,
+    // },
+    // {
+    //   title: "Account Limits",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/account-limits",
+    // },
+    // {
+    //   title: "Customer Support",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/customer-support",
+    // },
+    // {
+    //   title: "Update Account Details",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/update-account-details",
+    // },
+    // {
+    //   title: "Change Password",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/change-password",
+    // },
   ];
 
   return (

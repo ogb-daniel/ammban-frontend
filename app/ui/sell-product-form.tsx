@@ -151,15 +151,7 @@ const SellProductForm = () => {
                     </option>
                   ))}
                 </select>
-                <p className="text-sm font-medium mt-1">
-                  Total Balance:{" "}
-                  {field.state.value
-                    ? (products.find((p) => p.id === field.state.value)
-                        ?.price || 0) *
-                      (products.find((p) => p.id === field.state.value)
-                        ?.quantity || 0)
-                    : 0}
-                </p>
+                <p className="text-sm font-medium mt-1">Total Balance: 0</p>
               </>
             )}
           />
