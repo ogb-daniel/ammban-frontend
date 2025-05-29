@@ -3,7 +3,6 @@ import { AiFillProduct, AiOutlineUser } from "react-icons/ai";
 import Logo from "../logo";
 import NavIcon from "../nav-icon";
 import { IoIosMenu } from "react-icons/io";
-import SearchBar from "../search-bar";
 import { RiHomeFill, RiWallet3Fill } from "react-icons/ri";
 import clsx from "clsx";
 import { FaUserLock, FaUsers } from "react-icons/fa";
@@ -17,7 +16,6 @@ import {
   AGENT_DASHBOARD,
   AGENT_PROFILE,
   AGENT_PRODUCTS,
-  AGENT_REPORTS,
 } from "@/app/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,7 +28,7 @@ export default function SideNav() {
   const pathname = usePathname();
   const [showDropdownMenu, setShowDropdownMenu] = useState(false);
   const { user } = useUserStore((state) => state);
-
+  console.log(user);
   const links =
     user?.role === "admin"
       ? [
@@ -70,8 +68,8 @@ export default function SideNav() {
             icon: AiFillProduct,
           },
           {
-            name: "Reports",
-            href: AGENT_REPORTS.url,
+            name: "Commissions",
+            href: `/${user?.role}/commissions`,
             icon: RiWallet3Fill,
           },
         ];
@@ -120,13 +118,23 @@ export default function SideNav() {
             </Link>
           );
         })}
-        <div className="mt-5">
+        <div className="mt-5 space-y-6">
+          {user?.walletBalance && (
+            <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6 text-black">
+              <h1 className="text-lg font-semibold">Wallet Balance</h1>
+              <p className="font-medium line-clamp-1">
+                {new Intl.NumberFormat("en-NG", {
+                  style: "currency",
+                  currency: "NGN",
+                }).format(user.walletBalance)}
+              </p>
+            </div>
+          )}
           <LogoutButton />
         </div>
       </div>
       {/* <NavLinks /> */}
-      <div className="hidden w-full grow rounded-md  md:block px-7 mt-10">
-        <SearchBar placeholder="Search for..." onChange={() => {}} />
+      <div className="hidden w-full grow rounded-md  md:block px-3 mt-10">
         <div className="space-y-1 mt-8 text-gray-400 font-medium">
           {links.map((link) => {
             const LinkIcon = link.icon;
@@ -147,8 +155,21 @@ export default function SideNav() {
             );
           })}
         </div>
-        <div className="mt-6">
-          <LogoutButton />
+        <div className="absolute bottom-10 left-0 right-0 space-y-6">
+          {user?.walletBalance && (
+            <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6">
+              <h1 className="text-lg font-semibold">Wallet Balance</h1>
+              <p className="font-medium line-clamp-1">
+                {new Intl.NumberFormat("en-NG", {
+                  style: "currency",
+                  currency: "NGN",
+                }).format(user.walletBalance)}
+              </p>
+            </div>
+          )}
+          <div className=" px-4">
+            <LogoutButton />
+          </div>
         </div>
       </div>
     </div>

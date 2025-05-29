@@ -3,6 +3,7 @@ import {
   FormState,
   SignInSchema,
   GetCurrentLoginInformationsResponse,
+  GetAccountBalanceResponse,
 } from "@/app/lib/definitions";
 
 import {
@@ -90,6 +91,7 @@ export async function login(state: FormState, formData: FormData) {
     const response2 = await getCurrentLoginInformation(
       response.result.accessToken
     );
+    const balance = await getAccountBalance(response.result.accessToken);
     const user = response2.result.user;
     const role = user.roleName.includes("Admin") ? "admin" : "agent";
     await createSession(
@@ -99,7 +101,10 @@ export async function login(state: FormState, formData: FormData) {
       user
     );
     return {
-      user: user,
+      user: {
+        ...user,
+        walletBalance: balance?.result?.payload?.availableBalance,
+      },
       success: true,
       role,
     };
@@ -166,11 +171,26 @@ export const getCurrentLoginInformation = async (
   accessToken: string
 ): Promise<GetCurrentLoginInformationsResponse> => {
   const response = await fetch(
-    `${baseUrl}//api/services/app/Session/GetCurrentLoginInformations`,
+    `${baseUrl}/api/services/app/Session/GetCurrentLoginInformations`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    }
+  );
+
+  return response.json();
+};
+export const getAccountBalance = async (
+  accessToken: string
+): Promise<GetAccountBalanceResponse> => {
+  const response = await fetch(
+    `${baseUrl}/api/services/app/PaymentService/AccountBalance`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      method: "POST",
     }
   );
 

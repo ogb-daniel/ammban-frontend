@@ -1,10 +1,5 @@
 "use client";
-import {
-  ADMIN_PROFILE,
-  ADMIN_TRANSACTIONS,
-  AGENT_PROFILE,
-  AGENT_TRANSACTIONS,
-} from "@/app/lib/routes";
+import { ADMIN_PROFILE, AGENT_PROFILE } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -19,37 +14,41 @@ export default function MobileProfile() {
         (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
         "/personal-information",
     },
+    // {
+    //   title: "Transaction History",
+    //   href:
+    //     user?.role === "admin"
+    //       ? ADMIN_TRANSACTIONS.url
+    //       : AGENT_TRANSACTIONS.url,
+    // },
+    // {
+    //   title: "Account Limits",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/account-limits",
+    // },
+    // {
+    //   title: "Customer Support",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/customer-support",
+    // },
+    // {
+    //   title: "Update Account Details",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/update-account-details",
+    // },
     {
-      title: "Transaction History",
-      href:
-        user?.role === "admin"
-          ? ADMIN_TRANSACTIONS.url
-          : AGENT_TRANSACTIONS.url,
+      title: "Wallet",
+      href: `/${user?.role}/wallet`,
     },
-    {
-      title: "Account Limits",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/account-limits",
-    },
-    {
-      title: "Customer Support",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/customer-support",
-    },
-    {
-      title: "Update Account Details",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/update-account-details",
-    },
-    {
-      title: "Change Password",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/change-password",
-    },
+    // {
+    //   title: "Change Password",
+    //   href:
+    //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+    //     "/change-password",
+    // },
   ];
 
   return (

@@ -44,6 +44,12 @@ export default function DesktopProfileLayout({
     //     (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
     //     "/update-account-details",
     // },
+    {
+      title: "Wallet",
+      href:
+        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        "/wallet",
+    },
     // {
     //   title: "Change Password",
     //   href:
@@ -55,10 +61,7 @@ export default function DesktopProfileLayout({
   return (
     <div>
       <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
-        <h1 className="font-semibold ">Welcome {user?.fullName}</h1>
-        <p className="text-blue-500">
-          AXA {user?.role === "admin" ? "Admin" : "Agent"}
-        </p>
+        <h1 className="font-semibold">Profile</h1>
       </div>
       <div className="flex w-full min-h-screen">
         {/* Sidebar */}

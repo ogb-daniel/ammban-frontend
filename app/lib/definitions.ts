@@ -69,6 +69,7 @@ export type User = {
   roleName: string;
   role?: string;
   id: number;
+  walletBalance: number;
 };
 
 export type Role = {
@@ -537,7 +538,7 @@ export interface GetAccountBalanceResponse
     responseCode: number;
     message: string;
     payload: {
-      accountBalance: number;
+      availableBalance: number;
       accountNumber: string;
       accountName: string;
     };
@@ -546,7 +547,7 @@ export interface GetAccountBalanceResponse
     responseCode: number;
     message: string;
     payload: {
-      accountBalance: number;
+      availableBalance: number;
       accountNumber: string;
       accountName: string;
     };
@@ -647,4 +648,11 @@ export interface SyncTransactionResponse
       transactionID: string;
     };
   };
+}
+
+export interface WalletAccountDetails {
+  accountName: string;
+  accountNumber: string;
+  bankName: string;
+  bankCode: string;
 }

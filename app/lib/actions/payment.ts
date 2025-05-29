@@ -20,10 +20,7 @@ export const getAccountBalance = async (): Promise<
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error(
-      "Error setting up commission percentage:",
-      error?.response?.data
-    );
+    console.error("Error getting balance:", error?.response?.data);
     return (
       error?.response?.data || {
         success: false,
