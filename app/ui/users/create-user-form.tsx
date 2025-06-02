@@ -3,12 +3,12 @@ import React from "react";
 import { useForm } from "@tanstack/react-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { ADMIN_USERS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import FieldInfo from "../auth/field-info";
 import { SignupFormSchema, States } from "@/app/lib/definitions";
 import { createUser, getAllStates } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function CreateUserForm() {
   const [states, setStates] = React.useState<States[] | null>([]);
@@ -22,6 +22,7 @@ export default function CreateUserForm() {
     })();
   }, []);
   const router = useRouter();
+  const { user } = useUserStore((state) => state);
 
   const form = useForm({
     defaultValues: {
@@ -54,7 +55,7 @@ export default function CreateUserForm() {
       } finally {
         setSubmitting(false);
       }
-      router.push(ADMIN_USERS.url);
+      router.push(`/${user?.role}/user`);
     },
     validators: {
       onChange: SignupFormSchema,

@@ -2,15 +2,17 @@
 import React from "react";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
-import { ADMIN_PRODUCTS } from "@/app/lib/routes";
 import { createProductCategory } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import styles from "./products.module.css";
 import { industryList } from "@/app/lib/static-data";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function CreateCategoryForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
+  const { user } = useUserStore((state) => state);
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -34,7 +36,7 @@ export default function CreateCategoryForm() {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(ADMIN_PRODUCTS.url);
+      router.replace(`/${user?.role}/products`);
     },
   });
   return (

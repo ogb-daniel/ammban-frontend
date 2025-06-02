@@ -7,7 +7,6 @@ import { FaTrash, FaUser } from "react-icons/fa";
 import { BiSolidShoppingBagAlt } from "react-icons/bi";
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MdEdit, MdInfo } from "react-icons/md";
-import { ADMIN_PRODUCTS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import { Product } from "@/app/lib/definitions";
 import Swal from "sweetalert2";
@@ -78,7 +77,7 @@ const ProductsTable = () => {
           {
             element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
             onClick: (product: Product) => {
-              router.push(`${ADMIN_PRODUCTS.url}/${product.id}`);
+              router.push(`/${user?.role}/products/${product.id}`);
             },
             label: "Edit Product",
           },

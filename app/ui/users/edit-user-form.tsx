@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import FieldInfo from "../auth/field-info";
 import { EditUserInformationSchema, States, User } from "@/app/lib/definitions";
 import { getAllStates, updateUser } from "@/app/lib/actions/user";
-import { ADMIN_USERS } from "@/app/lib/routes";
 import { toast } from "react-toastify";
 
 export default function EditUserForm({ user }: { user: User }) {
@@ -55,7 +54,7 @@ export default function EditUserForm({ user }: { user: User }) {
         setSubmitting(false);
       }
       // Handle form submission
-      router.push(ADMIN_USERS.url);
+      router.push(`/${user?.role}/users`);
     },
     validators: {
       onChange: EditUserInformationSchema,

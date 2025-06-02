@@ -2,12 +2,7 @@
 import React, { useActionState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
-import {
-  ADMIN_DASHBOARD,
-  AGENT_DASHBOARD,
-  FORGOT_PASSWORD,
-  SIGNUP,
-} from "@/app/lib/routes";
+import { FORGOT_PASSWORD, SIGNUP } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
 import { SignInSchema } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
@@ -44,8 +39,7 @@ export default function LoginForm() {
     } else if (state?.success) {
       setUser({ ...state.user, role: state.role });
       showLoader(); // Show progress bar before navigation
-      const redirectUrl =
-        state.role === "admin" ? ADMIN_DASHBOARD.url : AGENT_DASHBOARD.url;
+      const redirectUrl = `/${state.role}/dashboard`;
       if (typeof window !== "undefined") {
         window.location.href = redirectUrl;
       }

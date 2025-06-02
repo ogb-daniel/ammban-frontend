@@ -2,7 +2,6 @@ import Link from "next/link";
 import React from "react";
 import { BiCard } from "react-icons/bi";
 import CircleIcon from "../circle-icon";
-import { ADMIN_PRODUCTS, AGENT_PRODUCTS } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 
 export default function RecentProducts() {
@@ -13,9 +12,7 @@ export default function RecentProducts() {
         <h2 className="text-lg font-semibold">Recent Products</h2>
         <Link
           className="text-primary font-semibold"
-          href={
-            user?.role === "admin" ? ADMIN_PRODUCTS.url : AGENT_PRODUCTS.url
-          }
+          href={`/${user?.role}/products`}
         >
           View All
         </Link>

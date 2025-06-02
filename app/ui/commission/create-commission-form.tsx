@@ -7,12 +7,13 @@ import { getAllRoles } from "@/app/lib/actions/role";
 import { Role } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
 import { setupCommissionPercentage } from "@/app/lib/actions/commission";
-import { ADMIN_COMMISSION } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function CreateCommissionForm() {
   const router = useRouter();
   const [roles, setRoles] = useState<Role[]>([]);
   const [submitting, setSubmitting] = React.useState(false);
+  const { user } = useUserStore((state) => state);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -56,7 +57,7 @@ export default function CreateCommissionForm() {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(ADMIN_COMMISSION.url);
+      router.replace(`/${user?.role}/commissions`);
     },
   });
 

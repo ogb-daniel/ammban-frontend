@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ADMIN_PROFILE, AGENT_PROFILE } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 
 export default function DesktopProfileLayout({
@@ -16,7 +15,7 @@ export default function DesktopProfileLayout({
     {
       title: "Personal Information",
       href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        user?.role  +
         "/personal-information",
     },
     // {
@@ -47,7 +46,7 @@ export default function DesktopProfileLayout({
     {
       title: "Wallet",
       href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
+        user?.role +
         "/wallet",
     },
     // {

@@ -7,7 +7,7 @@ import { Permission, Role } from "@/app/lib/definitions";
 import { getPermissions, updateRole } from "@/app/lib/actions/role";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { ADMIN_ROLES } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function EditRoleForm({ role }: { role: Role }) {
   const { editRole: updateRoleFromStore } = useAdminStore((state) => state);
@@ -20,6 +20,7 @@ export default function EditRoleForm({ role }: { role: Role }) {
   );
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const { user } = useUserStore((state) => state);
 
   // State for selected color
 
@@ -59,7 +60,7 @@ export default function EditRoleForm({ role }: { role: Role }) {
       } finally {
         setSubmitting(false);
       }
-      router.replace(ADMIN_ROLES.url);
+      router.replace(`/${user?.role}/roles`);
     },
   });
 

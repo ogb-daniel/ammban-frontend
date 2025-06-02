@@ -4,7 +4,6 @@ import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
 import { MdCheckBox, MdEdit } from "react-icons/md";
 import { FaTransgender, FaTrash, FaUser } from "react-icons/fa";
-import { ADMIN_USERS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import { PiPhoneFill } from "react-icons/pi";
 import { FaLocationDot } from "react-icons/fa6";
@@ -145,7 +144,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
           {
             element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
             onClick: (user: User) => {
-              router.push(`${ADMIN_USERS.url}/${user.id}`);
+              router.push(`/${user?.role}/users/${user.id}`);
             },
             label: "Edit User",
           },

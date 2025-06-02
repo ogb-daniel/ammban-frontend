@@ -67,7 +67,7 @@ export type User = {
   creationTime: string;
   roleNames: string[];
   roleName: string;
-  role?: string;
+  role: string;
   id: number;
   walletBalance: number;
 };

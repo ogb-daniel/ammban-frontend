@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { getAllRoles } from "@/app/lib/actions/role";
 import { CommissionPercentage, Role } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
-import { ADMIN_COMMISSION } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function EditCommissionForm({
   commission,
@@ -15,6 +15,7 @@ export default function EditCommissionForm({
 }) {
   const router = useRouter();
   const [roles, setRoles] = useState<Role[]>([]);
+  const { user } = useUserStore((state) => state);
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -44,7 +45,7 @@ export default function EditCommissionForm({
       console.log(values);
 
       // Handle form submission
-      router.replace(ADMIN_COMMISSION.url);
+      router.replace(`/${user?.role}/commissions`);
     },
   });
 

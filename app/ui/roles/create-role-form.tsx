@@ -7,7 +7,7 @@ import { createRole, getPermissions } from "@/app/lib/actions/role";
 import { Permission } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { ADMIN_ROLES } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 // Sample Permissions Data
 
 export default function CreateRoleForm() {
@@ -22,6 +22,7 @@ export default function CreateRoleForm() {
       return acc;
     }, {} as Record<string, boolean>)
   );
+  const { user } = useUserStore((state) => state);
 
   const handleToggle = (permission: string) => {
     setPermissions((prev) => ({
@@ -61,7 +62,7 @@ export default function CreateRoleForm() {
       } finally {
         setSubmitting(false);
       }
-      router.replace(ADMIN_ROLES.url);
+      router.replace(`/${user?.role}/roles`);
     },
   });
   useEffect(() => {

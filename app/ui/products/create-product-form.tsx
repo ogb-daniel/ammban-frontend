@@ -9,7 +9,7 @@ import {
 } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { ADMIN_PRODUCTS } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function CreateProductForm() {
   const { createProduct: createProductFromStore } = useAdminStore(
@@ -19,6 +19,8 @@ export default function CreateProductForm() {
   const [categories, setCategories] = React.useState<
     { id: number; name: string }[]
   >([]);
+    const { user } = useUserStore((state) => state);
+
   React.useEffect(() => {
     (async () => {
       const response = await getAllProductCategories({});
@@ -55,7 +57,7 @@ export default function CreateProductForm() {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(ADMIN_PRODUCTS.url);
+      router.replace(`/${user?.role}/products`);
     },
   });
   return (

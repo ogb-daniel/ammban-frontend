@@ -1,5 +1,4 @@
 "use client";
-import { ADMIN_PROFILE, AGENT_PROFILE } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -10,9 +9,7 @@ export default function MobileProfile() {
   const links = [
     {
       title: "Personal Information",
-      href:
-        (user?.role === "admin" ? ADMIN_PROFILE.url : AGENT_PROFILE.url) +
-        "/personal-information",
+      href: `/${user?.role}/profile` + "/personal-information",
     },
     // {
     //   title: "Transaction History",

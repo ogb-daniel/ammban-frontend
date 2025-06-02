@@ -2,7 +2,6 @@ import Link from "next/link";
 import React from "react";
 import TransactionCard from "../transactions/transaction-card";
 import { BiCard } from "react-icons/bi";
-import { ADMIN_TRANSACTIONS, AGENT_TRANSACTIONS } from "@/app/lib/routes";
 import { useUserStore } from "@/providers/user-store-provider";
 
 export default function RecentTransactions() {
@@ -15,11 +14,7 @@ export default function RecentTransactions() {
         <h2 className="text-lg font-semibold">Recent Transactions</h2>
         <Link
           className="text-primary font-semibold"
-          href={
-            user?.role === "admin"
-              ? ADMIN_TRANSACTIONS.url
-              : AGENT_TRANSACTIONS.url
-          }
+          href={`/${user?.role}/commissions`}
         >
           View All
         </Link>

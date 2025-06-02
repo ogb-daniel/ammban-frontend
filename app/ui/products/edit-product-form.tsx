@@ -10,7 +10,7 @@ import {
 } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { ADMIN_PRODUCTS } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function EditProductForm({ product }: { product: Product }) {
   const { editProduct: updateProductFromStore } = useAdminStore(
@@ -27,6 +27,7 @@ export default function EditProductForm({ product }: { product: Product }) {
     })();
   }, []);
   const router = useRouter();
+  const { user } = useUserStore((state) => state);
 
   const form = useForm({
     defaultValues: {
@@ -55,7 +56,7 @@ export default function EditProductForm({ product }: { product: Product }) {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(ADMIN_PRODUCTS.url);
+      router.replace(`/${user?.role}/products`);
     },
   });
 
