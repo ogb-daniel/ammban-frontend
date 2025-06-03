@@ -649,10 +649,165 @@ export interface SyncTransactionResponse
     };
   };
 }
+export interface SyncStatusResponse
+  extends ApiResponse<{
+    status: boolean;
+    message: string;
+    data: {
+      effectiveDate: string;
+      expiryDate: string;
+      trackNumber: string;
+      transactionID: string;
+    };
+  }> {
+  result: {
+    status: boolean;
+    message: string;
+    data: {
+      effectiveDate: string;
+      expiryDate: string;
+      trackNumber: string;
+      transactionID: string;
+    };
+  };
+}
+
+export interface GetTransactionHistoryResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: {
+        productName: string;
+        customerName: string;
+        phoneNumber: string;
+        status: number;
+        amount: number;
+      }[];
+    };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: {
+        productName: string;
+        customerName: string;
+        phoneNumber: string;
+        status: number;
+        amount: number;
+      }[];
+    };
+  };
+}
+
+export interface GetTransactionReceiptResponse
+  extends ApiResponse<{
+    transactionDate: string;
+    productName: string;
+    amount: number;
+    sellerName: string;
+    buyerName: string;
+  }> {
+  result: {
+    transactionDate: string;
+    productName: string;
+    amount: number;
+    sellerName: string;
+    buyerName: string;
+  };
+}
 
 export interface WalletAccountDetails {
   accountName: string;
   accountNumber: string;
   bankName: string;
   bankCode: string;
+}
+
+export interface CommissionsEarnedResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: {
+      amount: number;
+      userId: string;
+    };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      amount: number;
+      userId: string;
+    };
+  };
+}
+
+export interface GetReferredUsersResponse
+  extends ApiResponse<{
+    totalUsers: number;
+    totalActiveUsers: number;
+    totalInActiveUsers: number;
+    referredUsers: User[];
+  }> {
+  result: {
+    totalUsers: number;
+    totalActiveUsers: number;
+    totalInActiveUsers: number;
+    referredUsers: User[];
+  };
+}
+
+export interface TotalSalesResponse
+  extends ApiResponse<{
+    totalSales: number;
+    amount: number;
+  }> {
+  result: {
+    totalSales: number;
+    amount: number;
+  };
+}
+export interface TotalSalesByAgentsResponse
+  extends ApiResponse<{
+    totalSales: number;
+    totalAggregators: number;
+    totalAgents: number;
+    transactionAmount: number;
+    aggregatedBreakdown: {
+      aggregatorId: number;
+      aggregatorName: string;
+      agentCount: number;
+      salesCount: number;
+      salesAmount: number;
+      agentBreakdown: {
+        agentId: number;
+        agentName: string;
+        transactionCount: number;
+        transactionAmount: number;
+      }[];
+    }[];
+  }> {
+  result: {
+    totalSales: number;
+    totalAggregators: number;
+    totalAgents: number;
+    transactionAmount: number;
+    aggregatedBreakdown: {
+      aggregatorId: number;
+      aggregatorName: string;
+      agentCount: number;
+      salesCount: number;
+      salesAmount: number;
+      agentBreakdown: {
+        agentId: number;
+        agentName: string;
+        transactionCount: number;
+        transactionAmount: number;
+      }[];
+    }[];
+  };
 }

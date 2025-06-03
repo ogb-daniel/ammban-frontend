@@ -3,6 +3,9 @@ import {
   ApiResponse,
   DepositFundsResponse,
   GetAccountBalanceResponse,
+  GetTransactionHistoryResponse,
+  GetTransactionReceiptResponse,
+  SyncStatusResponse,
   SyncTransactionBody,
   SyncTransactionResponse,
   WithdrawFundsRequestBody,
@@ -90,6 +93,76 @@ export const syncTransaction = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error syncing transaction:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const getSyncStatus = async (
+  transactionId: string
+): Promise<SyncStatusResponse> => {
+  try {
+    const response = await api.get<SyncStatusResponse>(
+      `/api/services/app/PolicyService/GetSyncStatus`,
+      { params: { transactionId } }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error getting sync status:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const getTransactionHistory = async (): Promise<
+  ApiResponse<GetTransactionHistoryResponse[]>
+> => {
+  try {
+    const response = await api.get<
+      ApiResponse<GetTransactionHistoryResponse[]>
+    >(`/api/services/app/PolicyService/GetTransactionHistory`);
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error getting transaction history:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+export const transactionReceipt = async (
+  transactionId: string
+): Promise<ApiResponse<GetTransactionReceiptResponse>> => {
+  try {
+    const response = await api.post<ApiResponse<GetTransactionReceiptResponse>>(
+      `/api/services/app/PolicyService/TransactionReceipt`,
+      { params: { transactionId } }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error getting transaction receipt:", error?.response?.data);
     return (
       error?.response?.data || {
         success: false,
