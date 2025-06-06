@@ -5,7 +5,7 @@ type DashboardCardProps = {
   title: string;
   value: string | number;
   icon: JSX.Element;
-  change: string;
+  change?: string;
   duration: string;
   bgColor: string;
   textColor: string;
@@ -34,7 +34,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           </span>
           <span
             className={`text-sm font-medium ${
-              change.includes("-") ? "text-red-500" : "text-green-500"
+              change?.includes("-") ? "text-red-500" : "text-green-500"
             }`}
           >
             {change}

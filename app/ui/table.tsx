@@ -8,9 +8,11 @@ import {
   Row,
   SortingState,
   getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { CardLayout, CompactLayout, ListLayout } from "./table/mobile-layouts";
+import SearchBar from "./search-bar";
 export type Action<T> = {
   element: React.ReactNode;
   onClick: (row: T) => void;
@@ -47,6 +49,8 @@ const Table = <T extends object>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [globalFilter, setGlobalFilter] = useState();
+
   const allColumns = React.useMemo(() => {
     if (!actions?.length) return columns;
 
@@ -79,6 +83,7 @@ const Table = <T extends object>({
       pagination,
       rowSelection,
       sorting,
+      globalFilter,
     },
     enableRowSelection: true,
     enableSorting: true, // Enable global sorting
@@ -88,6 +93,10 @@ const Table = <T extends object>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
+    getFilteredRowModel: getFilteredRowModel(),
+
+    onGlobalFilterChange: setGlobalFilter,
+    enableGlobalFilter: true, // Enable global filtering
   });
   // Call onSelectedRowsChange when selection changes
   React.useEffect(() => {
@@ -128,6 +137,11 @@ const Table = <T extends object>({
           {title}
         </h2>
         <div className="overflow-x-auto">
+          <SearchBar
+            onChange={(e) => table.setGlobalFilter(String(e?.target?.value))}
+            placeholder="Search..."
+            className="w-1/2 px-8 mt-1"
+          />
           <table className="hidden md:table min-w-full table-fixed border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (

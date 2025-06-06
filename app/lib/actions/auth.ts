@@ -93,7 +93,7 @@ export async function login(state: FormState, formData: FormData) {
     );
     const balance = await getAccountBalance(response.result.accessToken);
     const user = response2.result.user;
-    const role = user.roleName.toLowerCase();
+    const role = user.roleName.split(" ").join("-").toLowerCase();
     await createSession(
       response.result.accessToken,
       response.result.expireInSeconds,

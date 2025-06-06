@@ -1,0 +1,101 @@
+"use client";
+import useResponsive from "@/app/lib/hooks/useResponsive";
+import DashboardCard from "@/app/ui/dashboard/dashboard-card";
+import RecentProducts from "@/app/ui/dashboard/recent-product";
+import RecentTransactions from "@/app/ui/dashboard/recent-transaction";
+import SalesInsights from "@/app/ui/dashboard/sales-insights";
+import React from "react";
+import { FiDollarSign, FiTrendingUp, FiUsers } from "react-icons/fi";
+import TabSlider from "../tab-slider";
+import AllTransactions from "../transactions/all-transactions";
+import Income from "../transactions/income";
+import Outflow from "../transactions/outflow";
+import { useUserStore } from "@/providers/user-store-provider";
+
+const mockData = [
+  { date: "23 Oct", users: 3000 },
+  { date: "6 Nov", users: 5000 },
+  { date: "20 Nov", users: 8000 },
+  { date: "4 Dec", users: 15000 },
+  { date: "18 Dec", users: 25000 },
+  { date: "1 Jan", users: 20000 },
+];
+const totalUsers = 56589;
+const tabs = [
+  { key: "all", label: "All Transactions", component: <AllTransactions /> },
+  { key: "income", label: "Income", component: <Income /> },
+  { key: "outflow", label: "Outflow", component: <Outflow /> },
+];
+
+export default function AgentDashboard({
+  totalSalesAmount,
+  totalSales,
+  commissionEarnings,
+}: {
+  totalSales: number;
+  totalSalesAmount: number;
+  commissionEarnings: number;
+}) {
+  const isMobile = useResponsive();
+  const user = useUserStore((state) => state.user);
+  const cards = [
+    {
+      title: "Total Sales",
+      value: totalSales,
+      icon: <FiTrendingUp className="text-yellow-500 text-xl" />,
+      duration: "7d",
+      bgColor: "bg-yellow-50",
+      textColor: "text-yellow-500",
+    },
+    {
+      title: "Total Sales (₦)",
+      value: new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+      }).format(totalSalesAmount),
+      icon: <FiUsers className="text-blue-500 text-xl" />,
+      duration: "7d",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-500",
+    },
+
+    {
+      title: "Commission Earnings",
+      value: new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+      }).format(commissionEarnings),
+      icon: <FiDollarSign className="text-teal-500 text-xl" />,
+      duration: "30d",
+      bgColor: "bg-teal-50",
+      textColor: "text-teal-500",
+    },
+  ];
+  return (
+    <main className="">
+      <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
+        <h1 className="font-semibold ">Welcome {user?.userName}</h1>
+      </div>
+      <div className=" p-6">
+        <h2 className="mt-6  font-semibold">Overview</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+          {cards.map((card, index) => (
+            <DashboardCard key={index} {...card} />
+          ))}
+        </div>
+        {isMobile ? (
+          <>
+            <SalesInsights data={mockData} totalUsers={totalUsers} />
+            <RecentTransactions />
+            <RecentProducts />
+          </>
+        ) : (
+          <div className="mt-10">
+            <h2 className="text-[22px]  font-semibold">Recent Transactions</h2>
+            <TabSlider tabs={tabs} />
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}

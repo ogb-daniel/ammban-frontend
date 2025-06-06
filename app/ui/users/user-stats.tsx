@@ -6,7 +6,7 @@ import { FaUser } from "react-icons/fa";
 import { HiUsers } from "react-icons/hi2";
 import { IoHeart } from "react-icons/io5";
 
-const userStats = [
+const stats = [
   {
     title: "Total Users",
     count: 250,
@@ -33,7 +33,16 @@ const userStats = [
   },
 ];
 
-export default function UserStats() {
+export default function UserStats({
+  userStats = stats,
+}: {
+  userStats?: {
+    title: string;
+    count: number;
+    baseColor: string;
+    icon: React.ElementType;
+  }[];
+}) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
       {userStats.map((stat, index) => (

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import styles from "@/app/ui/products/products.module.css";
 import { useRouter } from "next/navigation";
@@ -9,11 +9,19 @@ import { banks } from "@/app/lib/static-data";
 import { useUserStore } from "@/providers/user-store-provider";
 import { withdrawFunds } from "@/app/lib/actions/payment";
 import { showSuccessModal } from "@/app/lib/utils/transaction-result";
+import { commissionsEarned } from "@/app/lib/actions/dashboard";
 
 export default function WithdrawCommissionForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
   const { user } = useUserStore((state) => state);
+  const [commissionBalance, setCommissionBalance] = React.useState(0);
+  useEffect(() => {
+    (async () => {
+      const response = await commissionsEarned();
+      setCommissionBalance(response.result.payload.amount);
+    })();
+  }, []);
   const form = useForm({
     defaultValues: {
       amount: 0,
@@ -22,11 +30,9 @@ export default function WithdrawCommissionForm() {
       narration: "",
     },
     onSubmit: async (values) => {
-      if (!user?.walletBalance) {
-        return toast.error("No wallet found");
-      }
-      if (values.value.amount > user?.walletBalance) {
-        toast.error("Insufficient wallet balance");
+      if (values.value.amount > commissionBalance) {
+        toast.error("Insufficient commission balance");
+        return;
       }
       console.log(values);
       setSubmitting(true);
@@ -38,8 +44,12 @@ export default function WithdrawCommissionForm() {
           beneficiaryBankName: values.value.bank,
           narration: "Withdrawal",
         });
-        if (!response.result.requestSuccessful) {
+        if (!response.success) {
           toast.error(response.error.message);
+          return;
+        }
+        if (!response.result.requestSuccessful) {
+          toast.error(response.result.responseMessage);
           return;
         }
         await showSuccessModal(
@@ -50,11 +60,14 @@ export default function WithdrawCommissionForm() {
           }).format(values.value.amount)} was successful`,
           "Close"
         );
+      } catch (error) {
+        toast.error((error as Error).message);
+        return;
       } finally {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(`/${user.role}/commissions`);
+      router.replace(`/${user!.role}/commissions`);
     },
   });
 

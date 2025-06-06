@@ -1,6 +1,5 @@
 "use server";
 import {
-  ApiResponse,
   DepositFundsResponse,
   GetAccountBalanceResponse,
   GetTransactionHistoryResponse,
@@ -13,28 +12,27 @@ import {
 } from "../definitions";
 import api from "../api/axios";
 
-export const getAccountBalance = async (): Promise<
-  ApiResponse<GetAccountBalanceResponse>
-> => {
-  try {
-    const response = await api.post<ApiResponse<GetAccountBalanceResponse>>(
-      `/api/services/app/PaymentService/AccountBalance`
-    );
-    return response.data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.error("Error getting balance:", error?.response?.data);
-    return (
-      error?.response?.data || {
-        success: false,
-        error: {
-          message: error?.response?.data?.error?.message || error?.message,
-          details: error?.response?.data?.error?.details,
-        },
-      }
-    );
-  }
-};
+export const getAccountBalance =
+  async (): Promise<GetAccountBalanceResponse> => {
+    try {
+      const response = await api.post<GetAccountBalanceResponse>(
+        `/api/services/app/PaymentService/AccountBalance`
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error getting balance:", error?.response?.data);
+      return (
+        error?.response?.data || {
+          success: false,
+          error: {
+            message: error?.response?.data?.error?.message || error?.message,
+            details: error?.response?.data?.error?.details,
+          },
+        }
+      );
+    }
+  };
 
 export const withdrawFunds = async (
   body: WithdrawFundsRequestBody
@@ -89,6 +87,7 @@ export const syncTransaction = async (
       `/api/services/app/PolicyService/SyncTransaction`,
       body
     );
+    console.log("Sync Transaction Response:", response.data);
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -129,33 +128,37 @@ export const getSyncStatus = async (
   }
 };
 
-export const getTransactionHistory = async (): Promise<
-  ApiResponse<GetTransactionHistoryResponse[]>
-> => {
-  try {
-    const response = await api.get<
-      ApiResponse<GetTransactionHistoryResponse[]>
-    >(`/api/services/app/PolicyService/GetTransactionHistory`);
-    return response.data;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.error("Error getting transaction history:", error?.response?.data);
-    return (
-      error?.response?.data || {
-        success: false,
-        error: {
-          message: error?.response?.data?.error?.message || error?.message,
-          details: error?.response?.data?.error?.details,
-        },
-      }
-    );
-  }
-};
+export const getTransactionHistory =
+  async (): Promise<GetTransactionHistoryResponse> => {
+    try {
+      const response = await api.get<GetTransactionHistoryResponse>(
+        `/api/services/app/PolicyService/GetTransactionHistory`
+      );
+      console.log("Transaction History Response:", response.data);
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(
+        "Error getting transaction history:",
+        error?.response?.data
+      );
+      return (
+        error?.response?.data || {
+          success: false,
+          error: {
+            message: error?.response?.data?.error?.message || error?.message,
+            details: error?.response?.data?.error?.details,
+          },
+        }
+      );
+    }
+  };
 export const transactionReceipt = async (
   transactionId: string
-): Promise<ApiResponse<GetTransactionReceiptResponse>> => {
+): Promise<GetTransactionReceiptResponse> => {
   try {
-    const response = await api.post<ApiResponse<GetTransactionReceiptResponse>>(
+    const response = await api.post<GetTransactionReceiptResponse>(
       `/api/services/app/PolicyService/TransactionReceipt`,
       { params: { transactionId } }
     );

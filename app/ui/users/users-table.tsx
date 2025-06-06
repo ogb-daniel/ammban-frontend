@@ -22,10 +22,11 @@ import Swal from "sweetalert2";
 import { deleteUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
+import { useUserStore } from "@/providers/user-store-provider";
 
 const userColumns: ColumnDef<User>[] = [
   {
-    accessorKey: "",
+    accessorKey: "fullName",
     header: "Name",
     cell: (info) => (
       <div>
@@ -61,7 +62,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "gender",
     header: "Gender",
-    cell: (info) => info.getValue() && toTitleCase(info.getValue() as string),
+    cell: (info) => toTitleCase(info.getValue() === 0 ? "Male" : "Female"),
     enableSorting: true,
     meta: {
       icon: <FaTransgender className="text-gray-500" />,
@@ -137,6 +138,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
   const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
   const [isOpen, setIsOpen] = useState(false);
+  const { user: currentUser } = useUserStore((state) => state);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const actions =
     selected === "Manage Users"
@@ -144,7 +146,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
           {
             element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
             onClick: (user: User) => {
-              router.push(`/${user?.role}/users/${user.id}`);
+              router.push(`/${currentUser?.role}/users/${user.id}`);
             },
             label: "Edit User",
           },

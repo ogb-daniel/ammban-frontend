@@ -13,13 +13,6 @@ import Swal from "sweetalert2";
 import { deleteProduct } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
-import { showAXATransactionConfirmation } from "@/app/lib/utils/transaction-confirmation";
-import { syncTransaction } from "@/app/lib/actions/payment";
-import {
-  showAXAFailureModal,
-  showAXASuccessModal,
-} from "@/app/lib/utils/transaction-result";
-import { showAXATransactionDetails } from "@/app/lib/utils/transaction-details";
 
 const productColumns: ColumnDef<Product>[] = [
   {
@@ -43,7 +36,12 @@ const productColumns: ColumnDef<Product>[] = [
   {
     accessorKey: "price",
     header: "Price",
-    cell: (info) => `₦${info.getValue()}`,
+    cell: (info) => {
+      new Intl.NumberFormat("en-NG", {
+        style: "currency",
+        currency: "NGN",
+      }).format(info.getValue() as number);
+    },
     enableSorting: true,
     sortingFn: (rowA, rowB) => {
       const priceA = rowA.getValue("price") as number;
@@ -124,51 +122,7 @@ const ProductsTable = () => {
               </button>
             ),
             onClick: async (product: Product) => {
-              const result = await showAXATransactionConfirmation(
-                `₦${product.price}`, // cost (formatted)
-                "", // fee
-                user?.fullName || "", // seller
-                "", // buyer
-                "", // reference
-                async () => {
-                  return await syncTransaction({
-                    narration: `Purchase of ${product.name}`,
-                    amount: product.price,
-                    isTrial: false,
-                    productId: product.id,
-                  });
-                }
-              );
-              console.log(result);
-              if (result.isConfirmed) {
-                if (result.value?.success) {
-                  await showAXASuccessModal(
-                    async () => {
-                      await showAXATransactionDetails(
-                        `₦${product.price}`, // cost (formatted)
-                        "", // fee
-                        user?.fullName || "", // seller
-                        "", // buyer
-                        "", // reference
-                        result.value?.result.data.transactionID,
-                        result.value?.result.data.effectiveDate
-                      );
-                    },
-                    async () => {
-                      console.log("Navigating to new policy purchase");
-                    }
-                  );
-                } else {
-                  await showAXAFailureModal(
-                    async () => {
-                      console.log("Retrying transaction");
-                    },
-                    async () => {
-                      console.log("Opening support contact form");
-                    }
-                  );
-                }
-              }
+              router.push(`/${user?.role}/products/buy-product/${product.id}`);
             },
             label: "Purchase Product",
           },

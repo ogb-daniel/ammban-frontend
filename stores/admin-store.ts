@@ -4,6 +4,7 @@ import {
   CommissionPercentage,
   Product,
   Role,
+  Transaction,
   User,
 } from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
@@ -13,15 +14,6 @@ type Category = {
   description: string;
   industry: string;
   id: number;
-};
-export type Transaction = {
-  description: string;
-  type: string;
-  date: Date;
-  amount: Price;
-  receipt: string;
-  id: number;
-  source: string;
 };
 
 export type Price = {
@@ -104,32 +96,7 @@ export const initAdminStore = (): AdminState => {
       id: 1,
       role: "Admin",
     },
-    transactions: [
-      {
-        description: "AXA PASS",
-        type: "AXA PASS",
-        date: new Date(),
-        amount: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        receipt: "https://www.google.com",
-        id: 1,
-        source: "income",
-      },
-      {
-        description: "AXA PASS",
-        type: "AXA PASS",
-        date: new Date(),
-        amount: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        receipt: "https://www.google.com",
-        id: 2,
-        source: "outflow",
-      },
-    ],
+    transactions: [],
   };
 };
 export const defaultInitState: AdminState = {

@@ -14,9 +14,7 @@ export default function DesktopProfileLayout({
   const links = [
     {
       title: "Personal Information",
-      href:
-        user?.role  +
-        "/personal-information",
+      href: "/" + user?.role + "/profile/personal-information",
     },
     // {
     //   title: "Transaction History",
@@ -45,9 +43,7 @@ export default function DesktopProfileLayout({
     // },
     {
       title: "Wallet",
-      href:
-        user?.role +
-        "/wallet",
+      href: "/" + user?.role + "/profile/wallet",
     },
     // {
     //   title: "Change Password",

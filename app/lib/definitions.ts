@@ -146,6 +146,13 @@ export type States = {
   regionId: number;
 };
 
+export type Transaction = {
+  productName: string;
+  customerName: string;
+  phoneNumber: string;
+  status: number;
+  amount: number;
+};
 export interface ApiResponse<T> {
   result: T;
   targetUrl: null;
@@ -625,6 +632,14 @@ export interface SyncTransactionBody {
   amount: number;
   isTrial: boolean;
   productId: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+  stateId: number;
+  dateOfBirth: string;
+  gender: string;
 }
 
 export interface SyncTransactionResponse
