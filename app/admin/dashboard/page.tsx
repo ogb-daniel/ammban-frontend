@@ -1,18 +1,20 @@
+import { commissionsEarned, totalSales } from "@/app/lib/actions/dashboard";
 import AdminDashboard from "@/app/ui/dashboard/admin-dashboard";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Dashboard",
 };
-export default function Dashboard() {
+export default async function Dashboard() {
+  const tSales = await totalSales();
+  const commissionEarnings = await commissionsEarned();
+
   return (
     <main>
-      <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
-        <h1 className="font-semibold ">Welcome</h1>
-        <p className="text-blue-500">AXA Admin</p>
-      </div>
-      <div className=" p-6">
-        <AdminDashboard />
-      </div>
+      <AdminDashboard
+        totalSales={tSales?.result?.totalSales || 0}
+        totalSalesAmount={tSales?.result?.amount || 0}
+        commissionEarnings={commissionEarnings?.result?.payload?.amount || 0}
+      />
     </main>
   );
 }

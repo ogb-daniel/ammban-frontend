@@ -1,31 +1,27 @@
 "use client";
-import useResponsive from "@/app/lib/hooks/useResponsive";
 import DashboardCard from "@/app/ui/dashboard/dashboard-card";
-import RecentProducts from "@/app/ui/dashboard/recent-product";
-import RecentTransactions from "@/app/ui/dashboard/recent-transaction";
-import SalesInsights from "@/app/ui/dashboard/sales-insights";
+
 import React from "react";
 import { FiDollarSign, FiTrendingUp, FiUsers } from "react-icons/fi";
-import TabSlider from "../tab-slider";
-import AllTransactions from "../transactions/all-transactions";
-import Income from "../transactions/income";
-import Outflow from "../transactions/outflow";
-import { useUserStore } from "@/providers/user-store-provider";
 
-const mockData = [
-  { date: "23 Oct", users: 3000 },
-  { date: "6 Nov", users: 5000 },
-  { date: "20 Nov", users: 8000 },
-  { date: "4 Dec", users: 15000 },
-  { date: "18 Dec", users: 25000 },
-  { date: "1 Jan", users: 20000 },
-];
-const totalUsers = 56589;
-const tabs = [
-  { key: "all", label: "All Transactions", component: <AllTransactions /> },
-  { key: "income", label: "Income", component: <Income /> },
-  { key: "outflow", label: "Outflow", component: <Outflow /> },
-];
+import { useUserStore } from "@/providers/user-store-provider";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+// const mockData = [
+//   { date: "23 Oct", users: 3000 },
+//   { date: "6 Nov", users: 5000 },
+//   { date: "20 Nov", users: 8000 },
+//   { date: "4 Dec", users: 15000 },
+//   { date: "18 Dec", users: 25000 },
+//   { date: "1 Jan", users: 20000 },
+// ];
+// const totalUsers = 56589;
+// const tabs = [
+//   { key: "all", label: "All Transactions", component: <AllTransactions /> },
+//   { key: "income", label: "Income", component: <Income /> },
+//   { key: "outflow", label: "Outflow", component: <Outflow /> },
+// ];
 
 export default function AgentDashboard({
   totalSalesAmount,
@@ -36,7 +32,7 @@ export default function AgentDashboard({
   totalSalesAmount: number;
   commissionEarnings: number;
 }) {
-  const isMobile = useResponsive();
+  // const isMobile = useResponsive();
   const user = useUserStore((state) => state.user);
   const cards = [
     {
@@ -83,7 +79,18 @@ export default function AgentDashboard({
             <DashboardCard key={index} {...card} />
           ))}
         </div>
-        {isMobile ? (
+        <Link
+          href={`/${user?.role}/products`}
+          className="flex w-fit items-center flex-row gap-4 mt-6 px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+        >
+          <div className="flex flex-col">
+            <span className="font-medium">Purchase New Product</span>
+            <span className="font-semibold text-xl">Select Product</span>
+          </div>
+          <ArrowRight className="text-white ml-2 inline-block" />
+        </Link>
+
+        {/* {isMobile ? (
           <>
             <SalesInsights data={mockData} totalUsers={totalUsers} />
             <RecentTransactions />
@@ -94,7 +101,7 @@ export default function AgentDashboard({
             <h2 className="text-[22px]  font-semibold">Recent Transactions</h2>
             <TabSlider tabs={tabs} />
           </div>
-        )}
+        )} */}
       </div>
     </main>
   );

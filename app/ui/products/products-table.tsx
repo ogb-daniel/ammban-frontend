@@ -37,7 +37,7 @@ const productColumns: ColumnDef<Product>[] = [
     accessorKey: "price",
     header: "Price",
     cell: (info) => {
-      new Intl.NumberFormat("en-NG", {
+      return new Intl.NumberFormat("en-NG", {
         style: "currency",
         currency: "NGN",
       }).format(info.getValue() as number);

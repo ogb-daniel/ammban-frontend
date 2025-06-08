@@ -18,7 +18,7 @@ export default function CommissionsView({
 }) {
   return (
     <div className="p-6">
-      <div className="flex flex-wrap items-center gap-5">
+      <div className="flex flex-wrap items-center gap-5 mb-4">
         <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6 flex-1">
           <h1 className="text-lg font-semibold">Commission Earnings</h1>
           <p className="font-medium line-clamp-1">
