@@ -10,6 +10,7 @@ import {
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function CreateProductForm() {
   const { createProduct: createProductFromStore } = useAdminStore(
@@ -19,7 +20,7 @@ export default function CreateProductForm() {
   const [categories, setCategories] = React.useState<
     { id: number; name: string }[]
   >([]);
-    const { user } = useUserStore((state) => state);
+  const { user } = useUserStore((state) => state);
 
   React.useEffect(() => {
     (async () => {
@@ -200,7 +201,13 @@ export default function CreateProductForm() {
           disabled={submitting}
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Product
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Product"
+          )}
         </button>
       </div>
     </form>

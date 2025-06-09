@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import styles from "./products.module.css";
 import { industryList } from "@/app/lib/static-data";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function CreateCategoryForm() {
   const router = useRouter();
@@ -132,7 +133,13 @@ export default function CreateCategoryForm() {
           disabled={submitting}
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Category
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Category"
+          )}
         </button>
       </div>
     </form>

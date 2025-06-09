@@ -8,6 +8,7 @@ import { Role } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
 import { setupCommissionPercentage } from "@/app/lib/actions/commission";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function CreateCommissionForm() {
   const router = useRouter();
@@ -163,7 +164,13 @@ export default function CreateCommissionForm() {
           disabled={submitting}
           className="w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Commission
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Commission"
+          )}
         </button>
       </div>
     </form>

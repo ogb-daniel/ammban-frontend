@@ -6,6 +6,7 @@ import FieldInfo from "../auth/field-info";
 import { resetPassword } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import * as z from "zod";
+import CircleLoader from "../circle-loader";
 
 const Schema = z
   .object({
@@ -193,7 +194,13 @@ export default function ChangePasswordForm() {
           disabled={submitting}
           className="btn-primary mt-10"
         >
-          Change Password
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Change Password"
+          )}
         </button>
       </div>
     </form>

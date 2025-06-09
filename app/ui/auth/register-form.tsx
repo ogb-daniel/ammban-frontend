@@ -11,10 +11,14 @@ import { signup } from "@/app/lib/actions/auth";
 import { SignupFormSchema, States } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
 import { getAllStates } from "@/app/lib/actions/user";
+import { Upload } from "lucide-react";
+import Image from "next/image";
 
 export default function RegistrationForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const [states, setStates] = React.useState<States[] | null>([]);
+  const [image, setImage] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     (async () => {
       const response = await getAllStates();
@@ -60,7 +64,21 @@ export default function RegistrationForm() {
 
     return action(formData);
   };
-
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (
+      file &&
+      ["image/png", "image/jpeg", "image/gif", "image/svg+xml"].includes(
+        file.type
+      )
+    ) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <form action={handleAction} className="max-w-lg mx-auto  space-y-4 mt-9">
       <div>
@@ -430,7 +448,34 @@ export default function RegistrationForm() {
           }}
         />
       </div>
-
+      <div className="space-y-2">
+        <p className="flex-[0.8] font-medium">
+          Upload a clear image of your government-issued ID for identity
+          verification
+        </p>
+        <label className="flex-1 border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+          {image && (
+            <div className="w-full h-72 relative">
+              <Image
+                src={image}
+                alt="Profile"
+                fill
+                className=" object-cover border"
+                sizes="64px"
+              />
+            </div>
+          )}
+          <Upload className="text-gray-500 w-8 h-8 mb-2 mt-5" />
+          <p>
+            <span className="text-primary font-medium">Click to upload</span> or
+            drag and drop
+          </p>
+          <p className="text-sm text-gray-500">
+            SVG, PNG, JPG or GIF (max. 800 x 400px)
+          </p>
+          <input type="file" className="hidden" onChange={handleImageUpload} />
+        </label>
+      </div>
       <button className="btn-primary mt-10" disabled={pending}>
         Create Account
       </button>

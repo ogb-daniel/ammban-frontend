@@ -8,6 +8,7 @@ import { Permission } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 // Sample Permissions Data
 
 export default function CreateRoleForm() {
@@ -218,7 +219,13 @@ export default function CreateRoleForm() {
           type="submit"
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Role
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Role"
+          )}
         </button>
       </div>
     </form>

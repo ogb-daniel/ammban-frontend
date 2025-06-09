@@ -40,6 +40,7 @@ export default function AdminDashboard({
       duration: "7d",
       bgColor: "bg-yellow-50",
       textColor: "text-yellow-500",
+      link: "#",
     },
     {
       title: "Total Sales (₦)",
@@ -51,6 +52,7 @@ export default function AdminDashboard({
       duration: "7d",
       bgColor: "bg-blue-50",
       textColor: "text-blue-500",
+      link: "#",
     },
 
     {
@@ -63,6 +65,7 @@ export default function AdminDashboard({
       duration: "30d",
       bgColor: "bg-teal-50",
       textColor: "text-teal-500",
+      link: `/${user?.role}/commissions`,
     },
   ];
   return (

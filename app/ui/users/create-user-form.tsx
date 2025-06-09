@@ -9,6 +9,7 @@ import { SignupFormSchema, States } from "@/app/lib/definitions";
 import { createUser, getAllStates } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function CreateUserForm() {
   const [states, setStates] = React.useState<States[] | null>([]);
@@ -451,7 +452,13 @@ export default function CreateUserForm() {
           disabled={submitting}
           className="btn-primary mt-10"
         >
-          Create User
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create User"
+          )}
         </button>
       </div>
     </form>

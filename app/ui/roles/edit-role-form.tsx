@@ -8,6 +8,7 @@ import { getPermissions, updateRole } from "@/app/lib/actions/role";
 import { toast } from "react-toastify";
 import { useAdminStore } from "@/providers/admin-store-provider";
 import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function EditRoleForm({ role }: { role: Role }) {
   const { editRole: updateRoleFromStore } = useAdminStore((state) => state);
@@ -220,7 +221,13 @@ export default function EditRoleForm({ role }: { role: Role }) {
           type="submit"
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Edit Role
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Edit Role"
+          )}
         </button>
       </div>
     </form>

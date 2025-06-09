@@ -7,6 +7,7 @@ import FieldInfo from "../auth/field-info";
 import { EditUserInformationSchema, States, User } from "@/app/lib/definitions";
 import { getAllStates, updateUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
+import CircleLoader from "../circle-loader";
 
 export default function EditUserForm({ user }: { user: User }) {
   // const { editUser } = useAdminStore((state) => state);
@@ -325,7 +326,13 @@ export default function EditUserForm({ user }: { user: User }) {
           className="btn-primary mt-10"
           disabled={submitting}
         >
-          Update
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
     </form>
