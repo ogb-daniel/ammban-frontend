@@ -100,6 +100,8 @@ export type Commission = {
   roleName: string;
   customerType: number;
   userId: number;
+  roleId: number;
+  percentage: number;
   id: number;
 };
 

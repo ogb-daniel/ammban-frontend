@@ -5,7 +5,7 @@ export default function ProfileContainer({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
