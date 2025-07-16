@@ -1,6 +1,9 @@
-"use client";
-
-import AdminDashboard from "@/app/ui/dashboard/admin-dashboard";
+import {
+  commissionsEarned,
+  getMonthlyReferrals,
+  totalSales,
+} from "@/app/lib/actions/dashboard";
+import AgentDashboard from "@/app/ui/dashboard/agent-dashboard";
 
 // const cards = [
 //   {
@@ -50,16 +53,18 @@ import AdminDashboard from "@/app/ui/dashboard/admin-dashboard";
 // ];
 // const totalUsers = 56589;
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const tSales = await totalSales();
+  const commissionEarnings = await commissionsEarned();
+  const monthlyReferrals = await getMonthlyReferrals();
   return (
     <main>
-      <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
-        <h1 className="font-semibold ">Welcome</h1>
-        <p className="text-blue-500">AXA Admin</p>
-      </div>
-      <div className=" p-6">
-        <AdminDashboard />
-      </div>
+      <AgentDashboard
+        totalSales={tSales?.result?.totalSales || 0}
+        totalSalesAmount={tSales?.result?.amount || 0}
+        commissionEarnings={commissionEarnings?.result?.payload?.amount || 0}
+        monthlyReferrals={monthlyReferrals?.result || []}
+      />
     </main>
   );
 }

@@ -1,3 +1,5 @@
+// At the top of your page.tsx
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import "./ui/globals.css";
 import { montserrat } from "./ui/fonts";
