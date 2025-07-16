@@ -5,6 +5,7 @@ import React from "react";
 import { FiDollarSign, FiTrendingUp, FiUsers } from "react-icons/fi";
 
 import { useUserStore } from "@/providers/user-store-provider";
+import ReferralInsights from "./referral-insights";
 
 // const mockData = [
 //   { date: "23 Oct", users: 3000 },
@@ -25,10 +26,12 @@ export default function AdminDashboard({
   totalSalesAmount,
   totalSales,
   commissionEarnings,
+  monthlyReferrals,
 }: {
   totalSales: number;
   totalSalesAmount: number;
   commissionEarnings: number;
+  monthlyReferrals: { month: string; count: number }[];
 }) {
   // const isMobile = useResponsive();
   const user = useUserStore((state) => state.user);
@@ -80,7 +83,7 @@ export default function AdminDashboard({
             <DashboardCard key={index} {...card} />
           ))}
         </div>
-
+        <ReferralInsights data={monthlyReferrals} />
         {/* {isMobile ? (
           <>
             <SalesInsights data={mockData} totalUsers={totalUsers} />

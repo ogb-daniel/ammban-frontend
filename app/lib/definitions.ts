@@ -826,3 +826,20 @@ export interface TotalSalesByAgentsResponse
     }[];
   };
 }
+
+export interface MonthlyReferralResponse
+  extends ApiResponse<
+    [
+      {
+        month: string;
+        count: number;
+      }
+    ]
+  > {
+  result: [
+    {
+      month: string;
+      count: number;
+    }
+  ];
+}

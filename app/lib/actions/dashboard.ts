@@ -3,6 +3,7 @@ import api from "../api/axios";
 import {
   CommissionsEarnedResponse,
   GetReferredUsersResponse,
+  MonthlyReferralResponse,
   TotalSalesByAgentsResponse,
   TotalSalesResponse,
 } from "../definitions";
@@ -103,6 +104,29 @@ export const totalSalesByAggregator =
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error getting total sales:", error?.response?.data);
+      return (
+        error?.response?.data || {
+          success: false,
+          error: {
+            message: error?.response?.data?.error?.message || error?.message,
+            details: error?.response?.data?.error?.details,
+          },
+        }
+      );
+    }
+  };
+
+export const getMonthlyReferrals =
+  async (): Promise<MonthlyReferralResponse> => {
+    try {
+      const response = await api.get<MonthlyReferralResponse>(
+        `/api/services/app/DashBoardService/GetMonthlyReferrals`
+      );
+      console.log("Monthly Referrals Response:", response.data);
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error getting monthly referrals:", error?.response?.data);
       return (
         error?.response?.data || {
           success: false,
