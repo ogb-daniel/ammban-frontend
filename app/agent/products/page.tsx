@@ -15,7 +15,7 @@ export default async function Products() {
       </div>
       <div className=" p-6">
         <ProductsContainer
-          products={products.result.payload.items}
+          products={products?.result?.payload?.items || []}
           limit={limit}
         />
       </div>

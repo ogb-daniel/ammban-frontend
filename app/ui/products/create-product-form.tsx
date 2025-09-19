@@ -26,7 +26,7 @@ export default function CreateProductForm() {
     (async () => {
       const response = await getAllProductCategories({});
       if (response.success) {
-        setCategories(response.result.payload.items);
+        setCategories(response.result.payload.items || []);
       }
     })();
   }, []);

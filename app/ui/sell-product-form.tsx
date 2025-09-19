@@ -22,14 +22,14 @@ const SellProductForm = () => {
     const fetchCategories = async () => {
       const response = await getAllProductCategories({});
       if (response.success && response.result.responseCode === 200) {
-        setCategories(response.result.payload.items);
+        setCategories(response.result.payload.items || []);
       }
     };
 
     const fetchProducts = async () => {
       const response = await getAllProducts({});
       if (response.success && response.result.responseCode === 200) {
-        setProducts(response.result.payload.items);
+        setProducts(response.result.payload.items || []);
       }
     };
 

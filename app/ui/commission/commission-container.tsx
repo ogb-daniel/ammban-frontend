@@ -27,14 +27,18 @@ export default function CommissionContainer({
 
   useEffect(() => {
     console.log(skip);
-    if (skip > storeCommissions.length || skip < storeCommissions.length)
+    if (skip > storeCommissions?.length || skip < storeCommissions?.length)
       return;
     getAllCommissionPercentages({
       MaxResultCount: limit,
       SkipCount: skip,
     }).then((res) => {
       console.log(res);
-      if (res.success)
+      if (
+        res.success &&
+        res?.result?.payload?.items?.length &&
+        storeCommissions
+      )
         initializeCommissionsPercentage([
           ...storeCommissions,
           ...res.result.payload.items,

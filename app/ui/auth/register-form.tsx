@@ -17,7 +17,9 @@ import Image from "next/image";
 export default function RegistrationForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const [states, setStates] = React.useState<States[] | null>([]);
-  const [image, setImage] = React.useState<string | null>(null);
+  const [governmentId, setGovernmentId] = React.useState<File | undefined | null>(null);
+  const [selfie, setSelfie] = React.useState<File | undefined | null>(null);
+  const [proofOfAddress, setProofOfAddress] = React.useState<File | undefined | null>(null);
 
   React.useEffect(() => {
     (async () => {
@@ -41,6 +43,9 @@ export default function RegistrationForm() {
       gender: 0,
       password: "",
       confirmPassword: "",
+      governmentId: null,
+      selfie: null,
+      proofOfAddress: null,
     },
     onSubmit: (values) => {
       console.log(values);
@@ -59,25 +64,36 @@ export default function RegistrationForm() {
   }, [state]);
   const handleAction = async (formData: FormData) => {
     Object.entries(form.state.values).forEach(([key, value]) => {
-      formData.append(key, String(value));
+      if (key !== "governmentId" && key !== "selfie" && key !== "proofOfAddress") {
+        formData.append(key, String(value));
+      }
     });
+    if (governmentId) {
+      formData.append("governmentId", governmentId);
+    }
+    if (selfie) {
+      formData.append("selfie", selfie);
+    }
+    if (proofOfAddress) {
+      formData.append("proofOfAddress", proofOfAddress);
+    }
 
     return action(formData);
   };
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleGovernmentIdUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (
-      file &&
-      ["image/png", "image/jpeg", "image/gif", "image/svg+xml"].includes(
-        file.type
-      )
-    ) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+    setGovernmentId(file);
+  };
+
+  const handleSelfieUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setSelfie(file);
+  };
+
+  const handleProofOfAddressUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setProofOfAddress(file);
   };
   return (
     <form action={handleAction} className="max-w-lg mx-auto  space-y-4 mt-9">
@@ -448,33 +464,123 @@ export default function RegistrationForm() {
           }}
         />
       </div>
-      <div className="space-y-2">
-        <p className="flex-[0.8] font-medium">
-          Upload a clear image of your government-issued ID for identity
-          verification
-        </p>
-        <label className="flex-1 border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
-          {image && (
-            <div className="w-full h-72 relative">
-              <Image
-                src={image}
-                alt="Profile"
-                fill
-                className=" object-cover border"
-                sizes="64px"
-              />
-            </div>
-          )}
-          <Upload className="text-gray-500 w-8 h-8 mb-2 mt-5" />
-          <p>
-            <span className="text-primary font-medium">Click to upload</span> or
-            drag and drop
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <p className="font-medium">
+            Government-Issued ID
           </p>
-          <p className="text-sm text-gray-500">
-            SVG, PNG, JPG or GIF (max. 800 x 400px)
+          <p className="text-sm text-gray-600">
+            Upload a clear image of your government-issued ID for identity verification
           </p>
-          <input type="file" className="hidden" onChange={handleImageUpload} />
-        </label>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {governmentId && (
+              <div className="w-full mb-2">
+                {governmentId.type.startsWith('image/') ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(governmentId)}
+                      alt="Government ID"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{governmentId.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span> or
+              drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleGovernmentIdUpload} />
+          </label>
+        </div>
+
+        <div className="space-y-2">
+          <p className="font-medium">
+            Selfie Photo
+          </p>
+          <p className="text-sm text-gray-600">
+            Upload a clear selfie photo for identity verification
+          </p>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {selfie && (
+              <div className="w-full mb-2">
+                {selfie.type.startsWith('image/') ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(selfie)}
+                      alt="Selfie"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{selfie.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span> or
+              drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleSelfieUpload} />
+          </label>
+        </div>
+
+        <div className="space-y-2">
+          <p className="font-medium">
+            Proof of Address
+          </p>
+          <p className="text-sm text-gray-600">
+            Upload a utility bill, bank statement, or other document showing your address
+          </p>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {proofOfAddress && (
+              <div className="w-full mb-2">
+                {proofOfAddress.type.startsWith('image/') ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(proofOfAddress)}
+                      alt="Proof of Address"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{proofOfAddress.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span> or
+              drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleProofOfAddressUpload} />
+          </label>
+        </div>
       </div>
       <button className="btn-primary mt-10" disabled={pending}>
         Create Account

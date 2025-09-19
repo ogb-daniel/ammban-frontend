@@ -26,10 +26,10 @@ export default function ProductsContainer({
 
   useEffect(() => {
     console.log(skip);
-    if (skip > storeProducts.length || skip < storeProducts.length) return;
+    if (skip > storeProducts?.length || skip < storeProducts?.length) return;
     getAllProducts({ MaxResultCount: limit, SkipCount: skip }).then((res) => {
       console.log(res);
-      if (res.success)
+      if (res.success && res?.result?.payload?.items?.length && storeProducts)
         initializeProducts([...storeProducts, ...res.result.payload.items]);
       setSkip(skip + limit);
     });

@@ -37,7 +37,7 @@ export default function UsersContainer({
 
   useEffect(() => {
     console.log(skip);
-    if (skip > storeUsers.length || skip < storeUsers.length) return;
+    if (skip > storeUsers?.length || skip < storeUsers?.length) return;
     getAllUsers({ MaxResultCount: limit, SkipCount: skip }).then((res) => {
       if (res.success) initializeUsers([...storeUsers, ...res.result.items]);
       setSkip(skip + limit);

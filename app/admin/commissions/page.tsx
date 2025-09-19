@@ -14,7 +14,7 @@ export default async function Commission() {
       </div>
       <div className=" p-6">
         <CommissionContainer
-          commissions={products.result.payload.items}
+          commissions={products?.result?.payload?.items || []}
           limit={limit}
         />
       </div>

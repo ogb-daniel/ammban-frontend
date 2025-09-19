@@ -34,7 +34,7 @@ type ColumnMeta = {
   className?: string;
 };
 const Table = <T extends object>({
-  data,
+  data = [],
   columns,
   title,
   rowsPerPageOptions = [10, 20, 50],
@@ -138,19 +138,19 @@ const Table = <T extends object>({
         </h2>
         <div className="overflow-x-auto">
           <SearchBar
-            onChange={(e) => table.setGlobalFilter(String(e?.target?.value))}
+            onChange={(e) => table?.setGlobalFilter(String(e?.target?.value))}
             placeholder="Search..."
             className="w-1/2 px-8 mt-1"
           />
           <table className="hidden md:table min-w-full table-fixed border-collapse">
             <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table?.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   <th className="p-2 text-left pt-4 pb-2 font-semibold text-[10px] pl-8">
                     <input
                       type="checkbox"
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
+                      checked={table?.getIsAllRowsSelected()}
+                      onChange={table?.getToggleAllRowsSelectedHandler()}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
                   </th>
@@ -160,7 +160,7 @@ const Table = <T extends object>({
                       <th
                         key={header.id}
                         className={`p-2 text-left pt-4 pb-2 font-semibold text-[10px] ${
-                          index === headerGroup.headers.length - 1 && "pr-8"
+                          index === headerGroup.headers?.length - 1 && "pr-8"
                         } ${canSort ? "cursor-pointer select-none" : ""}`}
                         onClick={
                           canSort
@@ -195,7 +195,7 @@ const Table = <T extends object>({
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row, visualIndex) => (
+              {table?.getRowModel().rows.map((row, visualIndex) => (
                 <tr
                   key={row.id}
                   className={`${
@@ -214,7 +214,7 @@ const Table = <T extends object>({
                     <td
                       key={cell.id}
                       className={`p-2 py-6 text-sm ${
-                        index === row.getVisibleCells().length - 1 && "pr-8"
+                        index === row.getVisibleCells()?.length - 1 && "pr-8"
                       } `}
                     >
                       <div
@@ -245,19 +245,19 @@ const Table = <T extends object>({
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm font-medium">
-          {table.getState().pagination.pageIndex + 1}-
+          {table?.getState().pagination.pageIndex + 1}-
           {Math.min(
-            (table.getState().pagination.pageIndex + 1) *
-              table.getState().pagination.pageSize,
-            data.length
+            (table?.getState().pagination.pageIndex + 1) *
+              table?.getState().pagination.pageSize,
+            data?.length
           )}{" "}
-          of {data.length}
+          of {data?.length}
         </div>
         <div className="text-sm font-medium">
           Rows per page:
           <select
             className="ml-2 p-1 border rounded bg-primary text-white"
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            onChange={(e) => table?.setPageSize(Number(e.target.value))}
           >
             {rowsPerPageOptions.map((size) => (
               <option key={size} value={size}>
@@ -270,15 +270,15 @@ const Table = <T extends object>({
         <div className="flex items-center">
           <button
             className="p-1 px-3 border rounded mr-2"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => table?.previousPage()}
+            disabled={!table?.getCanPreviousPage()}
           >
             Previous
           </button>
           <button
             className="p-1 px-3 border rounded"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => table?.nextPage()}
+            disabled={!table?.getCanNextPage()}
           >
             Next
           </button>

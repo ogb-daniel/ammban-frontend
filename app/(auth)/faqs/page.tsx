@@ -21,7 +21,7 @@ export default function Faqs() {
           <div
             key={index}
             className={`${
-              index === faqs.length - 1 ? "" : "border-b border-gray-300"
+              index === faqs?.length - 1 ? "" : "border-b border-gray-300"
             } py-6`}
           >
             <FAQItem question={faq.question} answer={faq.answer} />

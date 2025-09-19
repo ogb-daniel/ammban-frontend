@@ -1,10 +1,14 @@
 "use client";
+import { verifyEmail } from "@/app/lib/actions/auth";
+import { HOME } from "@/app/lib/routes";
 import VerificationCodeInput from "@/app/ui/auth/verification-input";
+import { redirect } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function VerificationForm() {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
-
+  const [loading, setLoading] = useState(false);
   const handleChange = (index: number, value: string) => {
     const newCode = [...code];
     newCode[index] = value;
@@ -15,10 +19,19 @@ export default function VerificationForm() {
     e.preventDefault();
     const verificationCode = code.join("");
 
-    if (verificationCode.length !== 6) {
-      alert("Please complete the code.");
+    if (verificationCode?.length !== 6) {
+      toast.error("Please enter a valid 6-digit code.");
       return;
     }
+
+    setLoading(true);
+    verifyEmail({ code: verificationCode }).then((response) => {
+      setLoading(false);
+      if (response.success) {
+        toast.success("Email verified successfully!");
+        redirect(HOME.url);
+      }
+    });
 
     console.log("Verification code submitted:", verificationCode);
   };
@@ -36,8 +49,8 @@ export default function VerificationForm() {
         </p>
       </div>
 
-      <button type="submit" className="btn-primary mt-16">
-        Verify Code
+      <button type="submit" className="btn-primary mt-16" disabled={loading}>
+        {loading ? "Verifying..." : "Verify Code"}
       </button>
     </form>
   );

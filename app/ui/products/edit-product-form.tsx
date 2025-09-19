@@ -23,7 +23,7 @@ export default function EditProductForm({ product }: { product: Product }) {
     (async () => {
       const response = await getAllProductCategories({});
       if (response.success) {
-        setCategories(response.result.payload.items);
+        setCategories(response.result.payload.items || []);
       }
     })();
   }, []);
@@ -62,7 +62,7 @@ export default function EditProductForm({ product }: { product: Product }) {
   });
 
   React.useEffect(() => {
-    if (categories.length > 0) {
+    if (categories?.length > 0) {
       const categoryId =
         categories.find((category) => category.name === product.categoryName)
           ?.id || 0;

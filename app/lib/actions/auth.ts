@@ -14,7 +14,7 @@ import {
 } from "../definitions";
 
 import { redirect } from "next/navigation";
-import { HOME } from "../routes";
+import { VERIFY_ACCOUNT } from "../routes";
 import { createSession, deleteSession } from "../session";
 import { toast } from "react-toastify";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -43,15 +43,27 @@ export async function signup(state: FormState, formData: FormData) {
         errors: validatedFields.error.flatten().fieldErrors,
       };
     }
-
     const response = await register({
       ...validatedFields.data,
       sureName: validatedFields.data.lastName,
       name: validatedFields.data.firstName,
     });
+
     if (!response.success) {
       return {
         error: response?.error?.message,
+      };
+    }
+
+    const userId = response?.result?.userID;
+    console.log(formData);
+    const documentUploadResponse = await uploadDocument(
+      userId.toString(),
+      formData
+    );
+    if (!documentUploadResponse.success) {
+      return {
+        error: documentUploadResponse?.error?.message,
       };
     }
   } catch (error) {
@@ -60,7 +72,7 @@ export async function signup(state: FormState, formData: FormData) {
     };
   }
   toast.success("Account created successfully");
-  redirect(HOME.url);
+  redirect(VERIFY_ACCOUNT.url);
 }
 
 export async function login(state: FormState, formData: FormData) {
@@ -136,6 +148,33 @@ const register = async (body: IRegisterBody): Promise<RegisterResponse> => {
       "Content-Type": "application/json",
     },
   });
+
+  return response.json();
+};
+
+export const verifyEmail = async (body: { code: string }) => {
+  const response = await fetch(
+    `${baseUrl}/api/services/app/Account/VerifyEmailCode`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.json();
+};
+
+const uploadDocument = async (userId: string, formData: FormData) => {
+  const response = await fetch(
+    `${baseUrl}/api/services/app/Account/UploadDocuments?userId=${userId}`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
 
   return response.json();
 };

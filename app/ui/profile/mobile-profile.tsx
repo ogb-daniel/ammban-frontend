@@ -58,11 +58,8 @@ export default function MobileProfile() {
           height={100}
           className="rounded-full"
         />
-        <h2 className="mt-2 text-xl font-semibold">Sophia Rose</h2>
-        <p className="text-sm text-gray-500">sophiarose221@gmail.com</p>
-        <p className="text-sm text-gray-500">
-          Date of Birth: December, 07, 2020
-        </p>
+        <h2 className="mt-2 text-xl font-semibold">{user?.fullName}</h2>
+        <p className="text-sm text-gray-500">{user?.emailAddress}</p>
         <p className="text-green-500 font-medium">
           AXA {user?.role === "admin" ? "Admin" : "Agent"}
         </p>

@@ -121,17 +121,17 @@ export default function SideNav() {
           );
         })}
         <div className="mt-5 space-y-6">
-          {user?.walletBalance && (
+          {
             <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6 text-black">
               <h1 className="text-lg font-semibold">Wallet Balance</h1>
               <p className="font-medium line-clamp-1">
                 {new Intl.NumberFormat("en-NG", {
                   style: "currency",
                   currency: "NGN",
-                }).format(user.walletBalance)}
+                }).format(user?.walletBalance || 0)}
               </p>
             </div>
-          )}
+          }
           <LogoutButton />
         </div>
       </div>
@@ -161,17 +161,17 @@ export default function SideNav() {
           })}
         </div>
         <div className="absolute bottom-10 left-0 right-0 space-y-6">
-          {user?.walletBalance && (
+          {
             <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6">
               <h1 className="text-lg font-semibold">Wallet Balance</h1>
               <p className="font-medium line-clamp-1">
                 {new Intl.NumberFormat("en-NG", {
                   style: "currency",
                   currency: "NGN",
-                }).format(user.walletBalance)}
+                }).format(user?.walletBalance || 0)}
               </p>
             </div>
-          )}
+          }
           <div className=" px-4">
             <LogoutButton />
           </div>

@@ -22,6 +22,9 @@ export const SignupFormSchema = z
         "Password must contain at least one special character"
       ),
     confirmPassword: z.string().nonempty("Please confirm your password"),
+    governmentId: z.any().nullable(),
+    selfie: z.any().nullable(),
+    proofOfAddress: z.any().nullable(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -182,6 +185,7 @@ export interface IRegisterBody {
 export interface RegisterResponse extends ApiResponse<{ canLogin: boolean }> {
   result: {
     canLogin: boolean;
+    userID: number;
   };
 }
 

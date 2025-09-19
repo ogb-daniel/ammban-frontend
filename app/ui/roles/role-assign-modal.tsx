@@ -45,7 +45,7 @@ const RoleAssignmentModal = ({
       <div className="bg-white w-full max-w-md md:max-w-lg p-6 rounded-lg shadow-lg">
         {loading ? (
           <CircleLoader className="text-primary" />
-        ) : roles.length === 0 ? (
+        ) : roles?.length === 0 ? (
           <p className="text-center">No roles available</p>
         ) : (
           <div>
