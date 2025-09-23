@@ -8,16 +8,40 @@ export const metadata: Metadata = {
 };
 export default async function ChangePassword() {
   const user = (await getSession()).user;
+
   if (user) {
     const parsedUser: User = JSON.parse(user);
+
+    // Handle missing user gracefully
     if (!parsedUser?.emailAddress) {
-      throw new Error("User not found");
+      return (
+        <main>
+          <div className="p-6">
+            <div className="text-center py-8">
+              <p className="text-red-500">User session not found. Please log in again.</p>
+            </div>
+          </div>
+        </main>
+      );
     }
+
     const response = await generatePasswordResetToken({
       Email: parsedUser?.emailAddress,
     });
+
+    // Handle API error gracefully
     if (!response.success) {
-      throw new Error(response.error.message);
+      return (
+        <main>
+          <div className="p-6">
+            <div className="text-center py-8">
+              <p className="text-red-500">
+                {response.error.message || "Failed to generate reset token"}
+              </p>
+            </div>
+          </div>
+        </main>
+      );
     }
   }
   return (

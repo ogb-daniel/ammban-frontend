@@ -9,11 +9,21 @@ export const metadata: Metadata = {
 export default async function Commissions() {
   const transactions = await getTransactionHistory();
   const commissionEarnings = await commissionsEarned();
+  // Handle errors gracefully instead of throwing
   if (transactions.error || commissionEarnings.error) {
-    throw new Error(
-      transactions.error?.message ||
-        commissionEarnings.error?.message ||
-        "Something went wrong!"
+    return (
+      <main>
+        <div className="bg-white px-10 t-3 md:pt-7 pb-3 md:border-b-2 md:border-gray-100 hidden md:block">
+          <h1 className="font-semibold">Transactions</h1>
+        </div>
+        <div className="p-6 text-center">
+          <p className="text-red-500">
+            {transactions.error?.message ||
+              commissionEarnings.error?.message ||
+              "Failed to load commission data"}
+          </p>
+        </div>
+      </main>
     );
   }
   return (
