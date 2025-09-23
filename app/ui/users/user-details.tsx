@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EditUserForm from "./edit-user-form";
+import ViewDocuments from "./view-documents";
 import { User } from "@/app/lib/definitions";
 import { disapproveUser, approveUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
@@ -15,6 +16,7 @@ type Props = {
 const UserDetails = ({ user }: Props) => {
   const router = useRouter();
   const [updateInformation, setUpdateInformation] = React.useState(false);
+  const [viewDocuments, setViewDocuments] = React.useState(false);
   const [isToggling, setIsToggling] = React.useState(false);
   const handleToggle = async () => {
     let response;
@@ -40,6 +42,8 @@ const UserDetails = ({ user }: Props) => {
           onClick={() => {
             if (updateInformation) {
               setUpdateInformation(false);
+            } else if (viewDocuments) {
+              setViewDocuments(false);
             } else {
               router.back();
             }
@@ -51,6 +55,8 @@ const UserDetails = ({ user }: Props) => {
 
         {updateInformation ? (
           <EditUserForm user={user} />
+        ) : viewDocuments ? (
+          <ViewDocuments userId={user.id.toString()} />
         ) : (
           <>
             {/* User Info Section */}
@@ -112,6 +118,13 @@ const UserDetails = ({ user }: Props) => {
                 onClick={() => setUpdateInformation(true)}
               >
                 Update Information
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full md:w-auto"
+                onClick={() => setViewDocuments(true)}
+              >
+                Verify Documents
               </Button>
             </div>
           </>

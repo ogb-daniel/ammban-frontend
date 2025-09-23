@@ -849,3 +849,18 @@ export interface MonthlyReferralResponse
     }
   ];
 }
+
+export interface GetUserDocumentResponse
+  extends ApiResponse<{
+    fileName: string;
+    fileType: string;
+    fileUrl: string;
+    fileContent: string;
+  }> {
+  result: {
+    fileName: string;
+    fileType: string;
+    fileUrl: string;
+    fileContent: string;
+  };
+}

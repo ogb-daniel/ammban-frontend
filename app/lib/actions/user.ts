@@ -6,6 +6,7 @@ import {
   CreateUserResponse,
   DeleteUserResponse,
   GetAllUsersResponse,
+  GetUserDocumentResponse,
   GetUserResponse,
   GetUserRolesResponse,
   ResetPasswordBody,
@@ -321,6 +322,54 @@ export const getAllStates = async (): Promise<ApiResponse<States[]>> => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error fetching states:", error);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const getUserDocument = async (
+  userId: string,
+  documentType: string
+): Promise<GetUserDocumentResponse> => {
+  try {
+    const response = await api.get<GetUserDocumentResponse>(
+      `/api/services/app/Account/GetUserDocument?userId=${userId}&documentType=${documentType}`
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching user document:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const verifyUserDocument = async (
+  userId: string
+): Promise<ApiResponse<{ success: boolean }>> => {
+  try {
+    const response = await api.post<ApiResponse<{ success: boolean }>>(
+      `/api/services/app/User/VerifyUserDocument`,
+      { id: userId }
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error verifying user document:", error?.response?.data);
     return (
       error?.response?.data || {
         success: false,
