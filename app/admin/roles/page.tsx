@@ -13,7 +13,7 @@ export default async function Roles() {
         <h1 className="font-semibold ">Roles and Permissions</h1>
       </div>
       <div className=" p-6">
-        {roles ? <AllRoles roles={roles.result.items} /> : null}
+        {roles ? <AllRoles roles={roles?.result?.items || []} /> : null}
       </div>
     </main>
   );

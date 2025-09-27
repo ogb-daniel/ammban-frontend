@@ -70,7 +70,7 @@ export default function CreateRoleForm() {
     (async () => {
       const response = await getPermissions();
       if (response.success) {
-        setPermissionsList(response.result.items);
+        setPermissionsList(response?.result?.items);
       }
     })();
   }, []);

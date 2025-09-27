@@ -20,8 +20,8 @@ export default function CreateCommissionForm() {
     const fetchRoles = async () => {
       try {
         const response = await getAllRoles();
-        if (response.success && response.result) {
-          setRoles(response.result.items || []);
+        if (response?.success && response?.result) {
+          setRoles(response?.result?.items || []);
         } else {
           toast.error("Failed to fetch roles");
         }

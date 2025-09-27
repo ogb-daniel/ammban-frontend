@@ -14,7 +14,7 @@ export default async function Users() {
         <h1 className="font-semibold">Users</h1>
       </div>
       <div className="p-6">
-        <UsersContainer users={users.result.items} limit={limit} />
+        <UsersContainer users={users?.result?.items || []} limit={limit} />
       </div>
     </main>
   );

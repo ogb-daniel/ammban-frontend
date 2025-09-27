@@ -26,8 +26,8 @@ const RoleAssignmentModal = ({
     if (isOpen) {
       (async () => {
         const response = await getRoles();
-        if (response.success) {
-          setRoles(response.result.items);
+        if (response?.success) {
+          setRoles(response?.result?.items);
         }
         setLoading(false);
       })();

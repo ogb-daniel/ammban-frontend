@@ -68,8 +68,8 @@ export default function EditRoleForm({ role }: { role: Role }) {
   useEffect(() => {
     (async () => {
       const response = await getPermissions();
-      if (response.success) {
-        setPermissionsList(response.result.items);
+      if (response?.success) {
+        setPermissionsList(response?.result?.items);
       }
     })();
   }, []);
