@@ -73,6 +73,7 @@ export type User = {
   role: string;
   id: number;
   walletBalance: number;
+  phoneNumber?: string;
 };
 
 export type Role = {

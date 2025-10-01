@@ -30,7 +30,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     >
       <div>
         <div className="flex justify-between items-center">
-          {icon} <BsArrowRight />
+          {icon} {link !== "#" ? <BsArrowRight /> : null}
         </div>
         <div className="flex gap-2 items-center mt-2">
           <span className={`text-2xl font-bold ${textColor} inline-block`}>
