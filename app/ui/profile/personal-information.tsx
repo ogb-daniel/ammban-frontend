@@ -216,17 +216,57 @@ export default function PersonalInformation() {
     }
 
     const isImage = document.fileType?.startsWith("image/");
+    const isPDF = document.fileType === "application/pdf";
+    const downloadUrl = document.fileContent
+      ? `data:${document.fileType};base64,${document.fileContent}`
+      : document.fileUrl;
 
     return (
       <div className="border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium mb-2">{type}</h4>
         <p className="text-sm text-gray-600 mb-2">File: {document.fileName}</p>
+        <p className="text-xs text-gray-500 mb-3">Type: {document.fileType}</p>
+
+        {/* Show image preview for images */}
         {isImage && document.fileContent && (
           <img
             src={`data:${document.fileType};base64,${document.fileContent}`}
             alt={type}
-            className="max-w-full h-auto max-h-48 object-contain rounded mb-2"
+            className="max-w-full h-auto max-h-48 object-contain rounded mb-3"
           />
+        )}
+
+        {/* Show PDF icon for PDFs */}
+        {isPDF && (
+          <div className="flex items-center justify-center bg-gray-100 rounded p-8 mb-3">
+            <svg className="w-16 h-16 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 18h12V6h-4V2H4v16zm-2 1V0h12l4 4v16H2v-1z" />
+              <text x="50%" y="70%" fontSize="6" textAnchor="middle" fill="currentColor">PDF</text>
+            </svg>
+          </div>
+        )}
+
+        {/* Show generic file icon for other types */}
+        {!isImage && !isPDF && (
+          <div className="flex items-center justify-center bg-gray-100 rounded p-8 mb-3">
+            <svg className="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 2h8l4 4v12H4V2zm8 4V2.5L15.5 6H12z" />
+            </svg>
+          </div>
+        )}
+
+        {/* Download button */}
+        {downloadUrl && (
+          <a
+            href={downloadUrl}
+            download={document.fileName}
+            className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
+          </a>
         )}
       </div>
     );

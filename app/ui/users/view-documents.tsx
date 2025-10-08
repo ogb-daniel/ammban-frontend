@@ -88,28 +88,117 @@ const ViewDocuments = ({ userId }: Props) => {
     }
 
     const isImage = document.fileType?.startsWith("image/");
+    const isPDF = document.fileType === "application/pdf";
+
+    // Create download link from base64 content
+    const downloadUrl = document.fileContent
+      ? `data:${document.fileType};base64,${document.fileContent}`
+      : document.fileUrl;
 
     return (
       <div className="border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium mb-2">{type}</h4>
         <p className="text-sm text-gray-600 mb-2">File: {document.fileName}</p>
+        <p className="text-xs text-gray-500 mb-3">Type: {document.fileType}</p>
+
+        {/* Show image preview for images */}
         {isImage && document.fileContent && (
           <img
             src={`data:${document.fileType};base64,${document.fileContent}`}
             alt={type}
-            className="max-w-full h-auto max-h-48 object-contain rounded"
+            className="max-w-full h-auto max-h-48 object-contain rounded mb-3"
           />
         )}
-        {document.fileUrl && (
-          <a
-            href={document.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline text-sm"
-          >
-            View Document
-          </a>
+
+        {/* Show PDF icon for PDFs */}
+        {isPDF && (
+          <div className="flex items-center justify-center bg-gray-100 rounded p-8 mb-3">
+            <svg
+              className="w-16 h-16 text-red-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M4 18h12V6h-4V2H4v16zm-2 1V0h12l4 4v16H2v-1z" />
+              <text
+                x="50%"
+                y="70%"
+                fontSize="6"
+                textAnchor="middle"
+                fill="currentColor"
+              >
+                PDF
+              </text>
+            </svg>
+          </div>
         )}
+
+        {/* Show generic file icon for other types */}
+        {!isImage && !isPDF && (
+          <div className="flex items-center justify-center bg-gray-100 rounded p-8 mb-3">
+            <svg
+              className="w-16 h-16 text-gray-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M4 2h8l4 4v12H4V2zm8 4V2.5L15.5 6H12z" />
+            </svg>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-2 flex-wrap">
+          {downloadUrl && (
+            <a
+              href={downloadUrl}
+              download={document.fileName}
+              className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download
+            </a>
+          )}
+          {downloadUrl && (
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              View
+            </a>
+          )}
+        </div>
       </div>
     );
   };
