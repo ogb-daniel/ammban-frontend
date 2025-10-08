@@ -78,6 +78,46 @@ const ViewDocuments = ({ userId }: Props) => {
     }
   };
 
+  const handleViewDocument = (doc: DocumentData) => {
+    if (!doc.fileContent) return;
+
+    // Convert base64 to blob
+    const byteCharacters = atob(doc.fileContent);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: doc.fileType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open in new tab
+    window.open(blobUrl, '_blank');
+  };
+
+  const handleDownloadDocument = (doc: DocumentData) => {
+    if (!doc.fileContent) return;
+
+    // Convert base64 to blob
+    const byteCharacters = atob(doc.fileContent);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: doc.fileType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create download link
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = doc.fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  };
+
   const renderDocument = (type: string, document?: DocumentData) => {
     if (!document) {
       return (
@@ -89,11 +129,6 @@ const ViewDocuments = ({ userId }: Props) => {
 
     const isImage = document.fileType?.startsWith("image/");
     const isPDF = document.fileType === "application/pdf";
-
-    // Create download link from base64 content
-    const downloadUrl = document.fileContent
-      ? `data:${document.fileType};base64,${document.fileContent}`
-      : document.fileUrl;
 
     return (
       <div className="border border-gray-200 rounded-lg p-4">
@@ -147,10 +182,9 @@ const ViewDocuments = ({ userId }: Props) => {
 
         {/* Action buttons */}
         <div className="flex gap-2 flex-wrap">
-          {downloadUrl && (
-            <a
-              href={downloadUrl}
-              download={document.fileName}
+          {document.fileContent && (
+            <button
+              onClick={() => handleDownloadDocument(document)}
               className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               <svg
@@ -167,13 +201,11 @@ const ViewDocuments = ({ userId }: Props) => {
                 />
               </svg>
               Download
-            </a>
+            </button>
           )}
-          {downloadUrl && (
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+          {document.fileContent && (
+            <button
+              onClick={() => handleViewDocument(document)}
               className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
             >
               <svg
@@ -196,7 +228,7 @@ const ViewDocuments = ({ userId }: Props) => {
                 />
               </svg>
               View
-            </a>
+            </button>
           )}
         </div>
       </div>

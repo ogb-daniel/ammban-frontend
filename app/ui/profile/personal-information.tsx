@@ -175,6 +175,29 @@ export default function PersonalInformation() {
     if (file) setProofOfAddress(file);
   };
 
+  const handleDownloadDocument = (doc: DocumentData) => {
+    if (!doc.fileContent) return;
+
+    // Convert base64 to blob
+    const byteCharacters = atob(doc.fileContent);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: doc.fileType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Create download link
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = doc.fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  };
+
   const renderDocument = (
     type: string,
     document?: DocumentData,
@@ -217,9 +240,6 @@ export default function PersonalInformation() {
 
     const isImage = document.fileType?.startsWith("image/");
     const isPDF = document.fileType === "application/pdf";
-    const downloadUrl = document.fileContent
-      ? `data:${document.fileType};base64,${document.fileContent}`
-      : document.fileUrl;
 
     return (
       <div className="border border-gray-200 rounded-lg p-4">
@@ -256,17 +276,16 @@ export default function PersonalInformation() {
         )}
 
         {/* Download button */}
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            download={document.fileName}
+        {document.fileContent && (
+          <button
+            onClick={() => handleDownloadDocument(document)}
             className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             Download
-          </a>
+          </button>
         )}
       </div>
     );
