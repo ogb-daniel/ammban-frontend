@@ -6,7 +6,7 @@ import { Globe, Phone, User, Upload } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "@tanstack/react-form";
 import { useUserStore } from "@/providers/user-store-provider";
-import { getUserDocument, updateUser } from "@/app/lib/actions/user";
+import { getUserDocument } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import CircleLoader from "../circle-loader";
 
@@ -95,25 +95,25 @@ export default function PersonalInformation() {
       setSubmitting(true);
       try {
         // Handle user information update
-        const [firstName, ...lastNameParts] = values.value.fullName.split(" ");
-        const lastName = lastNameParts.join(" ");
-        console.log("Parsed names:", { firstName, lastName });
-        const updateResponse = await updateUser({
-          ...user,
-          id: user.id,
-          fullName: values.value.fullName,
-          surname: lastName,
-          emailAddress: values.value.emailAddress,
-          phoneNumber: values.value.phoneNumber,
-        });
-        console.log("Update response:", updateResponse);
+        // const [firstName, ...lastNameParts] = values.value.fullName.split(" ");
+        // const lastName = lastNameParts.join(" ");
+        // console.log("Parsed names:", { firstName, lastName });
+        // const updateResponse = await updateUser({
+        //   ...user,
+        //   id: user.id,
+        //   fullName: values.value.fullName,
+        //   surname: lastName,
+        //   emailAddress: values.value.emailAddress,
+        //   phoneNumber: values.value.phoneNumber,
+        // });
+        // console.log("Update response:", updateResponse);
 
-        if (!updateResponse.success) {
-          toast.error(
-            updateResponse.error?.message || "Failed to update user information"
-          );
-          return;
-        }
+        // if (!updateResponse.success) {
+        //   toast.error(
+        //     updateResponse.error?.message || "Failed to update user information"
+        //   );
+        //   return;
+        // }
 
         // Handle document uploads if any files changed
         if (governmentId || selfie || proofOfAddress) {
