@@ -32,8 +32,8 @@ export default async function Commissions() {
         <h1 className="font-semibold">Transactions</h1>
       </div>
       <CommissionsView
-        transactions={transactions.result.payload.items || []}
-        commissionEarnings={commissionEarnings.result.payload.amount}
+        transactions={transactions?.result?.payload?.items || []}
+        commissionEarnings={commissionEarnings?.result?.payload?.amount}
       />
     </main>
   );

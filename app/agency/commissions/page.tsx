@@ -26,14 +26,16 @@ export default async function Commissions() {
       </main>
     );
   }
+  console.log("Transactions:", transactions);
+  console.log("Commission Earnings:", commissionEarnings);
   return (
     <main>
       <div className="bg-white px-10 t-3 md:pt-7 pb-3 md:border-b-2 md:border-gray-100 hidden md:block">
         <h1 className="font-semibold">Transactions</h1>
       </div>
       <CommissionsView
-        transactions={transactions.result.payload.items || []}
-        commissionEarnings={commissionEarnings.result.payload.amount}
+        transactions={transactions?.result?.payload?.items || []}
+        commissionEarnings={commissionEarnings?.result?.payload?.amount}
       />
     </main>
   );
