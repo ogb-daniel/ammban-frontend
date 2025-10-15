@@ -575,6 +575,9 @@ export interface WithdrawFundsRequestBody {
   beneficiaryBankCode: string;
   narration: string;
 }
+export interface WithdrawCommissionRequestBody {
+  amount: number;
+}
 
 export interface WithdrawFundsResponse
   extends ApiResponse<{
@@ -608,6 +611,18 @@ export interface WithdrawFundsResponse
       destinationAccountName: string;
       destinationBankCode: string;
     };
+  };
+}
+export interface WithdrawCommissionResponse
+  extends ApiResponse<{
+    message: string;
+    payload: string;
+    responseCode: number;
+  }> {
+  result: {
+    message: string;
+    payload: string;
+    responseCode: number
   };
 }
 

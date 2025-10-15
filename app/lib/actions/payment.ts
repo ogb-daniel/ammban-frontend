@@ -7,6 +7,8 @@ import {
   SyncStatusResponse,
   SyncTransactionBody,
   SyncTransactionResponse,
+  WithdrawCommissionRequestBody,
+  WithdrawCommissionResponse,
   WithdrawFundsRequestBody,
   WithdrawFundsResponse,
 } from "../definitions";
@@ -41,6 +43,29 @@ export const withdrawFunds = async (
     const response = await api.post<WithdrawFundsResponse>(
       `/api/services/app/PaymentService/WithdrawFunds`,
       body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error withdrawing funds:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+export const withdrawCommission = async (
+  body: WithdrawCommissionRequestBody
+): Promise<WithdrawCommissionResponse> => {
+  try {
+    const response = await api.post<WithdrawCommissionResponse>(
+      `/api/services/app/PaymentService/WithdrawCommission`,
+      { params: body }
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

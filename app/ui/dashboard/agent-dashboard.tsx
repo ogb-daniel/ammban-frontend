@@ -85,16 +85,18 @@ export default function AgentDashboard({
             <DashboardCard key={index} {...card} />
           ))}
         </div>
-        <Link
-          href={`/${user?.role}/products`}
-          className="flex w-fit items-center flex-row gap-4 mt-6 px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-        >
-          <div className="flex flex-col">
-            <span className="font-medium">Purchase New Product</span>
-            <span className="font-semibold text-xl">Select Product</span>
-          </div>
-          <ArrowRight className="text-white ml-2 inline-block" />
-        </Link>
+        {user?.role === "agent" && (
+          <Link
+            href={`/${user?.role}/products`}
+            className="flex w-fit items-center flex-row gap-4 mt-6 px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          >
+            <div className="flex flex-col">
+              <span className="font-medium">Purchase New Product</span>
+              <span className="font-semibold text-xl">Select Product</span>
+            </div>
+            <ArrowRight className="text-white ml-2 inline-block" />
+          </Link>
+        )}
         <ReferralInsights data={monthlyReferrals} />
         {/* {isMobile ? (
           <>

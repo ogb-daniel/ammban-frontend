@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "@tanstack/react-form";
 import styles from "@/app/ui/products/products.module.css";
 import { useRouter } from "next/navigation";
@@ -9,20 +9,13 @@ import { banks } from "@/app/lib/static-data";
 import { useUserStore } from "@/providers/user-store-provider";
 import { withdrawFunds } from "@/app/lib/actions/payment";
 import { showSuccessModal } from "@/app/lib/utils/transaction-result";
-import { commissionsEarned } from "@/app/lib/actions/dashboard";
 import CircleLoader from "../circle-loader";
 
 export default function WithdrawCommissionForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
   const { user } = useUserStore((state) => state);
-  const [commissionBalance, setCommissionBalance] = React.useState(0);
-  useEffect(() => {
-    (async () => {
-      const response = await commissionsEarned();
-      setCommissionBalance(response.result.payload.amount);
-    })();
-  }, []);
+
   const form = useForm({
     defaultValues: {
       amount: 0,
@@ -31,8 +24,8 @@ export default function WithdrawCommissionForm() {
       narration: "",
     },
     onSubmit: async (values) => {
-      if (values.value.amount > commissionBalance) {
-        toast.error("Insufficient commission balance");
+      if (values.value.amount > (user?.walletBalance || 0)) {
+        toast.error("Insufficient wallet balance");
         return;
       }
       console.log(values);
