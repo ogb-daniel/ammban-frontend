@@ -12,6 +12,10 @@ const api = axios.create({
 // Request interceptor to add auth token to requests
 api.interceptors.request.use(
   async (config) => {
+    // Disable caching for all requests
+    config.headers["Cache-Control"] = "no-cache";
+    config.headers["Pragma"] = "no-cache";
+
     // For client-side requests
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");

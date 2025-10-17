@@ -64,8 +64,7 @@ export const withdrawCommission = async (
 ): Promise<WithdrawCommissionResponse> => {
   try {
     const response = await api.post<WithdrawCommissionResponse>(
-      `/api/services/app/PaymentService/WithdrawCommission`,
-      { params: body }
+      `/api/services/app/PaymentService/WithdrawCommission?amount=${body.amount}`
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

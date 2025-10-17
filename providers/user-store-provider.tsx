@@ -14,6 +14,7 @@ import {
   createUserStore,
   defaultInitState,
 } from "@/stores/user-store";
+import { refreshUserData } from "@/app/lib/actions/auth";
 
 export type UserStoreApi = ReturnType<typeof createUserStore>;
 
@@ -33,6 +34,17 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
 
   useEffect(() => {
     storeRef.current?.persist.rehydrate();
+  }, []);
+
+  useEffect(() => {
+    const refreshUser = async () => {
+      const result = await refreshUserData();
+      if (result.success && result.user) {
+        storeRef.current?.getState().setUser(result.user);
+        console.log("User data refreshed");
+      }
+    };
+    refreshUser();
   }, []);
 
   return (

@@ -1,5 +1,8 @@
 "use client";
-import { withdrawCommission } from "@/app/lib/actions/payment";
+import {
+  getAccountBalance,
+  withdrawCommission,
+} from "@/app/lib/actions/payment";
 import { useUserStore } from "@/providers/user-store-provider";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -7,7 +10,7 @@ import Swal from "sweetalert2";
 
 export default function WithdrawCommission() {
   const router = useRouter();
-  const { user } = useUserStore((state) => state);
+  const { user, setUser } = useUserStore((state) => state);
   return (
     <div className="flex max-w-lg mx-auto gap-2 mt-4 flex-col">
       <button
@@ -55,11 +58,17 @@ export default function WithdrawCommission() {
                 return;
               }
               const response = await withdrawCommission({ amount });
+
               if (response.success) {
                 Swal.fire({
                   icon: "success",
                   title: "Withdrawal Successful",
                   text: `₦${amount} has been withdrawn to your wallet.`,
+                });
+                const balance = await getAccountBalance();
+                setUser({
+                  ...user!,
+                  walletBalance: balance?.result?.payload?.availableBalance,
                 });
               } else {
                 Swal.fire({

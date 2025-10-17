@@ -15,7 +15,7 @@ import {
 
 import { redirect } from "next/navigation";
 import { VERIFY_ACCOUNT } from "../routes";
-import { createSession, deleteSession } from "../session";
+import { createSession, deleteSession, getSession } from "../session";
 import { toast } from "react-toastify";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -215,6 +215,7 @@ export const getCurrentLoginInformation = async (
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      cache: "no-store",
     }
   );
 
@@ -230,8 +231,32 @@ export const getAccountBalance = async (
         Authorization: `Bearer ${accessToken}`,
       },
       method: "POST",
+      cache: "no-store",
     }
   );
 
   return response.json();
 };
+
+export async function refreshUserData() {
+  try {
+    const session = await getSession();
+    if (!session.accessToken) {
+      return { success: false, error: "No access token" };
+    }
+    const response = await getCurrentLoginInformation(session.accessToken);
+    if (!response.success) {
+      return { success: false, error: response.error?.message };
+    }
+    const balance = await getAccountBalance(session.accessToken);
+    const user = response.result.user;
+    const updatedUser = {
+      ...user,
+      walletBalance: balance?.result?.payload?.availableBalance,
+      role: user.roleName.split(" ").join("-").toLowerCase(),
+    };
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
+  }
+}
