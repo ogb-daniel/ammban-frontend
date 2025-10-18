@@ -89,7 +89,9 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
                   user?.fullName || "", // seller
                   "", // buyer
                   "" // reference
-                );
+                ).then(() => {
+                  router.back();
+                });
               },
               async () => {
                 router.back();
