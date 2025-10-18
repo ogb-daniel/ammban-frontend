@@ -80,11 +80,7 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
         );
         console.log(result);
         if (result.isConfirmed) {
-          if (
-            result.value?.success &&
-            result.value?.result.status &&
-            result.value?.result.data
-          ) {
+          if (result.value?.success && result.value?.result.status) {
             await showAXASuccessModal(
               async () => {
                 await showAXATransactionDetails(
@@ -92,9 +88,7 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
                   "", // fee
                   user?.fullName || "", // seller
                   "", // buyer
-                  "", // reference
-                  result.value?.result.data.transactionID,
-                  result.value?.result.data.effectiveDate
+                  "" // reference
                 );
               },
               async () => {
