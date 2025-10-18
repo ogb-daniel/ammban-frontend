@@ -11,6 +11,7 @@ import { withdrawFunds } from "@/app/lib/actions/payment";
 import { showSuccessModal } from "@/app/lib/utils/transaction-result";
 import CircleLoader from "../circle-loader";
 import Swal from "sweetalert2";
+import { verifyPin } from "@/app/lib/actions/user";
 
 export default function WithdrawCommissionForm() {
   const router = useRouter();
@@ -70,8 +71,12 @@ export default function WithdrawCommissionForm() {
           preConfirm: async () => {
             const pin = (document.getElementById("pin") as HTMLInputElement)
               .value;
-
-            return pin;
+            const res = await verifyPin({ pin });
+            if (res.success) {
+              return "wrong";
+            } else {
+              return "wrong";
+            }
           },
         });
         if (!result.isConfirmed) {
@@ -79,6 +84,9 @@ export default function WithdrawCommissionForm() {
         }
         if (!result.value) {
           return toast.error("Input your pin");
+        }
+        if (result.value === "wrong") {
+          return toast.error("Incorrect pin");
         }
         const response = await withdrawFunds({
           ...values.value,
