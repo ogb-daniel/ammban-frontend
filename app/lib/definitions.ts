@@ -269,6 +269,20 @@ export interface ResetPasswordBody {
   newPassword: string;
 }
 
+export interface SetupPinBody {
+  newPin: string;
+  confirmPin: string;
+}
+export interface VerifyPinBody {
+  pin: string;
+}
+
+export interface SetupPinResponse extends ApiResponse<null> {
+  result: null;
+}
+export interface VerifyPinResponse extends ApiResponse<boolean> {
+  result: boolean;
+}
 export interface SetupCommissionPercentageBody {
   roleId: number;
   percentage: number;
@@ -622,7 +636,7 @@ export interface WithdrawCommissionResponse
   result: {
     message: string;
     payload: string;
-    responseCode: number
+    responseCode: number;
   };
 }
 

@@ -45,6 +45,10 @@ export default function DesktopProfileLayout({
       title: "Wallet",
       href: "/" + user?.role + "/profile/wallet",
     },
+    {
+      title: "Change Pin",
+      href: "/" + user?.role + "/profile/change-pin",
+    },
     // {
     //   title: "Change Password",
     //   href:

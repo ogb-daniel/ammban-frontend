@@ -10,7 +10,11 @@ import {
   GetUserResponse,
   GetUserRolesResponse,
   ResetPasswordBody,
+  SetupPinBody,
+  SetupPinResponse,
   States,
+  VerifyPinBody,
+  VerifyPinResponse,
 } from "../definitions";
 import api from "../api/axios";
 
@@ -370,6 +374,55 @@ export const verifyUserDocument = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error verifying user document:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const setupPin = async (
+  body: SetupPinBody
+): Promise<SetupPinResponse> => {
+  try {
+    const response = await api.post<ApiResponse<null>>(
+      `/api/services/app/SecurityPin/Setup`,
+      body
+    );
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error setting up pin:", error);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const verifyPin = async (
+  params: VerifyPinBody
+): Promise<VerifyPinResponse> => {
+  try {
+    const response = await api.post<VerifyPinResponse>(
+      `/api/services/app/SecurityPin/Verify?pin=${params.pin}`
+    );
+    console.log(response);
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error verifying pin:", error);
     return (
       error?.response?.data || {
         success: false,
