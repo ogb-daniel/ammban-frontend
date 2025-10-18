@@ -10,6 +10,7 @@ import { useUserStore } from "@/providers/user-store-provider";
 import { withdrawFunds } from "@/app/lib/actions/payment";
 import { showSuccessModal } from "@/app/lib/utils/transaction-result";
 import CircleLoader from "../circle-loader";
+import Swal from "sweetalert2";
 
 export default function WithdrawCommissionForm() {
   const router = useRouter();
@@ -24,6 +25,13 @@ export default function WithdrawCommissionForm() {
       narration: "",
     },
     onSubmit: async (values) => {
+      if (
+        !values.value.bank ||
+        !values.value.amount ||
+        !values.value.beneficiaryAccountNumber
+      ) {
+        return;
+      }
       if (values.value.amount > (user?.walletBalance || 0)) {
         toast.error("Insufficient wallet balance");
         return;
@@ -31,12 +39,54 @@ export default function WithdrawCommissionForm() {
       console.log(values);
       setSubmitting(true);
       try {
+        const html = `
+                  <div class="space-y-4">
+                    <label for="pin" class="block text-sm font-medium text-gray-700">Enter Pin</label>
+                    <input type="text" id="pin" name="pin" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Pin" />
+                  </div>
+                  `;
+        const result = await Swal.fire({
+          html,
+
+          allowOutsideClick: true,
+          allowEscapeKey: true,
+          customClass: {
+            popup: "!rounded-3xl !p-8",
+            htmlContainer: "!p-0 !m-0",
+            cancelButton:
+              "text-primary bg-white border border-primary !rounded-lg !px-6 !py-3",
+            confirmButton: "!rounded-lg !px-6 !py-3",
+            actions: "flex-row gap-3 !mt-8",
+          },
+          width: "400px",
+          showCancelButton: true,
+          confirmButtonText: "Withdraw",
+          showLoaderOnConfirm: true,
+
+          confirmButtonColor: "#094794", // Tailwind's blue-600
+          cancelButtonText: "Cancel",
+          buttonsStyling: true,
+          reverseButtons: true,
+          preConfirm: async () => {
+            const pin = (document.getElementById("pin") as HTMLInputElement)
+              .value;
+
+            return pin;
+          },
+        });
+        if (!result.isConfirmed) {
+          return;
+        }
+        if (!result.value) {
+          return toast.error("Input your pin");
+        }
         const response = await withdrawFunds({
           ...values.value,
           beneficiaryBankCode: banks.find((b) => b.name === values.value.bank)!
             .code,
           beneficiaryBankName: values.value.bank,
           narration: "Withdrawal",
+          securityPin: result.value,
         });
         if (!response.success) {
           toast.error(response.error.message);
@@ -53,7 +103,9 @@ export default function WithdrawCommissionForm() {
             currency: "NGN",
           }).format(values.value.amount)} was successful`,
           "Close"
-        );
+        ).then(() => {
+          router.replace(`/${user!.role}/commissions`);
+        });
       } catch (error) {
         toast.error((error as Error).message);
         return;
@@ -61,7 +113,6 @@ export default function WithdrawCommissionForm() {
         setSubmitting(false);
       }
       // Handle form submission
-      router.replace(`/${user!.role}/commissions`);
     },
   });
 

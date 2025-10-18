@@ -588,6 +588,7 @@ export interface WithdrawFundsRequestBody {
   beneficiaryBankName: string;
   beneficiaryBankCode: string;
   narration: string;
+  securityPin: string;
 }
 export interface WithdrawCommissionRequestBody {
   amount: number;
