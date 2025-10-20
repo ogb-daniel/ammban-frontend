@@ -69,11 +69,12 @@ export default function WithdrawCommissionForm() {
           buttonsStyling: true,
           reverseButtons: true,
           preConfirm: async () => {
-            const pin = (document.getElementById("pin") as HTMLInputElement)
-              .value;
+            const pin = (
+              document.getElementById("pin") as HTMLInputElement
+            ).value.trim();
             const res = await verifyPin({ pin });
             if (res.success) {
-              return "wrong";
+              return pin;
             } else {
               return "wrong";
             }
