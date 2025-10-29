@@ -77,6 +77,9 @@ export default function AgentDashboard({
     <main className="">
       <div className="bg-white px-10 pt-7 pb-3 md:border-b-2 md:border-gray-100">
         <h1 className="font-semibold ">Welcome {user?.userName}</h1>
+        <p className="text-blue-500 font-medium">
+          {user!.role.charAt(0)?.toUpperCase() + user?.role?.slice(1)}
+        </p>
       </div>
       <div className=" p-6">
         <h2 className="mt-6  font-semibold">Overview</h2>
