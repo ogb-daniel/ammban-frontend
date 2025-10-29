@@ -206,7 +206,15 @@ export default function WithdrawCommissionForm() {
                   id={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  onChange={(e) => {
+                    if (
+                      e.target.value.charAt(0) === "0" &&
+                      e.target.value.length > 1
+                    ) {
+                      e.target.value = e.target.value.substring(1);
+                    }
+                    field.handleChange(Number(e.target.value));
+                  }}
                   className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
               </>

@@ -1,4 +1,5 @@
 "use client";
+import { commissionsEarned } from "@/app/lib/actions/dashboard";
 import {
   getAccountBalance,
   withdrawCommission,
@@ -66,9 +67,13 @@ export default function WithdrawCommission() {
                   text: `₦${amount} has been withdrawn to your wallet.`,
                 });
                 const balance = await getAccountBalance();
+                const commissionEarnings = await commissionsEarned();
+
                 setUser({
                   ...user!,
                   walletBalance: balance?.result?.payload?.availableBalance,
+                  commissionEarnings:
+                    commissionEarnings?.result?.payload?.amount,
                 });
               } else {
                 Swal.fire({

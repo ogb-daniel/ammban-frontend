@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import WithdrawCommission from "./withdraw-commision";
 
 import TransactionContainer from "../transactions/transaction-container";
 import { Transaction } from "@/app/lib/definitions";
+import { useUserStore } from "@/providers/user-store-provider";
 // const tabs = [
 //   { key: "all", label: "All Transactions", component: <AllTransactions /> },
 //   { key: "income", label: "Income", component: <Income /> },
@@ -16,6 +17,17 @@ export default function CommissionsView({
   transactions: Transaction[];
   commissionEarnings: number;
 }) {
+  const { setUser, user } = useUserStore((state) => state);
+  useEffect(() => {
+    console.log(
+      "Updating commission earnings in user store:",
+      commissionEarnings
+    );
+
+    setUser({ ...user!, commissionEarnings });
+  }, []);
+  console.log(user);
+
   return (
     <div className="p-6">
       <div className="flex flex-wrap items-center gap-5 mb-4">
@@ -25,7 +37,7 @@ export default function CommissionsView({
             {new Intl.NumberFormat("en-NG", {
               style: "currency",
               currency: "NGN",
-            }).format(commissionEarnings)}
+            }).format(user?.commissionEarnings || 0)}
           </p>
         </div>
         <div className="flex-1">

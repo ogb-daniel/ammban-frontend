@@ -74,6 +74,7 @@ export type User = {
   id: number;
   walletBalance: number;
   phoneNumber?: string;
+  commissionEarnings?: number;
 };
 
 export type Role = {

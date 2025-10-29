@@ -40,7 +40,9 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
     const refreshUser = async () => {
       const result = await refreshUserData();
       if (result.success && result.user) {
-        storeRef.current?.getState().setUser(result.user);
+        storeRef.current
+          ?.getState()
+          .setUser({ ...storeRef.current?.getState().user, ...result.user });
         console.log("User data refreshed");
       }
     };

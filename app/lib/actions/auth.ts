@@ -249,6 +249,7 @@ export async function refreshUserData() {
       return { success: false, error: response.error?.message };
     }
     const balance = await getAccountBalance(session.accessToken);
+
     const user = response.result.user;
     const updatedUser = {
       ...user,
