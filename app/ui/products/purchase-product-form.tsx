@@ -10,7 +10,7 @@ import { getAllStates } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
 import { showAXATransactionConfirmation } from "@/app/lib/utils/transaction-confirmation";
-import { syncTransaction } from "@/app/lib/actions/payment";
+import { getAccountBalance, syncTransaction } from "@/app/lib/actions/payment";
 import {
   showAXAFailureModal,
   showAXASuccessModal,
@@ -21,6 +21,7 @@ import CircleLoader from "../circle-loader";
 export default function PurchaseProductForm({ product }: { product: Product }) {
   const [states, setStates] = React.useState<States[] | null>([]);
   const [submitting, setSubmitting] = React.useState(false);
+  const { setUser } = useUserStore((state) => state);
   React.useEffect(() => {
     (async () => {
       const response = await getAllStates();
@@ -81,6 +82,11 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
         console.log(result);
         if (result.isConfirmed) {
           if (result.value?.success && result.value?.result.status) {
+            const balance = await getAccountBalance();
+            setUser({
+              ...user!,
+              walletBalance: balance?.result?.payload?.availableBalance,
+            });
             await showAXASuccessModal(
               async () => {
                 await showAXATransactionDetails(
