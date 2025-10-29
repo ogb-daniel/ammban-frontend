@@ -92,7 +92,7 @@ const ViewDocuments = ({ userId }: Props) => {
     const blobUrl = URL.createObjectURL(blob);
 
     // Open in new tab
-    window.open(blobUrl, '_blank');
+    window.open(blobUrl, "_blank");
   };
 
   const handleDownloadDocument = (doc: DocumentData) => {
@@ -109,7 +109,7 @@ const ViewDocuments = ({ userId }: Props) => {
     const blobUrl = URL.createObjectURL(blob);
 
     // Create download link
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = blobUrl;
     link.download = doc.fileName;
     document.body.appendChild(link);
@@ -133,7 +133,7 @@ const ViewDocuments = ({ userId }: Props) => {
     return (
       <div className="border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium mb-2">{type}</h4>
-        <p className="text-sm text-gray-600 mb-2">File: {document.fileName}</p>
+
         <p className="text-xs text-gray-500 mb-3">Type: {document.fileType}</p>
 
         {/* Show image preview for images */}
