@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { banks } from "@/app/lib/static-data";
 import { useUserStore } from "@/providers/user-store-provider";
-import { withdrawFunds } from "@/app/lib/actions/payment";
+import { getAccountBalance, withdrawFunds } from "@/app/lib/actions/payment";
 import { showSuccessModal } from "@/app/lib/utils/transaction-result";
 import CircleLoader from "../circle-loader";
 import Swal from "sweetalert2";
@@ -16,7 +16,7 @@ import { verifyPin } from "@/app/lib/actions/user";
 export default function WithdrawCommissionForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
-  const { user } = useUserStore((state) => state);
+  const { user, setUser } = useUserStore((state) => state);
 
   const form = useForm({
     defaultValues: {
@@ -105,6 +105,11 @@ export default function WithdrawCommissionForm() {
           toast.error(response.result.responseMessage);
           return;
         }
+        const balance = await getAccountBalance();
+        setUser({
+          ...user!,
+          walletBalance: balance?.result?.payload?.availableBalance,
+        });
         await showSuccessModal(
           `Success`,
           `Withdraw of ${new Intl.NumberFormat("en-NG", {
