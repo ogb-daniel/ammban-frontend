@@ -13,12 +13,9 @@ import { toast } from "react-toastify";
 import { getAllStates } from "@/app/lib/actions/user";
 import { Upload } from "lucide-react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
-export default function RegistrationForm({
-  referrerCode,
-}: {
-  referrerCode?: string;
-}) {
+export default function RegistrationForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const [states, setStates] = React.useState<States[] | null>([]);
   const [governmentId, setGovernmentId] = React.useState<
@@ -28,6 +25,9 @@ export default function RegistrationForm({
   const [proofOfAddress, setProofOfAddress] = React.useState<
     File | undefined | null
   >(null);
+  const searchParams = useSearchParams();
+
+  const referrerCode = searchParams.get("referrerCode") || "";
 
   React.useEffect(() => {
     (async () => {

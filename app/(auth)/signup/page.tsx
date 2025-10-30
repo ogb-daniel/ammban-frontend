@@ -3,11 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Signup",
 };
-export default function Signup({
-  searchParams,
-}: {
-  searchParams: { referrerCode?: string };
-}) {
+export default function Signup() {
   return (
     <main className=" p-6">
       <h1 className="text-primary text-[40px] font-bold text-center">
@@ -18,7 +14,7 @@ export default function Signup({
         protecting what matters most with an account built for your peace of
         mind.
       </p>
-      <RegistrationForm referrerCode={searchParams.referrerCode} />
+      <RegistrationForm />
     </main>
   );
 }
