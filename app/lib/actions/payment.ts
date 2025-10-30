@@ -4,6 +4,7 @@ import {
   GetAccountBalanceResponse,
   GetTransactionHistoryResponse,
   GetTransactionReceiptResponse,
+  GetWalletTransactionHistoryResponse,
   SyncStatusResponse,
   SyncTransactionBody,
   SyncTransactionResponse,
@@ -167,6 +168,29 @@ export const getTransactionHistory =
         "Error getting transaction history:",
         error?.response?.data
       );
+      return (
+        error?.response?.data || {
+          success: false,
+          error: {
+            message: error?.response?.data?.error?.message || error?.message,
+            details: error?.response?.data?.error?.details,
+          },
+        }
+      );
+    }
+  };
+export const getWalletTransactionHistory =
+  async (): Promise<GetWalletTransactionHistoryResponse> => {
+    try {
+      const response = await api.post<GetWalletTransactionHistoryResponse>(
+        `/api/services/app/PaymentService/WithDrawalHistory`
+      );
+      console.log("Withdrawal History Response:", response.data);
+
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error getting withdrawal history:", error?.response?.data);
       return (
         error?.response?.data || {
           success: false,

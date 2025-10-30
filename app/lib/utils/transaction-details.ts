@@ -1,5 +1,8 @@
 import Swal from "sweetalert2";
-import { TransactionDetailsData, generateTransactionDetailsHTML } from "@/app/ui/modals/transaction-details-content";
+import {
+  TransactionDetailsData,
+  generateTransactionDetailsHTML,
+} from "@/app/ui/modals/transaction-details-content";
 
 export interface TransactionDetailsOptions {
   transactionDetails: TransactionDetailsData;
@@ -46,14 +49,7 @@ export const showAXATransactionDetails = async (
 ) => {
   const transactionDetails: TransactionDetailsData = {
     title: "Purchase at AXA PASS",
-    date: date || new Date().toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }),
+    date: date || "",
     cost,
     fee,
     paymentType: "Electronic Scan Transfer",
@@ -82,14 +78,16 @@ export const showInsuranceTransactionDetails = async (
 ) => {
   const transactionDetails: TransactionDetailsData = {
     title: `${policyType} Policy Purchase`,
-    date: date || new Date().toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }),
+    date:
+      date ||
+      new Date().toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }),
     cost,
     fee,
     paymentType: "Electronic Transfer",
@@ -106,49 +104,49 @@ export const showInsuranceTransactionDetails = async (
 };
 
 // Function to show transaction details from existing transaction data
-export const showTransactionDetailsFromData = async (
-  transaction: {
-    id?: string | number;
-    type?: string;
-    amount?: number | string;
-    fee?: number | string;
-    seller?: string;
-    buyer?: string;
-    reference?: string;
-    date?: string | Date;
-    paymentMethod?: string;
-  }
-) => {
+export const showTransactionDetailsFromData = async (transaction: {
+  id?: string | number;
+  type?: string;
+  amount?: number | string;
+  fee?: number | string;
+  seller?: string;
+  buyer?: string;
+  reference?: string;
+  date?: string | Date;
+  paymentMethod?: string;
+}) => {
   const transactionDetails: TransactionDetailsData = {
     title: transaction.type || "Transaction",
-    date: transaction.date 
-      ? (typeof transaction.date === 'string' 
-          ? transaction.date 
-          : transaction.date.toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "2-digit", 
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            }))
+    date: transaction.date
+      ? typeof transaction.date === "string"
+        ? transaction.date
+        : transaction.date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
       : new Date().toLocaleDateString("en-GB", {
           day: "2-digit",
           month: "2-digit",
-          year: "numeric", 
+          year: "numeric",
           hour: "2-digit",
           minute: "2-digit",
           hour12: true,
         }),
-    cost: typeof transaction.amount === 'number' 
-      ? `₦${transaction.amount.toLocaleString()}` 
-      : transaction.amount?.toString() || "₦0.00",
-    fee: typeof transaction.fee === 'number'
-      ? `₦${transaction.fee.toLocaleString()}`
-      : transaction.fee?.toString() || "₦0.00",
+    cost:
+      typeof transaction.amount === "number"
+        ? `₦${transaction.amount.toLocaleString()}`
+        : transaction.amount?.toString() || "₦0.00",
+    fee:
+      typeof transaction.fee === "number"
+        ? `₦${transaction.fee.toLocaleString()}`
+        : transaction.fee?.toString() || "₦0.00",
     paymentType: transaction.paymentMethod || "Electronic Transfer",
     sellerName: transaction.seller || "N/A",
-    buyerName: transaction.buyer || "N/A", 
+    buyerName: transaction.buyer || "N/A",
     buyerReference: transaction.reference,
     transactionId: transaction.id?.toString(),
     logoText: "CC",

@@ -6,6 +6,7 @@ import {
   Role,
   Transaction,
   User,
+  WithdrawalHistory,
 } from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 
@@ -46,6 +47,7 @@ export type AdminState = {
   users: User[];
   admin: Admin;
   transactions: Transaction[];
+  walletTransactions: WithdrawalHistory[];
 };
 
 export type AdminActions = {
@@ -58,6 +60,7 @@ export type AdminActions = {
     commissionsPercentage: CommissionPercentage[]
   ) => void;
   initializeTransactions: (transactions: Transaction[]) => void;
+  initializeWalletTransactions: (transactions: WithdrawalHistory[]) => void;
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
   createRole: (role: Role) => void;
@@ -77,7 +80,6 @@ export const initAdminStore = (): AdminState => {
     categories: [],
     roles: [],
     products: [],
-
     commissions: [],
     commissionsPercentage: [],
     users: [],
@@ -97,6 +99,7 @@ export const initAdminStore = (): AdminState => {
       role: "Admin",
     },
     transactions: [],
+    walletTransactions: [],
   };
 };
 export const defaultInitState: AdminState = {
@@ -122,6 +125,7 @@ export const defaultInitState: AdminState = {
     role: "",
   },
   transactions: [],
+  walletTransactions: [],
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {
@@ -156,6 +160,10 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     initializeTransactions: (transactions: Transaction[]) =>
       set(() => ({
         transactions: transactions,
+      })),
+    initializeWalletTransactions: (transactions: WithdrawalHistory[]) =>
+      set(() => ({
+        walletTransactions: transactions,
       })),
     createCategory: (category) =>
       set((state) => ({

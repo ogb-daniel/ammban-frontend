@@ -160,6 +160,13 @@ export type Transaction = {
   status: number;
   amount: number;
 };
+
+export type WithdrawalHistory = {
+  amount: number;
+  narration: string;
+  status: "SUCCESS" | "PENDING" | "FAILED" | null;
+  beneficiaryAccountNumber: string;
+};
 export interface ApiResponse<T> {
   result: T;
   targetUrl: null;
@@ -753,6 +760,18 @@ export interface GetTransactionHistoryResponse
         amount: number;
       }[];
     };
+  };
+}
+export interface GetWalletTransactionHistoryResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: WithdrawalHistory[];
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: WithdrawalHistory[];
   };
 }
 

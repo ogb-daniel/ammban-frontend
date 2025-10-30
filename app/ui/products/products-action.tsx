@@ -10,19 +10,25 @@ export default function ProductsAction() {
   return (
     <div className="flex max-w-3xl mx-auto gap-6 mt-4">
       {user?.role !== "agent" && (
-        <button
-          className="btn text-primary border border-primary"
-          onClick={() => router.push(`/${user?.role}/products/create-category`)}
-        >
-          Create Category
-        </button>
+        <>
+          <button
+            className="btn text-primary border border-primary"
+            onClick={() =>
+              router.push(`/${user?.role}/products/create-category`)
+            }
+          >
+            Create Category
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() =>
+              router.push(`/${user?.role}/products/create-product`)
+            }
+          >
+            Create Product
+          </button>
+        </>
       )}
-      <button
-        className="btn-primary"
-        onClick={() => router.push(`/${user?.role}/products/create-product`)}
-      >
-        Create Product
-      </button>
     </div>
   );
 }

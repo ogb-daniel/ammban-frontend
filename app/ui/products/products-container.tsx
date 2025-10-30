@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/providers/admin-store-provider";
 
-import { Product } from "@/app/lib/definitions";
+import { Product, Transaction } from "@/app/lib/definitions";
 import ProductsTable from "./products-table";
 import ProductsAction from "./products-action";
 import { getAllProducts } from "@/app/lib/actions/product";
@@ -11,9 +11,11 @@ import { getAllProducts } from "@/app/lib/actions/product";
 export default function ProductsContainer({
   products,
   limit,
+  transactions,
 }: {
   products: Product[];
   limit: number;
+  transactions: Transaction[];
 }) {
   const [skip, setSkip] = useState(100);
   const { initializeProducts, products: storeProducts } = useAdminStore(
@@ -37,7 +39,7 @@ export default function ProductsContainer({
 
   return (
     <div className="space-y-6">
-      <ProductsTable />
+      <ProductsTable transactions={transactions} />
       <ProductsAction />
     </div>
   );

@@ -1,3 +1,4 @@
+import { getTransactionHistory } from "@/app/lib/actions/payment";
 import { getAllProducts } from "@/app/lib/actions/product";
 import ProductsContainer from "@/app/ui/products/products-container";
 import { Metadata } from "next";
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
 export default async function Products() {
   const limit = 100;
   const products = await getAllProducts({ MaxResultCount: limit });
+  const transactions = await getTransactionHistory();
 
   return (
     <main>
@@ -17,6 +19,7 @@ export default async function Products() {
         <ProductsContainer
           products={products?.result?.payload?.items || []}
           limit={limit}
+          transactions={transactions?.result?.payload?.items || []}
         />
       </div>
     </main>

@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
 import { useAdminStore } from "@/providers/admin-store-provider";
@@ -8,12 +8,20 @@ import { BiSolidShoppingBagAlt } from "react-icons/bi";
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MdEdit, MdInfo } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import { Product } from "@/app/lib/definitions";
+import { Product, Transaction } from "@/app/lib/definitions";
 import Swal from "sweetalert2";
 import { deleteProduct } from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { UserCog, UserCheck, ChevronDown } from "lucide-react";
+import TransactionContainer from "../transactions/transaction-container";
 const productColumns: ColumnDef<Product>[] = [
   {
     accessorKey: "name",
@@ -62,11 +70,47 @@ const productColumns: ColumnDef<Product>[] = [
     },
   },
 ];
-
-const ProductsTable = () => {
+function ManageTransactionsDropdown({
+  selected,
+  setSelected,
+}: {
+  selected: string;
+  setSelected: (value: string) => void;
+}) {
+  const handleSelect = (value: string) => {
+    setSelected(value);
+    console.log("Selected:", value); // You can use this value for further logic
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="default" className="bg-primary text-white">
+          {selected} <ChevronDown className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem
+          className="flex items-center gap-2"
+          onClick={() => handleSelect("Available Products")}
+        >
+          <UserCog size={16} /> Available Products
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="flex items-center gap-2"
+          onClick={() => handleSelect("Product Sales History")}
+        >
+          <UserCheck size={16} /> Product Sales History
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+const ProductsTable = ({ transactions }: { transactions: Transaction[] }) => {
   const { products, deleteProduct: deleteProductFromStore } = useAdminStore(
     (state) => state
   );
+  const [selected, setSelected] = useState("Available Products");
+
   const router = useRouter();
   const { user } = useUserStore((state) => state);
   const actions =
@@ -128,12 +172,28 @@ const ProductsTable = () => {
           },
         ];
   return (
-    <Table<Product>
-      data={products}
-      columns={productColumns}
-      title="All Products"
-      actions={actions}
-    />
+    <div className="space-y-2">
+      {user?.role !== "admin" && (
+        <ManageTransactionsDropdown
+          selected={selected}
+          setSelected={setSelected}
+        />
+      )}
+      {selected === "Product Sales History" && user?.role !== "admin" ? (
+        <TransactionContainer transactions={transactions} />
+      ) : (
+        <Table<Product>
+          data={products}
+          columns={productColumns}
+          title={
+            selected === "Available Products"
+              ? "All Products"
+              : "All Transactions"
+          }
+          actions={actions}
+        />
+      )}
+    </div>
   );
 };
 
