@@ -15,11 +15,11 @@ export default async function Users() {
       </div>
       <div className="p-6">
         <UsersContainer
-          users={users.result.referredUsers}
+          users={users?.result?.referredUsers || []}
           limit={limit}
-          totalActiveUsers={users.result.totalActiveUsers}
-          totalInactiveUsers={users.result.totalInActiveUsers}
-          totalUsers={users.result.totalUsers}
+          totalActiveUsers={users?.result?.totalActiveUsers || 0}
+          totalInactiveUsers={users?.result?.totalInActiveUsers || 0}
+          totalUsers={users?.result?.totalUsers || 0}
           hasStats={true}
         />
       </div>

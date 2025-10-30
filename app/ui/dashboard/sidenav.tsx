@@ -34,7 +34,7 @@ export default function SideNav() {
       name: user.role === "trade-partners" ? "Aggregators" : "Users",
       href: `/${user.role}/users`,
       icon: FaUsers,
-      roles: ["admin", "agency", "aggregator", "trade-partners"],
+      roles: ["admin", "agency", "aggregator", "trade-partners", "agent"],
     },
     {
       name: "Roles and Permissions",
