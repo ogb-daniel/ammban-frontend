@@ -15,7 +15,7 @@ export default function ProductsContainer({
 }: {
   products: Product[];
   limit: number;
-  transactions: Transaction[];
+  transactions?: Transaction[];
 }) {
   const [skip, setSkip] = useState(100);
   const { initializeProducts, products: storeProducts } = useAdminStore(

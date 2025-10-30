@@ -105,7 +105,7 @@ function ManageTransactionsDropdown({
     </DropdownMenu>
   );
 }
-const ProductsTable = ({ transactions }: { transactions: Transaction[] }) => {
+const ProductsTable = ({ transactions }: { transactions?: Transaction[] }) => {
   const { products, deleteProduct: deleteProductFromStore } = useAdminStore(
     (state) => state
   );
@@ -179,7 +179,9 @@ const ProductsTable = ({ transactions }: { transactions: Transaction[] }) => {
           setSelected={setSelected}
         />
       )}
-      {selected === "Product Sales History" && user?.role !== "admin" ? (
+      {selected === "Product Sales History" &&
+      user?.role !== "admin" &&
+      transactions ? (
         <TransactionContainer transactions={transactions} />
       ) : (
         <Table<Product>
