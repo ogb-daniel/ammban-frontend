@@ -118,7 +118,7 @@ export default function WithdrawCommissionForm() {
           }).format(values.value.amount)} was successful`,
           "Close"
         ).then(() => {
-          router.replace(`/${user!.role}/commissions`);
+          router.replace(`/${user!.role}/wallet`);
         });
       } catch (error) {
         toast.error((error as Error).message);
