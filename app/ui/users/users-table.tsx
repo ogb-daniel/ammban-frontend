@@ -62,7 +62,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "roleNames",
     header: "Role",
-    cell: (info) => (info.getValue() as string[]).join(", "),
+    cell: (info) => (info.getValue() as string[])?.join(", "),
     enableSorting: true,
 
     meta: {
@@ -244,13 +244,13 @@ const UsersTable = ({ users }: { users: User[] }) => {
                   user?.emailAddress,
                   user?.phoneNumber,
                   user?.state,
-                  user?.roleNames.join(", "),
+                  user?.roleNames?.join(", "),
                   user?.gender === 0 ? "Male" : "Female",
                   user?.isActive ? "Active" : "Inactive",
                 ]),
               ]
-                .map((row) => row.join(","))
-                .join("\n");
+                .map((row) => row?.join(","))
+                ?.join("\n");
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
