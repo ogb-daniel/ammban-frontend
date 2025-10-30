@@ -146,11 +146,7 @@ function ManageUsersDropdown({
   );
 }
 
-const UsersTable = ({
-  users,
-}: {
-  users: (User & { gender: number; state: string; isActive: boolean })[];
-}) => {
+const UsersTable = ({ users }: { users: User[] }) => {
   const router = useRouter();
   const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
@@ -242,7 +238,8 @@ const UsersTable = ({
                   "Gender",
                   "Status",
                 ],
-                ...users.map((user) => [
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...users.map((user: any) => [
                   user?.fullName,
                   user?.emailAddress,
                   user?.phoneNumber,
