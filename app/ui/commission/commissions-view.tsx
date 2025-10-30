@@ -12,6 +12,7 @@ import {
 import { commissionsEarned } from "@/app/lib/actions/dashboard";
 import WithdrawalHistoryContainer from "../transactions/withdawal-history-container";
 import { showWalletDetails } from "@/app/lib/utils/transaction-details";
+import { Button } from "@/components/ui/button";
 // const tabs = [
 //   { key: "all", label: "All Transactions", component: <AllTransactions /> },
 //   { key: "income", label: "Income", component: <Income /> },
@@ -39,16 +40,18 @@ export default function CommissionsView({
 
   return (
     <div className="p-6">
-      <button
-        className="bg-primary font-medium  text-white py-2 px-4 hover:opacity-90 rounded-xl"
+      <Button
+        variant="default"
+        className="bg-primary text-white"
         onClick={() => {
           showWalletDetails({
             accountDetails: walletDetails,
           });
         }}
       >
-        Deposit to wallet
-      </button>
+        Deposit to wallet{" "}
+      </Button>
+
       <div className="flex flex-wrap items-center gap-5 mb-4">
         <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6 flex-1">
           <h1 className="text-lg font-semibold">Commission Earnings</h1>

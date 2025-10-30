@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MdCheckBox, MdEdit, MdPermIdentity } from "react-icons/md";
 import { FaTransgender, FaTrash, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { PiPhoneFill } from "react-icons/pi";
+import { PiExportBold, PiPhoneFill } from "react-icons/pi";
 import { FaLocationDot } from "react-icons/fa6";
 import {
   DropdownMenu,
@@ -146,7 +146,11 @@ function ManageUsersDropdown({
   );
 }
 
-const UsersTable = ({ users }: { users: User[] }) => {
+const UsersTable = ({
+  users,
+}: {
+  users: (User & { gender: number; state: string; isActive: boolean })[];
+}) => {
   const router = useRouter();
   const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
@@ -219,7 +223,49 @@ const UsersTable = ({ users }: { users: User[] }) => {
         onRequestClose={() => setIsOpen(false)}
         user={selectedUser as User}
       />
-      <ManageUsersDropdown selected={selected} setSelected={setSelected} />
+      <div className="flex items-center justify-between">
+        <ManageUsersDropdown selected={selected} setSelected={setSelected} />
+        <Button
+          variant="default"
+          className="bg-primary text-white"
+          onClick={() => {
+            // Export users to CSV
+            const csvContent =
+              "data:text/csv;charset=utf-8," +
+              [
+                [
+                  "Full Name",
+                  "Email",
+                  "Phone",
+                  "State",
+                  "Roles",
+                  "Gender",
+                  "Status",
+                ],
+                ...users.map((user) => [
+                  user?.fullName,
+                  user?.emailAddress,
+                  user?.phoneNumber,
+                  user?.state,
+                  user?.roleNames.join(", "),
+                  user?.gender === 0 ? "Male" : "Female",
+                  user?.isActive ? "Active" : "Inactive",
+                ]),
+              ]
+                .map((row) => row.join(","))
+                .join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "users.csv");
+            document.body.appendChild(link);
+            link.click();
+          }}
+        >
+          Export Users
+          <PiExportBold className="w-4 h-4" />
+        </Button>
+      </div>
       <Table<User>
         data={users}
         columns={userColumns}
