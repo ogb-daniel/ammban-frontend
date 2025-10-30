@@ -2,10 +2,18 @@ import Swal from "sweetalert2";
 import {
   TransactionDetailsData,
   generateTransactionDetailsHTML,
+  generateWalletDetailsHTML,
 } from "@/app/ui/modals/transaction-details-content";
+import { WalletAccountDetails } from "../definitions";
 
 export interface TransactionDetailsOptions {
   transactionDetails: TransactionDetailsData;
+  allowOutsideClick?: boolean;
+  allowEscapeKey?: boolean;
+  showCloseButton?: boolean;
+}
+export interface WalletDetailsOptions {
+  accountDetails: WalletAccountDetails;
   allowOutsideClick?: boolean;
   allowEscapeKey?: boolean;
   showCloseButton?: boolean;
@@ -18,6 +26,31 @@ export const showTransactionDetails = async ({
   showCloseButton = true,
 }: TransactionDetailsOptions) => {
   const htmlContent = generateTransactionDetailsHTML(transactionDetails);
+
+  const result = await Swal.fire({
+    html: htmlContent,
+    showConfirmButton: false,
+    showCancelButton: false,
+    showCloseButton,
+    allowOutsideClick,
+    allowEscapeKey,
+    customClass: {
+      popup: "!rounded-3xl !p-8",
+      htmlContainer: "!p-0 !m-0",
+      closeButton: "!text-gray-500 hover:!text-gray-700 !text-2xl !font-normal",
+    },
+    width: "500px",
+  });
+
+  return result;
+};
+export const showWalletDetails = async ({
+  accountDetails,
+  allowOutsideClick = true,
+  allowEscapeKey = true,
+  showCloseButton = true,
+}: WalletDetailsOptions) => {
+  const htmlContent = generateWalletDetailsHTML(accountDetails);
 
   const result = await Swal.fire({
     html: htmlContent,

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import WithdrawCommission from "./withdraw-commision";
 
-import { WithdrawalHistory } from "@/app/lib/definitions";
+import { WalletAccountDetails, WithdrawalHistory } from "@/app/lib/definitions";
 import { useUserStore } from "@/providers/user-store-provider";
 import Swal from "sweetalert2";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/app/lib/actions/payment";
 import { commissionsEarned } from "@/app/lib/actions/dashboard";
 import WithdrawalHistoryContainer from "../transactions/withdawal-history-container";
+import { showWalletDetails } from "@/app/lib/utils/transaction-details";
 // const tabs = [
 //   { key: "all", label: "All Transactions", component: <AllTransactions /> },
 //   { key: "income", label: "Income", component: <Income /> },
@@ -19,9 +20,11 @@ import WithdrawalHistoryContainer from "../transactions/withdawal-history-contai
 export default function CommissionsView({
   transactions,
   commissionEarnings,
+  walletDetails,
 }: {
   transactions: WithdrawalHistory[];
   commissionEarnings: number;
+  walletDetails: WalletAccountDetails;
 }) {
   const { setUser, user } = useUserStore((state) => state);
   useEffect(() => {
@@ -36,6 +39,16 @@ export default function CommissionsView({
 
   return (
     <div className="p-6">
+      <button
+        className="bg-primary font-medium  text-white py-2 px-4 hover:opacity-90 rounded-xl"
+        onClick={() => {
+          showWalletDetails({
+            accountDetails: walletDetails,
+          });
+        }}
+      >
+        Deposit to wallet
+      </button>
       <div className="flex flex-wrap items-center gap-5 mb-4">
         <div className="bg-[#DDEBFD] p-3 px-4 rounded-md mt-6 flex-1">
           <h1 className="text-lg font-semibold">Commission Earnings</h1>

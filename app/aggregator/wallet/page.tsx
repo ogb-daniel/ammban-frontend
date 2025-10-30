@@ -1,5 +1,8 @@
 import { commissionsEarned } from "@/app/lib/actions/dashboard";
-import { getWalletTransactionHistory } from "@/app/lib/actions/payment";
+import {
+  depositFunds,
+  getWalletTransactionHistory,
+} from "@/app/lib/actions/payment";
 import CommissionsView from "@/app/ui/commission/commissions-view";
 import { Metadata } from "next";
 export const metadata: Metadata = {
@@ -9,6 +12,8 @@ export const metadata: Metadata = {
 export default async function Wallet() {
   const transactions = await getWalletTransactionHistory();
   const commissionEarnings = await commissionsEarned();
+  const response = await depositFunds();
+
   // Handle errors gracefully instead of throwing
   if (transactions.error || commissionEarnings.error) {
     return (
@@ -34,6 +39,7 @@ export default async function Wallet() {
       <CommissionsView
         transactions={transactions.result.payload || []}
         commissionEarnings={commissionEarnings.result.payload?.amount}
+        walletDetails={response?.result?.payload || {}}
       />
     </main>
   );

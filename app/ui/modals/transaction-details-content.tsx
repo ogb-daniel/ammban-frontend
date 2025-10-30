@@ -1,4 +1,5 @@
 "use client";
+import { WalletAccountDetails } from "@/app/lib/definitions";
 import React from "react";
 
 export interface TransactionDetailsData {
@@ -114,6 +115,57 @@ export const generateTransactionDetailsHTML = (
         `
             : ""
         }
+      </div>
+    </div>
+  `;
+};
+export const generateWalletDetailsHTML = (
+  accountDetails: WalletAccountDetails
+): string => {
+  return `
+    <div class="text-left">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">
+          Wallet Account Details
+        </h2>
+      </div>
+
+
+
+      <!-- Transaction Details -->
+      <div class="space-y-4">
+        <!-- Account Name -->
+        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600">Account Name</span>
+          <span class="font-semibold text-lg text-gray-800">
+            ${accountDetails.accountName}
+          </span>
+        </div>
+
+        <!-- Account Number -->
+        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600">Account Number</span>
+          <span class="font-semibold text-gray-800">
+            ${accountDetails.accountNumber}
+          </span>
+        </div>
+
+        <!-- Bank Name -->
+        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600">Bank Name</span>
+          <span class="font-medium text-gray-800">
+            ${accountDetails.bankName}
+          </span>
+        </div>
+
+        <!-- Bank Code -->
+        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+          <span class="text-gray-600">Bank Code</span>
+          <span class="font-medium text-gray-800">
+            ${accountDetails.bankCode || "N/A"}
+          </span>
+        </div>
       </div>
     </div>
   `;
