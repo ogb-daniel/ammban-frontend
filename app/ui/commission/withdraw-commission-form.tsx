@@ -43,7 +43,7 @@ export default function WithdrawCommissionForm() {
         const html = `
                   <div class="space-y-4">
                     <label for="pin" class="block text-sm font-medium text-gray-700">Enter Pin</label>
-                    <input type="text" id="pin" name="pin" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Pin" />
+                    <input type="password" id="pin" name="pin" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Pin" />
                   </div>
                   `;
         const result = await Swal.fire({

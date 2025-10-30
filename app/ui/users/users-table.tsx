@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
-import { MdCheckBox, MdEdit } from "react-icons/md";
+import { MdCheckBox, MdEdit, MdPermIdentity } from "react-icons/md";
 import { FaTransgender, FaTrash, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { PiPhoneFill } from "react-icons/pi";
@@ -60,6 +60,16 @@ const userColumns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "roleNames",
+    header: "Role",
+    cell: (info) => (info.getValue() as string[]).join(", "),
+    enableSorting: true,
+
+    meta: {
+      icon: <MdPermIdentity className="text-gray-500" />,
+    },
+  },
+  {
     accessorKey: "gender",
     header: "Gender",
     cell: (info) => toTitleCase(info.getValue() === 0 ? "Male" : "Female"),
@@ -104,6 +114,7 @@ function ManageUsersDropdown({
   selected: string;
   setSelected: (value: string) => void;
 }) {
+  const { user } = useUserStore((state) => state);
   const handleSelect = (value: string) => {
     setSelected(value);
     console.log("Selected:", value); // You can use this value for further logic
@@ -122,12 +133,14 @@ function ManageUsersDropdown({
         >
           <UserCog size={16} /> Manage Users
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => handleSelect("Assign Users")}
-        >
-          <UserCheck size={16} /> Assign Users
-        </DropdownMenuItem>
+        {user?.role === "admin" && (
+          <DropdownMenuItem
+            className="flex items-center gap-2"
+            onClick={() => handleSelect("Assign Users")}
+          >
+            <UserCheck size={16} /> Assign Users
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

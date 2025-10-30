@@ -14,12 +14,20 @@ import { getAllStates } from "@/app/lib/actions/user";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 
-export default function RegistrationForm() {
+export default function RegistrationForm({
+  referrerCode,
+}: {
+  referrerCode?: string;
+}) {
   const [state, action, pending] = useActionState(signup, undefined);
   const [states, setStates] = React.useState<States[] | null>([]);
-  const [governmentId, setGovernmentId] = React.useState<File | undefined | null>(null);
+  const [governmentId, setGovernmentId] = React.useState<
+    File | undefined | null
+  >(null);
   const [selfie, setSelfie] = React.useState<File | undefined | null>(null);
-  const [proofOfAddress, setProofOfAddress] = React.useState<File | undefined | null>(null);
+  const [proofOfAddress, setProofOfAddress] = React.useState<
+    File | undefined | null
+  >(null);
 
   React.useEffect(() => {
     (async () => {
@@ -31,7 +39,7 @@ export default function RegistrationForm() {
   }, []);
   const form = useForm({
     defaultValues: {
-      referralCode: "",
+      referralCode: referrerCode || "",
       firstName: "",
       lastName: "",
       phoneNumber: "",
@@ -64,7 +72,11 @@ export default function RegistrationForm() {
   }, [state]);
   const handleAction = async (formData: FormData) => {
     Object.entries(form.state.values).forEach(([key, value]) => {
-      if (key !== "governmentId" && key !== "selfie" && key !== "proofOfAddress") {
+      if (
+        key !== "governmentId" &&
+        key !== "selfie" &&
+        key !== "proofOfAddress"
+      ) {
         formData.append(key, String(value));
       }
     });
@@ -81,7 +93,9 @@ export default function RegistrationForm() {
     return action(formData);
   };
 
-  const handleGovernmentIdUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGovernmentIdUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     setGovernmentId(file);
   };
@@ -91,7 +105,9 @@ export default function RegistrationForm() {
     setSelfie(file);
   };
 
-  const handleProofOfAddressUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProofOfAddressUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     setProofOfAddress(file);
   };
@@ -466,16 +482,15 @@ export default function RegistrationForm() {
       </div>
       <div className="space-y-6">
         <div className="space-y-2">
-          <p className="font-medium">
-            Government-Issued ID
-          </p>
+          <p className="font-medium">Government-Issued ID</p>
           <p className="text-sm text-gray-600">
-            Upload a clear image of your government-issued ID for identity verification
+            Upload a clear image of your government-issued ID for identity
+            verification
           </p>
           <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
             {governmentId && (
               <div className="w-full mb-2">
-                {governmentId.type.startsWith('image/') ? (
+                {governmentId.type.startsWith("image/") ? (
                   <div className="w-full h-32 relative">
                     <Image
                       src={URL.createObjectURL(governmentId)}
@@ -494,27 +509,30 @@ export default function RegistrationForm() {
             )}
             <Upload className="text-gray-500 w-6 h-6 mb-2" />
             <p>
-              <span className="text-primary font-medium">Click to upload</span> or
-              drag and drop
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
             </p>
             <p className="text-sm text-gray-500">
               PNG, JPG or PDF (max. 800 x 400px)
             </p>
-            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleGovernmentIdUpload} />
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleGovernmentIdUpload}
+            />
           </label>
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium">
-            Selfie Photo
-          </p>
+          <p className="font-medium">Selfie Photo</p>
           <p className="text-sm text-gray-600">
             Upload a clear selfie photo for identity verification
           </p>
           <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
             {selfie && (
               <div className="w-full mb-2">
-                {selfie.type.startsWith('image/') ? (
+                {selfie.type.startsWith("image/") ? (
                   <div className="w-full h-32 relative">
                     <Image
                       src={URL.createObjectURL(selfie)}
@@ -533,27 +551,31 @@ export default function RegistrationForm() {
             )}
             <Upload className="text-gray-500 w-6 h-6 mb-2" />
             <p>
-              <span className="text-primary font-medium">Click to upload</span> or
-              drag and drop
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
             </p>
             <p className="text-sm text-gray-500">
               PNG, JPG or PDF (max. 800 x 400px)
             </p>
-            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleSelfieUpload} />
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleSelfieUpload}
+            />
           </label>
         </div>
 
         <div className="space-y-2">
-          <p className="font-medium">
-            Proof of Address
-          </p>
+          <p className="font-medium">Proof of Address</p>
           <p className="text-sm text-gray-600">
-            Upload a utility bill, bank statement, or other document showing your address
+            Upload a utility bill, bank statement, or other document showing
+            your address
           </p>
           <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
             {proofOfAddress && (
               <div className="w-full mb-2">
-                {proofOfAddress.type.startsWith('image/') ? (
+                {proofOfAddress.type.startsWith("image/") ? (
                   <div className="w-full h-32 relative">
                     <Image
                       src={URL.createObjectURL(proofOfAddress)}
@@ -572,13 +594,18 @@ export default function RegistrationForm() {
             )}
             <Upload className="text-gray-500 w-6 h-6 mb-2" />
             <p>
-              <span className="text-primary font-medium">Click to upload</span> or
-              drag and drop
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
             </p>
             <p className="text-sm text-gray-500">
               PNG, JPG or PDF (max. 800 x 400px)
             </p>
-            <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleProofOfAddressUpload} />
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleProofOfAddressUpload}
+            />
           </label>
         </div>
       </div>

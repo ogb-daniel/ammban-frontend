@@ -48,9 +48,10 @@ export default function SideNav() {
       icon: AiFillProduct,
       roles: ["admin", "agent"],
     },
+
     {
-      name: "Commission",
-      href: `/${user.role}/commissions`,
+      name: "Wallet",
+      href: `/${user.role}/wallet`,
       icon: RiWallet3Fill,
     },
   ];

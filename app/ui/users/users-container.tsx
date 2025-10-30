@@ -30,6 +30,7 @@ export default function UsersContainer({
   const { initializeUsers, users: storeUsers } = useAdminStore(
     (state) => state
   );
+  console.log(users);
 
   useEffect(() => {
     initializeUsers(users);

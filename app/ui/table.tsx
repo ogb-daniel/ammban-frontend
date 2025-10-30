@@ -9,6 +9,7 @@ import {
   SortingState,
   getSortedRowModel,
   getFilteredRowModel,
+  FilterFn,
 } from "@tanstack/react-table";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { CardLayout, CompactLayout, ListLayout } from "./table/mobile-layouts";
@@ -32,6 +33,23 @@ type TableProps<T> = {
 type ColumnMeta = {
   icon?: React.ReactNode;
   className?: string;
+};
+
+// Custom global filter function that handles arrays
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const globalFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  const searchValue = String(filterValue).toLowerCase();
+  const cellValue = row.getValue(columnId);
+
+  // Handle array values (like roleNames)
+  if (Array.isArray(cellValue)) {
+    return cellValue.some((item) =>
+      String(item).toLowerCase().includes(searchValue)
+    );
+  }
+
+  // Handle regular string/number values
+  return String(cellValue).toLowerCase().includes(searchValue);
 };
 const Table = <T extends object>({
   data = [],
@@ -97,6 +115,8 @@ const Table = <T extends object>({
 
     onGlobalFilterChange: setGlobalFilter,
     enableGlobalFilter: true, // Enable global filtering
+    globalFilterFn: globalFilterFn,
+    getColumnCanGlobalFilter: () => true,
   });
   // Call onSelectedRowsChange when selection changes
   React.useEffect(() => {
