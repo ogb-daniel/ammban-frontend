@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useAdminStore } from "@/providers/admin-store-provider";
 import UserStats from "./user-stats";
 import UsersTable from "./users-table";
-import UsersAction from "./users-action";
 import { User } from "@/app/lib/definitions";
 import { getAllUsers } from "@/app/lib/actions/user";
 import { HiUsers } from "react-icons/hi2";
@@ -73,7 +72,6 @@ export default function UsersContainer({
       )}
       <div>
         <UsersTable users={storeUsers} />
-        <UsersAction />
       </div>
     </div>
   );
