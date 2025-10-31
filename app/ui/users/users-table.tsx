@@ -244,7 +244,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
                   user?.emailAddress,
                   user?.phoneNumber,
                   user?.state,
-                  user?.roleNames?.join(", "),
+                  user?.roleNames,
                   user?.gender === 0 ? "Male" : "Female",
                   user?.isActive ? "Active" : "Inactive",
                 ]),
