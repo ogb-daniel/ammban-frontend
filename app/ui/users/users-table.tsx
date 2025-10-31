@@ -62,7 +62,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "roleNames",
     header: "Role",
-    cell: (info) => (info.getValue() as string[])?.join(", "),
+    cell: (info) => info.getValue(),
     enableSorting: true,
 
     meta: {

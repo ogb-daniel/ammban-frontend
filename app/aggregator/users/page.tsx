@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 export default async function Users() {
   const limit = 100;
   const users = await getReferredUsers();
+  console.log("users", users);
 
   return (
     <main>
