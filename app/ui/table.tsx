@@ -28,6 +28,7 @@ type TableProps<T> = {
   actions?: Action<T>[]; // New prop for actions
   mobileLayout?: "list" | "card" | "compact" | "custom"; // Add this prop
   customMobileComponent?: React.ReactNode; // Add this for fully custom mobile layouts
+  setFilteredData?: (data: T[]) => void;
 };
 
 type ColumnMeta = {
@@ -60,6 +61,7 @@ const Table = <T extends object>({
   actions,
   mobileLayout = "list",
   customMobileComponent,
+  setFilteredData,
 }: TableProps<T>) => {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -150,6 +152,14 @@ const Table = <T extends object>({
         return <ListLayout key={visualIndex} row={row} actions={actions} />;
     }
   };
+  React.useEffect(() => {
+    if (setFilteredData) {
+      const filteredRows = table
+        .getFilteredRowModel()
+        .rows.map((row) => row.original);
+      setFilteredData(filteredRows);
+    }
+  }, [table, setFilteredData, globalFilter]);
   return (
     <section>
       <div className="bg-white border-2 border-gray-100 rounded-lg">

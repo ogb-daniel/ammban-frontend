@@ -39,6 +39,7 @@ export default function CreateCommissionForm() {
     defaultValues: {
       roleId: 0,
       percentage: 0,
+      customerType: 0,
     },
     onSubmit: async (values) => {
       console.log(values);
@@ -84,7 +85,7 @@ export default function CreateCommissionForm() {
         </div>
 
         {/* Form Fields - Side by side layout */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col gap-6">
           {/* Role Field */}
           <div className="flex-1">
             <form.Field
@@ -129,6 +130,32 @@ export default function CreateCommissionForm() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Percentage
                   </label>
+                  <input
+                    type="number"
+                    name={field.name}
+                    placeholder="Commission Percentage"
+                    id={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) =>
+                      field.handleChange(parseFloat(e.target.value))
+                    }
+                    className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  />
+                </>
+              )}
+            />
+          </div>
+          {/* Customer type */}
+          <div className="flex-1">
+            <form.Field
+              name="customerType"
+              // eslint-disable-next-line react/no-children-prop
+              children={(field) => (
+                <>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Customer Type
+                  </label>
                   <select
                     name={field.name}
                     id={field.name}
@@ -140,15 +167,11 @@ export default function CreateCommissionForm() {
                     className={`${styles.customSelect} block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                   >
                     <option value="">
-                      Select your percentage for commission role
+                      Select your customer type for commission role
                     </option>
-                    {Array.from({ length: 20 }, (_, i) => (i + 1) * 5).map(
-                      (percentage) => (
-                        <option key={percentage} value={percentage}>
-                          {percentage}%
-                        </option>
-                      )
-                    )}
+                    <option value={1}>First Time Customer</option>
+                    <option value={2}>Returning Same Agent</option>
+                    <option value={3}>Returning Different Agent</option>
                   </select>
                 </>
               )}

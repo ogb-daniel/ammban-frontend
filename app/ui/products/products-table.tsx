@@ -8,9 +8,12 @@ import { BiSolidShoppingBagAlt } from "react-icons/bi";
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MdEdit, MdInfo } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import { Product, Transaction } from "@/app/lib/definitions";
+import { Product, ProductCategory, Transaction } from "@/app/lib/definitions";
 import Swal from "sweetalert2";
-import { deleteProduct } from "@/app/lib/actions/product";
+import {
+  deleteProduct,
+  deleteProductCategory,
+} from "@/app/lib/actions/product";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
 import {
@@ -70,6 +73,36 @@ const productColumns: ColumnDef<Product>[] = [
     },
   },
 ];
+const categoryColumns: ColumnDef<ProductCategory>[] = [
+  {
+    accessorKey: "name",
+    header: "Category Name",
+    cell: (info) => info.getValue(),
+    enableSorting: true,
+    meta: {
+      icon: <FaUser className="text-gray-500" />,
+    },
+  },
+  {
+    accessorKey: "industry",
+    header: "Industry",
+    cell: (info) => info.getValue(),
+    enableSorting: true,
+    meta: {
+      icon: <BiSolidShoppingBagAlt className="text-gray-500" />,
+    },
+  },
+
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: (info) => `${info.getValue() as string}`,
+    meta: {
+      icon: <MdInfo className="text-gray-500" />,
+      className: "line-clamp-1",
+    },
+  },
+];
 function ManageTransactionsDropdown({
   selected,
   setSelected,
@@ -105,14 +138,57 @@ function ManageTransactionsDropdown({
     </DropdownMenu>
   );
 }
-const ProductsTable = ({ transactions }: { transactions?: Transaction[] }) => {
+function ManageProductsOrCatDropdown({
+  selected,
+  setSelected,
+}: {
+  selected: string;
+  setSelected: (value: string) => void;
+}) {
+  const handleSelect = (value: string) => {
+    setSelected(value);
+    console.log("Selected:", value); // You can use this value for further logic
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="default" className="bg-primary text-white">
+          {selected} <ChevronDown className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuItem
+          className="flex items-center gap-2"
+          onClick={() => handleSelect("Products")}
+        >
+          <UserCog size={16} /> Products
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="flex items-center gap-2"
+          onClick={() => handleSelect("Product Categories")}
+        >
+          <UserCheck size={16} /> Product Categories
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+const ProductsTable = ({
+  transactions,
+  categories,
+}: {
+  transactions?: Transaction[];
+  categories?: ProductCategory[];
+}) => {
   const { products, deleteProduct: deleteProductFromStore } = useAdminStore(
     (state) => state
   );
-  const [selected, setSelected] = useState("Available Products");
+  const { user } = useUserStore((state) => state);
+  const [selected, setSelected] = useState(
+    user?.role === "admin" ? "Products" : "Available Products"
+  );
 
   const router = useRouter();
-  const { user } = useUserStore((state) => state);
   const actions =
     user?.role === "admin"
       ? [
@@ -171,26 +247,101 @@ const ProductsTable = ({ transactions }: { transactions?: Transaction[] }) => {
             label: "Purchase Product",
           },
         ];
+
+  const categoryActions = [
+    {
+      element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
+      onClick: (category: ProductCategory) => {
+        router.push(`/${user?.role}/products/edit-category/${category.id}`);
+      },
+      label: "Edit Category",
+    },
+    {
+      element: <FaTrash className="w-4 h-4 text-red-500" />,
+      onClick: (category: ProductCategory) => {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Please confirm your action.",
+          showCancelButton: true,
+          cancelButtonText: "No, Cancel",
+          confirmButtonColor: "#094794",
+          confirmButtonText: "Yes, Confirm",
+          reverseButtons: true,
+          customClass: {
+            cancelButton: "text-primary bg-white border border-primary",
+            actions: "flex-row gap-2",
+          },
+          buttonsStyling: true,
+          showLoaderOnConfirm: true,
+          preConfirm: () => {
+            return deleteProductCategory(category.id);
+          },
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            const response = result.value;
+            if (response.success) {
+              toast.success("Category deleted successfully");
+            } else {
+              toast.error(response.error.message);
+            }
+          }
+        });
+      },
+      label: "Delete Category",
+    },
+  ];
   return (
     <div className="space-y-2">
-      {user?.role !== "admin" && (
+      {user?.role !== "admin" ? (
         <ManageTransactionsDropdown
           selected={selected}
           setSelected={setSelected}
         />
+      ) : (
+        <ManageProductsOrCatDropdown
+          selected={selected}
+          setSelected={setSelected}
+        />
       )}
-      {selected === "Product Sales History" &&
-      user?.role !== "admin" &&
-      transactions ? (
-        <TransactionContainer transactions={transactions} />
+
+      {user?.role === "admin" ? (
+        selected === "Product Categories" ? (
+          <Table<ProductCategory>
+            data={categories!}
+            columns={categoryColumns}
+            title={"All Product Categories"}
+            actions={categoryActions}
+          />
+        ) : (
+          <Table<Product>
+            data={products}
+            columns={productColumns}
+            title={
+              user?.role !== "admin"
+                ? selected === "Available Products"
+                  ? "All Products"
+                  : "All Transactions"
+                : selected === "Products"
+                ? "All Products"
+                : "All Product Categories"
+            }
+            actions={actions}
+          />
+        )
+      ) : selected === "Product Sales History" && transactions ? (
+        <TransactionContainer transactions={transactions || []} />
       ) : (
         <Table<Product>
           data={products}
           columns={productColumns}
           title={
-            selected === "Available Products"
+            user?.role !== "admin"
+              ? selected === "Available Products"
+                ? "All Products"
+                : "All Transactions"
+              : selected === "Products"
               ? "All Products"
-              : "All Transactions"
+              : "All Product Categories"
           }
           actions={actions}
         />

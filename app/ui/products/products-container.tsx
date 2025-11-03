@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { useAdminStore } from "@/providers/admin-store-provider";
 
-import { Product, Transaction } from "@/app/lib/definitions";
+import { Product, ProductCategory, Transaction } from "@/app/lib/definitions";
 import ProductsTable from "./products-table";
 import ProductsAction from "./products-action";
-import { getAllProducts } from "@/app/lib/actions/product";
+import {
+  getAllProductCategories,
+  getAllProducts,
+} from "@/app/lib/actions/product";
 
 export default function ProductsContainer({
   products,
@@ -21,10 +24,19 @@ export default function ProductsContainer({
   const { initializeProducts, products: storeProducts } = useAdminStore(
     (state) => state
   );
-
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   useEffect(() => {
     initializeProducts(products);
   }, [initializeProducts, products]);
+
+  useEffect(() => {
+    (async () => {
+      const categories = await getAllProductCategories({});
+      if (categories.success && categories?.result?.payload?.items) {
+        setCategories(categories.result.payload.items);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     console.log(skip);
@@ -39,7 +51,7 @@ export default function ProductsContainer({
 
   return (
     <div className="space-y-6">
-      <ProductsTable transactions={transactions} />
+      <ProductsTable transactions={transactions} categories={categories} />
       <ProductsAction />
     </div>
   );

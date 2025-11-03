@@ -18,6 +18,20 @@ const commissionColumns: ColumnDef<CommissionPercentage>[] = [
     },
   },
   {
+    accessorKey: "customerType",
+    header: "Customer Type",
+    cell: (info) =>
+      info.getValue() === 1
+        ? "First Time Customer"
+        : info.getValue() === 2
+        ? "Returning Same Agent"
+        : "Returning Different Agent",
+    enableSorting: true,
+    meta: {
+      icon: <LiaUserShieldSolid className="text-gray-500" />,
+    },
+  },
+  {
     accessorKey: "percentage",
     header: "Percentage",
     cell: (info) => info.getValue() + "%",
@@ -30,7 +44,7 @@ const commissionColumns: ColumnDef<CommissionPercentage>[] = [
 
 const CommissionTable = () => {
   const { commissionsPercentage } = useAdminStore((state) => state);
-  
+
   return (
     <Table<CommissionPercentage>
       data={commissionsPercentage}

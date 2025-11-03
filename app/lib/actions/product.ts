@@ -134,12 +134,14 @@ export const deleteProduct = async (
 };
 
 export const getProductCategory = async (
-  id: string
+  id: number
 ): Promise<GetProductCategoryResponse> => {
   try {
     const response = await api.get<GetProductCategoryResponse>(
-      `/api/services/app/ProductCategoryService/Get?id=${id}`
+      `/api/services/app/ProductCategoryService/GetById?id=${id}`
     );
+    console.log(response.data);
+
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -208,7 +210,7 @@ export const createProductCategory = async (
 };
 
 export const updateProductCategory = async (
-  id: string,
+  id: number,
   body: CreateProductCategoryBody
 ): Promise<CreateProductCategoryResponse> => {
   try {
@@ -233,7 +235,7 @@ export const updateProductCategory = async (
 };
 
 export const deleteProductCategory = async (
-  id: string
+  id: number
 ): Promise<DeleteProductCategoryResponse> => {
   try {
     const response = await api.delete<DeleteProductCategoryResponse>(

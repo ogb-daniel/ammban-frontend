@@ -151,6 +151,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
   const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
   const [isOpen, setIsOpen] = useState(false);
+  const [filteredUsers, setFilteredUsers] = useState(users);
   const { user: currentUser } = useUserStore((state) => state);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const actions =
@@ -212,6 +213,8 @@ const UsersTable = ({ users }: { users: User[] }) => {
             label: "Edit User",
           },
         ];
+  console.log(filteredUsers);
+
   return (
     <div className="space-y-2">
       <RoleAssignmentModal
@@ -225,7 +228,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
           variant="default"
           className="bg-primary text-white"
           onClick={() => {
-            // Export users to CSV
+            // Export filtered users to CSV
             const csvContent =
               "data:text/csv;charset=utf-8," +
               [
@@ -239,7 +242,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
                   "Status",
                 ],
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ...users.map((user: any) => [
+                ...filteredUsers.map((user: any) => [
                   user?.fullName,
                   user?.emailAddress,
                   user?.phoneNumber,
@@ -268,6 +271,7 @@ const UsersTable = ({ users }: { users: User[] }) => {
         columns={userColumns}
         title="All Users"
         actions={actions}
+        setFilteredData={setFilteredUsers}
       />
     </div>
   );

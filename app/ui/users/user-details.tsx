@@ -9,6 +9,8 @@ import { User } from "@/app/lib/definitions";
 import { disapproveUser, approveUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import CircleLoader from "../circle-loader";
+import Swal from "sweetalert2";
+import { setTransactionLimit } from "@/app/lib/actions/transactionLimit";
 type Props = {
   user: User;
 };
@@ -98,7 +100,7 @@ const UserDetails = ({ user }: Props) => {
             </div>
 
             {/* Buttons */}
-            <div className="mt-6 flex flex-col md:flex-row gap-4">
+            <div className="mt-6 flex flex-col md:flex-row gap-4 flex-wrap">
               <Button
                 className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
                 onClick={handleToggle}
@@ -125,6 +127,58 @@ const UserDetails = ({ user }: Props) => {
                 onClick={() => setViewDocuments(true)}
               >
                 Verify Documents
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full md:w-auto"
+                onClick={async () => {
+                  const html = `
+                                  <div class="space-y-4">
+                                    <label for="limit" class="block text-sm font-medium text-gray-700">Set Transaction Limit</label>
+                                    <input type="number" id="limit" name="limit" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm" placeholder="Daily limit" />
+                                  </div>
+                                  `;
+                  await Swal.fire({
+                    html,
+
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    customClass: {
+                      popup: "!rounded-3xl !p-8",
+                      htmlContainer: "!p-0 !m-0",
+                      cancelButton:
+                        "text-primary bg-white border border-primary !rounded-lg !px-6 !py-3",
+                      confirmButton: "!rounded-lg !px-6 !py-3",
+                      actions: "flex-row gap-3 !mt-8",
+                    },
+                    width: "400px",
+                    showCancelButton: true,
+                    confirmButtonText: "Set Limit",
+                    showLoaderOnConfirm: true,
+
+                    confirmButtonColor: "#094794", // Tailwind's blue-600
+                    cancelButtonText: "Cancel",
+                    buttonsStyling: true,
+                    reverseButtons: true,
+                    preConfirm: async () => {
+                      const limit = Number(
+                        (
+                          document.getElementById("limit") as HTMLInputElement
+                        ).value.trim()
+                      );
+                      const res = await setTransactionLimit(
+                        `userId=${user.id}&dailyLimit=${limit}`
+                      );
+                      if (res.success) {
+                        toast.success("Transaction limit set successfully");
+                      } else {
+                        toast.error("Failed to set transaction limit");
+                      }
+                    },
+                  });
+                }}
+              >
+                Set transaction Limits
               </Button>
             </div>
           </>
