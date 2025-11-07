@@ -21,7 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ArrowUpDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { CgSortAz } from "react-icons/cg";
 
 export type Action<T> = {
   element: React.ReactNode;
@@ -100,7 +101,10 @@ const Table = <T extends object>({
       return data;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data.filter((item: any) => item.categoryName === categoryFilter.selected);
+    return data.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item: any) => item.categoryName === categoryFilter.selected
+    );
   }, [data, categoryFilter]);
 
   const allColumns = React.useMemo(() => {
@@ -200,12 +204,16 @@ const Table = <T extends object>({
         </h2>
         <div className="overflow-x-auto">
           <div className="flex items-center justify-between px-8 mt-1 mb-4 gap-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 font-bold">
               {categoryFilter && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-300 text-gray-700">
-                      {categoryFilter.selected} <ChevronDown className="w-4 h-4 ml-2" />
+                    <Button
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 font-bold"
+                    >
+                      {categoryFilter.selected}{" "}
+                      <ChevronDown className="w-4 h-4 ml-2" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-[500px] p-4">
@@ -217,8 +225,10 @@ const Table = <T extends object>({
                           onClick={() => categoryFilter.onSelect(option.name)}
                         >
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900">{option.name}</div>
-                            <div className="text-xs text-gray-500 mt-1">{option.description}</div>
+                            <div className=" text-gray-900">{option.name}</div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {option.description}
+                            </div>
                           </div>
                           <ChevronDown className="w-4 h-4 text-primary -rotate-90 ml-2" />
                         </DropdownMenuItem>
@@ -231,13 +241,19 @@ const Table = <T extends object>({
               {sortOptions && sortOptions.length > 0 && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-gray-300 text-gray-700">
-                      Sort <ArrowUpDown className="w-4 h-4 ml-2" />
+                    <Button
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 font-bold"
+                    >
+                      Sort <CgSortAz className="w-4 h-4 ml-2" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-48">
                     {sortOptions.map((option) => (
-                      <DropdownMenuItem key={option} className="flex items-center gap-2">
+                      <DropdownMenuItem
+                        key={option}
+                        className="flex items-center gap-2"
+                      >
                         {option}
                       </DropdownMenuItem>
                     ))}

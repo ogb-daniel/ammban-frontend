@@ -356,6 +356,7 @@ const ProductsTable = ({
               selected: categoryFilter,
               onSelect: setCategoryFilter,
             }}
+            sortOptions={["Price: Low to High", "Price: High to Low", "Name: A-Z", "Name: Z-A"]}
           />
         )
       ) : selected === "Product Sales History" && transactions ? (
@@ -379,6 +380,7 @@ const ProductsTable = ({
             selected: categoryFilter,
             onSelect: setCategoryFilter,
           }}
+          sortOptions={["Price: Low to High", "Price: High to Low", "Name: A-Z", "Name: Z-A"]}
         />
       )}
     </div>
