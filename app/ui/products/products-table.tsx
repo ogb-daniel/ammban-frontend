@@ -110,39 +110,31 @@ const Status = ({ value }: { value: number }) => {
     </span>
   );
 };
-function ManageTransactionsDropdown({
+function TabSwitcher({
   selected,
   setSelected,
+  tabs,
 }: {
   selected: string;
   setSelected: (value: string) => void;
+  tabs: string[];
 }) {
-  const handleSelect = (value: string) => {
-    setSelected(value);
-    console.log("Selected:", value); // You can use this value for further logic
-  };
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="default" className="bg-primary text-white">
-          {selected} <ChevronDown className="w-4 h-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => handleSelect("Available Products")}
+    <div className="inline-flex bg-white rounded-lg py-2 px-3 gap-1 border-gray-300 border-2">
+      {tabs.map((tab) => (
+        <button
+          key={tab}
+          onClick={() => setSelected(tab)}
+          className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
+            selected === tab
+              ? "bg-[#d9edff] text-primary shadow-sm font-bold"
+              : "text-gray-600 hover:text-primary"
+          }`}
         >
-          <UserCog size={16} /> Available Products
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => handleSelect("Product Sales History")}
-        >
-          <UserCheck size={16} /> Product Sales History
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {tab}
+        </button>
+      ))}
+    </div>
   );
 }
 function ManageProductsOrCatDropdown({
@@ -180,48 +172,6 @@ function ManageProductsOrCatDropdown({
     </DropdownMenu>
   );
 }
-function CategoryFilterDropdown({
-  selected,
-  setSelected,
-  products,
-}: {
-  selected: string;
-  setSelected: (value: string) => void;
-  products: Product[];
-}) {
-  // Get unique categories from products
-  const uniqueCategories = React.useMemo(() => {
-    const categories = products.map((product) => product.categoryName);
-    return Array.from(new Set(categories)).filter(Boolean);
-  }, [products]);
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="border-primary text-primary">
-          {selected} <ChevronDown className="w-4 h-4 ml-2" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48 max-h-64 overflow-y-auto">
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => setSelected("All Categories")}
-        >
-          All Categories
-        </DropdownMenuItem>
-        {uniqueCategories.map((category) => (
-          <DropdownMenuItem
-            key={category}
-            className="flex items-center gap-2"
-            onClick={() => setSelected(category)}
-          >
-            {category}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
 const ProductsTable = ({
   transactions,
   categories,
@@ -238,7 +188,8 @@ const ProductsTable = ({
   const [selected, setSelected] = useState(
     user?.role === "admin" ? "Products" : "Available Products"
   );
-  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
+  const [categoryFilter, setCategoryFilter] =
+    useState<string>("All Categories");
 
   const router = useRouter();
   const actions =
@@ -343,37 +294,40 @@ const ProductsTable = ({
     },
   ];
 
-  // Filter products based on selected category
-  const filteredProducts = React.useMemo(() => {
-    if (categoryFilter === "All Categories") {
-      return products;
+  // Get unique categories for the filter with descriptions from categories prop
+  const categoryOptions = React.useMemo(() => {
+    if (!categories || categories.length === 0) {
+      // Fallback to unique category names if categories prop is not provided
+      const uniqueNames = Array.from(
+        new Set(products.map((product) => product.categoryName))
+      ).filter(Boolean);
+      return uniqueNames.map((name) => ({
+        name,
+        description: "",
+      }));
     }
-    return products.filter((product) => product.categoryName === categoryFilter);
-  }, [products, categoryFilter]);
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        {user?.role !== "admin" ? (
-          <ManageTransactionsDropdown
-            selected={selected}
-            setSelected={setSelected}
-          />
-        ) : (
-          <ManageProductsOrCatDropdown
-            selected={selected}
-            setSelected={setSelected}
-          />
-        )}
 
-        {/* Show category filter only when viewing products */}
-        {(selected === "Products" || selected === "Available Products") && (
-          <CategoryFilterDropdown
-            selected={categoryFilter}
-            setSelected={setCategoryFilter}
-            products={products}
-          />
-        )}
-      </div>
+    // Use categories with descriptions
+    return categories.map((cat) => ({
+      name: cat.name,
+      description: cat.description || "",
+    }));
+  }, [products, categories]);
+
+  return (
+    <div className="space-y-4">
+      {user?.role !== "admin" ? (
+        <TabSwitcher
+          selected={selected}
+          setSelected={setSelected}
+          tabs={["Available Products", "Product Sales History"]}
+        />
+      ) : (
+        <ManageProductsOrCatDropdown
+          selected={selected}
+          setSelected={setSelected}
+        />
+      )}
 
       {user?.role === "admin" ? (
         selected === "Product Categories" ? (
@@ -385,7 +339,7 @@ const ProductsTable = ({
           />
         ) : (
           <Table<Product>
-            data={filteredProducts}
+            data={products}
             columns={productColumns}
             title={
               user?.role !== "admin"
@@ -397,13 +351,18 @@ const ProductsTable = ({
                 : "All Product Categories"
             }
             actions={actions}
+            categoryFilter={{
+              options: categoryOptions,
+              selected: categoryFilter,
+              onSelect: setCategoryFilter,
+            }}
           />
         )
       ) : selected === "Product Sales History" && transactions ? (
         <TransactionContainer transactions={transactions || []} />
       ) : (
         <Table<Product>
-          data={filteredProducts}
+          data={products}
           columns={productColumns}
           title={
             user?.role !== "admin"
@@ -415,6 +374,11 @@ const ProductsTable = ({
               : "All Product Categories"
           }
           actions={actions}
+          categoryFilter={{
+            options: categoryOptions,
+            selected: categoryFilter,
+            onSelect: setCategoryFilter,
+          }}
         />
       )}
     </div>

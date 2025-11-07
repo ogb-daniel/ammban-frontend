@@ -14,11 +14,26 @@ import {
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { CardLayout, CompactLayout, ListLayout } from "./table/mobile-layouts";
 import SearchBar from "./search-bar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ArrowUpDown } from "lucide-react";
+
 export type Action<T> = {
   element: React.ReactNode;
   onClick: (row: T) => void;
   label: string;
 };
+
+export type CategoryOption = {
+  name: string;
+  description: string;
+};
+
 type TableProps<T> = {
   data: T[];
   columns: ColumnDef<T, unknown>[];
@@ -29,6 +44,12 @@ type TableProps<T> = {
   mobileLayout?: "list" | "card" | "compact" | "custom"; // Add this prop
   customMobileComponent?: React.ReactNode; // Add this for fully custom mobile layouts
   setFilteredData?: (data: T[]) => void;
+  categoryFilter?: {
+    options: CategoryOption[];
+    selected: string;
+    onSelect: (category: string) => void;
+  };
+  sortOptions?: string[];
 };
 
 type ColumnMeta = {
@@ -62,6 +83,8 @@ const Table = <T extends object>({
   mobileLayout = "list",
   customMobileComponent,
   setFilteredData,
+  categoryFilter,
+  sortOptions,
 }: TableProps<T>) => {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -70,6 +93,15 @@ const Table = <T extends object>({
     pageSize: 10,
   });
   const [globalFilter, setGlobalFilter] = useState();
+
+  // Filter data based on selected category
+  const filteredData = React.useMemo(() => {
+    if (!categoryFilter || categoryFilter.selected === "All Categories") {
+      return data;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data.filter((item: any) => item.categoryName === categoryFilter.selected);
+  }, [data, categoryFilter]);
 
   const allColumns = React.useMemo(() => {
     if (!actions?.length) return columns;
@@ -97,7 +129,7 @@ const Table = <T extends object>({
     ] as ColumnDef<T, unknown>[];
   }, [columns, actions]);
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns: allColumns,
     state: {
       pagination,
@@ -167,11 +199,59 @@ const Table = <T extends object>({
           {title}
         </h2>
         <div className="overflow-x-auto">
-          <SearchBar
-            onChange={(e) => table?.setGlobalFilter(String(e?.target?.value))}
-            placeholder="Search..."
-            className="w-1/2 px-8 mt-1"
-          />
+          <div className="flex items-center justify-between px-8 mt-1 mb-4 gap-4">
+            <div className="flex items-center gap-2">
+              {categoryFilter && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="border-gray-300 text-gray-700">
+                      {categoryFilter.selected} <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[500px] p-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      {categoryFilter.options.map((option) => (
+                        <DropdownMenuItem
+                          key={option.name}
+                          className="flex items-start justify-between p-3 cursor-pointer hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200"
+                          onClick={() => categoryFilter.onSelect(option.name)}
+                        >
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">{option.name}</div>
+                            <div className="text-xs text-gray-500 mt-1">{option.description}</div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-primary -rotate-90 ml-2" />
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {sortOptions && sortOptions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="border-gray-300 text-gray-700">
+                      Sort <ArrowUpDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    {sortOptions.map((option) => (
+                      <DropdownMenuItem key={option} className="flex items-center gap-2">
+                        {option}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+
+            <SearchBar
+              onChange={(e) => table?.setGlobalFilter(String(e?.target?.value))}
+              placeholder="Search for id, name, product"
+              className="flex-1 max-w-md"
+            />
+          </div>
           <table className="hidden md:table min-w-full table-fixed border-collapse">
             <thead>
               {table?.getHeaderGroups().map((headerGroup) => (
@@ -279,9 +359,9 @@ const Table = <T extends object>({
           {Math.min(
             (table?.getState().pagination.pageIndex + 1) *
               table?.getState().pagination.pageSize,
-            data?.length
+            filteredData?.length
           )}{" "}
-          of {data?.length}
+          of {filteredData?.length}
         </div>
         <div className="text-sm font-medium">
           Rows per page:
