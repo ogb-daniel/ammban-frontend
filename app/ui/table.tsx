@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { CgSortAz } from "react-icons/cg";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 export type Action<T> = {
   element: React.ReactNode;
@@ -94,6 +95,7 @@ const Table = <T extends object>({
     pageSize: 10,
   });
   const [globalFilter, setGlobalFilter] = useState();
+  const [selectedSort, setSelectedSort] = useState<string>("Sort");
 
   // Filter data based on selected category
   const filteredData = React.useMemo(() => {
@@ -106,6 +108,32 @@ const Table = <T extends object>({
       (item: any) => item.categoryName === categoryFilter.selected
     );
   }, [data, categoryFilter]);
+
+  // Sort filtered data based on selected sort option
+  const sortedData = React.useMemo(() => {
+    if (!selectedSort || selectedSort === "Sort") {
+      return filteredData;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sortedArray = [...filteredData] as any[];
+
+    if (selectedSort === "Price: Low to High") {
+      return sortedArray.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (selectedSort === "Price: High to Low") {
+      return sortedArray.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (selectedSort === "Name: A-Z") {
+      return sortedArray.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "")
+      );
+    } else if (selectedSort === "Name: Z-A") {
+      return sortedArray.sort((a, b) =>
+        (b.name || "").localeCompare(a.name || "")
+      );
+    }
+
+    return filteredData;
+  }, [filteredData, selectedSort]);
 
   const allColumns = React.useMemo(() => {
     if (!actions?.length) return columns;
@@ -133,7 +161,7 @@ const Table = <T extends object>({
     ] as ColumnDef<T, unknown>[];
   }, [columns, actions]);
   const table = useReactTable({
-    data: filteredData,
+    data: sortedData,
     columns: allColumns,
     state: {
       pagination,
@@ -218,6 +246,20 @@ const Table = <T extends object>({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-[500px] p-4">
                     <div className="grid grid-cols-2 gap-3">
+                      <DropdownMenuItem
+                        className="flex items-start justify-between p-3 cursor-pointer hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200"
+                        onClick={() => categoryFilter.onSelect("All Categories")}
+                      >
+                        <div className="flex-1">
+                          <div className=" text-gray-900 font-semibold">
+                            All Categories
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Show all products
+                          </div>
+                        </div>
+                        <FaArrowRightLong className="w-4 h-4 text-primary ml-2" />
+                      </DropdownMenuItem>
                       {categoryFilter.options.map((option) => (
                         <DropdownMenuItem
                           key={option.name}
@@ -225,12 +267,14 @@ const Table = <T extends object>({
                           onClick={() => categoryFilter.onSelect(option.name)}
                         >
                           <div className="flex-1">
-                            <div className=" text-gray-900">{option.name}</div>
+                            <div className=" text-gray-900 font-semibold">
+                              {option.name}
+                            </div>
                             <div className="text-xs text-gray-500 mt-1">
                               {option.description}
                             </div>
                           </div>
-                          <ChevronDown className="w-4 h-4 text-primary -rotate-90 ml-2" />
+                          <FaArrowRightLong className="w-4 h-4 text-primary ml-2" />
                         </DropdownMenuItem>
                       ))}
                     </div>
@@ -245,14 +289,21 @@ const Table = <T extends object>({
                       variant="outline"
                       className="border-gray-300 text-gray-700 font-bold"
                     >
-                      Sort <CgSortAz className="w-4 h-4 ml-2" />
+                      {selectedSort} <CgSortAz className="w-4 h-4 ml-2" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuItem
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={() => setSelectedSort("Sort")}
+                    >
+                      Clear Sort
+                    </DropdownMenuItem>
                     {sortOptions.map((option) => (
                       <DropdownMenuItem
                         key={option}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => setSelectedSort(option)}
                       >
                         {option}
                       </DropdownMenuItem>
@@ -375,9 +426,9 @@ const Table = <T extends object>({
           {Math.min(
             (table?.getState().pagination.pageIndex + 1) *
               table?.getState().pagination.pageSize,
-            filteredData?.length
+            sortedData?.length
           )}{" "}
-          of {filteredData?.length}
+          of {sortedData?.length}
         </div>
         <div className="text-sm font-medium">
           Rows per page:
