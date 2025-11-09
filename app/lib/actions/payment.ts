@@ -1,5 +1,6 @@
 "use server";
 import {
+  CheckExistingCustomerResponse,
   DepositFundsResponse,
   GetAccountBalanceResponse,
   GetTransactionHistoryResponse,
@@ -214,6 +215,31 @@ export const transactionReceipt = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error getting transaction receipt:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+export const checkForExistingCustomer = async (
+  email: string
+): Promise<CheckExistingCustomerResponse> => {
+  try {
+    const response = await api.post<CheckExistingCustomerResponse>(
+      `/api/services/app/PolicyService/CheckForExistingCustomer?Email=${email}`,
+      { params: { Email: email } }
+    );
+    console.log(response);
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error checking for customer:", error?.response?.data);
     return (
       error?.response?.data || {
         success: false,

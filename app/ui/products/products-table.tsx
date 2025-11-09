@@ -313,6 +313,7 @@ const ProductsTable = ({
       description: cat.description || "",
     }));
   }, [products, categories]);
+  console.log(transactions);
 
   return (
     <div className="space-y-4">
@@ -356,7 +357,12 @@ const ProductsTable = ({
               selected: categoryFilter,
               onSelect: setCategoryFilter,
             }}
-            sortOptions={["Price: Low to High", "Price: High to Low", "Name: A-Z", "Name: Z-A"]}
+            sortOptions={[
+              "Price: Low to High",
+              "Price: High to Low",
+              "Name: A-Z",
+              "Name: Z-A",
+            ]}
           />
         )
       ) : selected === "Product Sales History" && transactions ? (
@@ -380,7 +386,12 @@ const ProductsTable = ({
             selected: categoryFilter,
             onSelect: setCategoryFilter,
           }}
-          sortOptions={["Price: Low to High", "Price: High to Low", "Name: A-Z", "Name: Z-A"]}
+          sortOptions={[
+            "Price: Low to High",
+            "Price: High to Low",
+            "Name: A-Z",
+            "Name: Z-A",
+          ]}
         />
       )}
     </div>

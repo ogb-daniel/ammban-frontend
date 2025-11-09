@@ -791,6 +791,82 @@ export interface GetTransactionReceiptResponse
     buyerName: string;
   };
 }
+export interface CheckExistingCustomerResponse
+  extends ApiResponse<{
+    responseCode: number;
+    message: string;
+    payload: {
+      id: number;
+      creationTime: string;
+      creatorUserId: number;
+      lastModificationTime: string;
+      lastModifierUserId: number;
+      isDeleted: boolean;
+      deleterUserId: number;
+      deletionTime: string;
+      narration: string;
+      amount: number;
+      isTrial: boolean;
+      productId: number;
+      payStatus: string;
+      transactionDate: string;
+      customerID: string;
+      transactionID: string;
+      serviceID: string;
+      sellerUserId: number;
+      payType: string;
+      status: number;
+      effectiveDate: string;
+      expiryDate: string;
+      firstName: string;
+      lastName: string;
+      phoneNumber: string;
+      email: string;
+      address: string;
+      state: string;
+      gender: string;
+      dateOfBirth: string;
+      productCategory: string;
+    };
+  }> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      id: number;
+      creationTime: string;
+      creatorUserId: number;
+      lastModificationTime: string;
+      lastModifierUserId: number;
+      isDeleted: boolean;
+      deleterUserId: number;
+      deletionTime: string;
+      narration: string;
+      amount: number;
+      isTrial: boolean;
+      productId: number;
+      payStatus: string;
+      transactionDate: string;
+      customerID: string;
+      transactionID: string;
+      serviceID: string;
+      sellerUserId: number;
+      payType: string;
+      status: number;
+      effectiveDate: string;
+      expiryDate: string;
+      firstName: string;
+      lastName: string;
+      phoneNumber: string;
+      email: string;
+      address: string;
+      state: string;
+      gender: string;
+      dateOfBirth: string;
+      productCategory: string;
+    };
+  };
+}
 
 export interface WalletAccountDetails {
   accountName: string;

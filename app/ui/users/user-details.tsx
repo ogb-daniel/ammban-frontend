@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,10 @@ import { disapproveUser, approveUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import CircleLoader from "../circle-loader";
 import Swal from "sweetalert2";
-import { setTransactionLimit } from "@/app/lib/actions/transactionLimit";
+import {
+  getUserRemainingLimit,
+  setTransactionLimit,
+} from "@/app/lib/actions/transactionLimit";
 type Props = {
   user: User;
 };
@@ -19,7 +22,17 @@ const UserDetails = ({ user }: Props) => {
   const router = useRouter();
   const [updateInformation, setUpdateInformation] = React.useState(false);
   const [viewDocuments, setViewDocuments] = React.useState(false);
+  const [remainingLimit, setRemainingLimit] = useState(0);
   const [isToggling, setIsToggling] = React.useState(false);
+  useEffect(() => {
+    const fetchRemainingLimit = async () => {
+      const response = await getUserRemainingLimit(user.id);
+      if (response.success) {
+        setRemainingLimit(response.result);
+      }
+    };
+    fetchRemainingLimit();
+  }, [user.id]);
   const handleToggle = async () => {
     let response;
     setIsToggling(true);
@@ -96,6 +109,10 @@ const UserDetails = ({ user }: Props) => {
                 >
                   {user.isActive ? "Active" : "Deactivated"}
                 </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Remaining Transaction Limit</p>
+                <p>{remainingLimit}</p>
               </div>
             </div>
 

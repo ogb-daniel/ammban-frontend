@@ -30,7 +30,7 @@ export const getAllTransactionLimits = async (
 };
 
 export const getUserRemainingLimit = async (
-  params: string
+  params: number
 ): Promise<ApiResponse<number>> => {
   try {
     const response = await api.get<ApiResponse<number>>(

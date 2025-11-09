@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -10,7 +10,11 @@ import { getAllStates } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/providers/user-store-provider";
 import { showAXATransactionConfirmation } from "@/app/lib/utils/transaction-confirmation";
-import { getAccountBalance, syncTransaction } from "@/app/lib/actions/payment";
+import {
+  getAccountBalance,
+  syncTransaction,
+  checkForExistingCustomer,
+} from "@/app/lib/actions/payment";
 import {
   showAXAFailureModal,
   showAXASuccessModal,
@@ -21,6 +25,9 @@ import CircleLoader from "../circle-loader";
 export default function PurchaseProductForm({ product }: { product: Product }) {
   const [states, setStates] = React.useState<States[] | null>([]);
   const [submitting, setSubmitting] = React.useState(false);
+  const [searchEmail, setSearchEmail] = React.useState("");
+  const [, setExisting] = useState(true);
+  const [searching, setSearching] = React.useState(false);
   const { setUser } = useUserStore((state) => state);
   React.useEffect(() => {
     (async () => {
@@ -32,6 +39,61 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
   }, []);
   const router = useRouter();
   const { user } = useUserStore((state) => state);
+
+  const handleSearchCustomer = async () => {
+    if (!searchEmail || !searchEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const response = await checkForExistingCustomer(searchEmail);
+
+      if (response.success && response.result.responseCode === 200) {
+        const customer = response.result.payload;
+
+        // Populate form fields with customer data if it exists
+        if (customer.firstName) {
+          form.setFieldValue("firstName", customer.firstName);
+        }
+        if (customer.lastName) {
+          form.setFieldValue("lastName", customer.lastName);
+        }
+        if (customer.phoneNumber) {
+          form.setFieldValue("phoneNumber", customer.phoneNumber);
+        }
+        if (customer.email) {
+          form.setFieldValue("email", customer.email);
+        }
+        if (customer.address) {
+          form.setFieldValue("address", customer.address);
+        }
+        if (customer.state) {
+          form.setFieldValue(
+            "stateId",
+            states?.find((state) => state.stateName === customer.state)?.id || 0
+          );
+        }
+        if (customer.dateOfBirth) {
+          form.setFieldValue("dateOfBirth", customer.dateOfBirth);
+        }
+        if (customer.gender) {
+          form.setFieldValue("gender", customer.gender);
+        }
+        setExisting(true);
+        // toast.success("Customer found! Form populated with existing data.");
+      } else {
+        setExisting(false);
+        toast.info("Customer not found. Please fill in the form manually.");
+      }
+    } catch (error) {
+      console.error("Error searching for customer:", error);
+      toast.error("Error searching for customer. Please try again.");
+    } finally {
+      setSearching(false);
+    }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -136,6 +198,41 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
       <p className="text-gray-600 mb-4">
         Please fill in the customer details below to purchase this product.
       </p>
+
+      {/* Customer Search Section */}
+      <div className="bg-white md:p-6 p-4 rounded-3xl mb-6 border-2 border-gray-100">
+        <h2 className="text-lg font-semibold mb-3">
+          Search for Existing Customer
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Enter customer&apos;s email to check if they already exist in the
+          system
+        </p>
+        <div className="flex gap-3">
+          <input
+            type="email"
+            value={searchEmail}
+            onChange={(e) => setSearchEmail(e.target.value)}
+            placeholder="Enter customer's email address"
+            className="form-input-field flex-1"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearchCustomer();
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleSearchCustomer}
+            disabled={searching}
+            className="btn-primary px-6 whitespace-nowrap flex-1"
+          >
+            {searching ? <CircleLoader /> : "Search Customer"}
+          </button>
+        </div>
+      </div>
+      {/* {!existing && ( */}
       <div
         className="
         grid sm:grid-cols-2 grid-cols-1 bg-white md:p-8 rounded-3xl gap-6
@@ -398,6 +495,7 @@ export default function PurchaseProductForm({ product }: { product: Product }) {
           />
         </div>
       </div>
+      {/* )} */}
 
       <button type="submit" disabled={submitting} className="btn-primary mt-10">
         {submitting ? <CircleLoader /> : "Purchase Product"}
