@@ -74,7 +74,7 @@ export const showAXATransactionConfirmation = async (
     }),
     cost,
     fee,
-    paymentType: "Electronic Scan Transfer",
+    paymentType: "Pay by Transfer",
     sellerName,
     buyerName,
     buyerReference,

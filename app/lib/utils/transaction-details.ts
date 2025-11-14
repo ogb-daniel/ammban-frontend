@@ -85,7 +85,7 @@ export const showAXATransactionDetails = async (
     date: date || "",
     cost,
     fee,
-    paymentType: "Electronic Scan Transfer",
+    paymentType: "Pay by Transfer",
     sellerName,
     buyerName,
     buyerReference,
