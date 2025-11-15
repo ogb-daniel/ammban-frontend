@@ -5,6 +5,7 @@ import {
   GetReferredUsersResponse,
   MonthlyReferralResponse,
   TotalSalesByAgentsResponse,
+  TotalSalesNationalResponse,
   TotalSalesResponse,
 } from "../definitions";
 
@@ -99,6 +100,27 @@ export const totalSalesByAggregator =
     try {
       const response = await api.post<TotalSalesByAgentsResponse>(
         `/api/services/app/DashBoardService/TotalSalesByAggregator`
+      );
+      return response.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error getting total sales:", error?.response?.data);
+      return (
+        error?.response?.data || {
+          success: false,
+          error: {
+            message: error?.response?.data?.error?.message || error?.message,
+            details: error?.response?.data?.error?.details,
+          },
+        }
+      );
+    }
+  };
+export const nationalTotalSales =
+  async (): Promise<TotalSalesNationalResponse> => {
+    try {
+      const response = await api.post<TotalSalesNationalResponse>(
+        `/api/services/app/DashBoardService/NationalTotalSales`
       );
       return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

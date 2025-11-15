@@ -959,6 +959,16 @@ export interface TotalSalesByAgentsResponse
     }[];
   };
 }
+export interface TotalSalesNationalResponse
+  extends ApiResponse<{
+    totalSales: number;
+    amount: number;
+  }> {
+  result: {
+    totalSales: number;
+    amount: number;
+  };
+}
 
 export interface MonthlyReferralResponse
   extends ApiResponse<

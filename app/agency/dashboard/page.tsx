@@ -1,7 +1,7 @@
 import {
   commissionsEarned,
   getMonthlyReferrals,
-  totalSales,
+  nationalTotalSales,
 } from "@/app/lib/actions/dashboard";
 import AgentDashboard from "@/app/ui/dashboard/agent-dashboard";
 
@@ -54,7 +54,7 @@ import AgentDashboard from "@/app/ui/dashboard/agent-dashboard";
 // const totalUsers = 56589;
 
 export default async function Dashboard() {
-  const tSales = await totalSales();
+  const tSales = await nationalTotalSales();
   const commissionEarnings = await commissionsEarned();
   const monthlyReferrals = await getMonthlyReferrals();
   return (
