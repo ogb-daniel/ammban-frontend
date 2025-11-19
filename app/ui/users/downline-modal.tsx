@@ -216,7 +216,9 @@ const DownlineModal = ({
                     <div className="flex items-center gap-2">
                       <MdPermIdentity className="text-gray-500 flex-shrink-0" />
                       <p className="text-sm text-gray-700">
-                        {downlineUser?.role || downlineUser?.roleName}
+                        {downlineUser?.role ||
+                          downlineUser?.roleName ||
+                          downlineUser?.roleNames}
                       </p>
                     </div>
                   </div>
