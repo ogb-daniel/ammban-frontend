@@ -138,7 +138,12 @@ const DownlineModal = ({
                 <p className="text-sm text-gray-600">
                   {getCurrentUser().emailAddress}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Role: {user.role}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Role:{" "}
+                  {getCurrentUser().role ||
+                    getCurrentUser().roleName ||
+                    getCurrentUser().roleNames}
+                </p>
               </div>
               {hierarchyStack.length > 1 && (
                 <button
