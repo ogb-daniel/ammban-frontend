@@ -138,9 +138,7 @@ const DownlineModal = ({
                 <p className="text-sm text-gray-600">
                   {getCurrentUser().emailAddress}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Role: {getCurrentUser().roleName}
-                </p>
+                <p className="text-xs text-gray-500 mt-1">Role: {user.role}</p>
               </div>
               {hierarchyStack.length > 1 && (
                 <button
@@ -218,7 +216,7 @@ const DownlineModal = ({
                     <div className="flex items-center gap-2">
                       <MdPermIdentity className="text-gray-500 flex-shrink-0" />
                       <p className="text-sm text-gray-700">
-                        {downlineUser?.roleName}
+                        {downlineUser?.roleNames?.join(", ")}
                       </p>
                     </div>
                   </div>
