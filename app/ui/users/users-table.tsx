@@ -14,8 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { UserCog, UserCheck, ChevronDown } from "lucide-react";
+import { UserCog, UserCheck, ChevronDown, Eye } from "lucide-react";
 import RoleAssignmentModal from "../roles/role-assign-modal";
+import DownlineModal from "./downline-modal";
 import { toTitleCase } from "@/lib/utils";
 import { User } from "@/app/lib/definitions";
 import Swal from "sweetalert2";
@@ -151,12 +152,21 @@ const UsersTable = ({ users }: { users: User[] }) => {
   const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
   const [isOpen, setIsOpen] = useState(false);
+  const [isDownlineModalOpen, setIsDownlineModalOpen] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState(users);
   const { user: currentUser } = useUserStore((state) => state);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const actions =
     selected === "Manage Users"
       ? [
+          {
+            element: <Eye className="w-4 h-4 text-[#094794]" />,
+            onClick: (user: User) => {
+              setSelectedUser(user);
+              setIsDownlineModalOpen(true);
+            },
+            label: "View Downline",
+          },
           {
             element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
             onClick: (user: User) => {
@@ -220,6 +230,11 @@ const UsersTable = ({ users }: { users: User[] }) => {
       <RoleAssignmentModal
         isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
+        user={selectedUser as User}
+      />
+      <DownlineModal
+        isOpen={isDownlineModalOpen}
+        onRequestClose={() => setIsDownlineModalOpen(false)}
         user={selectedUser as User}
       />
       <div className="flex items-center justify-between">

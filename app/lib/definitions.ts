@@ -974,13 +974,13 @@ export interface DownlinesResponse
     totalUsers: number;
     totalActiveUsers: number;
     totalInActiveUsers: number;
-    referredUsers: [];
+    referredUsers: User[];
   }> {
   result: {
     totalUsers: number;
     totalActiveUsers: number;
     totalInActiveUsers: number;
-    referredUsers: [];
+    referredUsers: User[];
   };
 }
 

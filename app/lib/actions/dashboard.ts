@@ -161,16 +161,19 @@ export const getMonthlyReferrals =
       );
     }
   };
-export const getDownlines = async (): Promise<DownlinesResponse> => {
+export const getDownlines = async (
+  userId?: number
+): Promise<DownlinesResponse> => {
   try {
-    const response = await api.get<DownlinesResponse>(
-      `/api/services/app/DashBoardService/GetDownlines`
-    );
-    console.log("Monthly Referrals Response:", response.data);
+    const url = userId
+      ? `/api/services/app/DashBoardService/GetDownlines?userId=${userId}`
+      : `/api/services/app/DashBoardService/GetDownlines`;
+    const response = await api.get<DownlinesResponse>(url);
+    console.log("Downlines Response:", response.data);
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error("Error getting monthly referrals:", error?.response?.data);
+    console.error("Error getting downlines:", error?.response?.data);
     return (
       error?.response?.data || {
         success: false,
