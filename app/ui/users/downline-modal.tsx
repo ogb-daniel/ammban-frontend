@@ -97,7 +97,7 @@ const DownlineModal = ({
   };
 
   const getBreadcrumbs = () => {
-    return hierarchyStack.map((level) => level.user.fullName).join(" > ");
+    return hierarchyStack.map((level) => level.user.fullName)?.join(" > ");
   };
 
   if (!user) return null;
@@ -168,10 +168,6 @@ const DownlineModal = ({
           <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-500 text-center">
               No downlines found for this user.
-              <br />
-              <span className="text-sm">
-                This user might be at the customer level.
-              </span>
             </p>
           </div>
         ) : (
