@@ -218,7 +218,7 @@ const DownlineModal = ({
                     <div className="flex items-center gap-2">
                       <MdPermIdentity className="text-gray-500 flex-shrink-0" />
                       <p className="text-sm text-gray-700">
-                        {downlineUser.roleNames?.join(", ") || "N/A"}
+                        {downlineUser?.roleNames?.join(", ") || "N/A"}
                       </p>
                     </div>
                   </div>
