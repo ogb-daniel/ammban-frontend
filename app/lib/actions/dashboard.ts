@@ -2,6 +2,7 @@
 import api from "../api/axios";
 import {
   CommissionsEarnedResponse,
+  DownlinesResponse,
   GetReferredUsersResponse,
   MonthlyReferralResponse,
   TotalSalesByAgentsResponse,
@@ -160,3 +161,24 @@ export const getMonthlyReferrals =
       );
     }
   };
+export const getDownlines = async (): Promise<DownlinesResponse> => {
+  try {
+    const response = await api.get<DownlinesResponse>(
+      `/api/services/app/DashBoardService/GetDownlines`
+    );
+    console.log("Monthly Referrals Response:", response.data);
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error getting monthly referrals:", error?.response?.data);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};

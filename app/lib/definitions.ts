@@ -969,6 +969,20 @@ export interface TotalSalesNationalResponse
     amount: number;
   };
 }
+export interface DownlinesResponse
+  extends ApiResponse<{
+    totalUsers: number;
+    totalActiveUsers: number;
+    totalInActiveUsers: number;
+    referredUsers: [];
+  }> {
+  result: {
+    totalUsers: number;
+    totalActiveUsers: number;
+    totalInActiveUsers: number;
+    referredUsers: [];
+  };
+}
 
 export interface MonthlyReferralResponse
   extends ApiResponse<
