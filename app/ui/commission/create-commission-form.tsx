@@ -47,7 +47,7 @@ export default function CreateCommissionForm() {
       try {
         const response = await setupCommissionPercentage({
           ...values.value,
-          customerType: 0,
+          
           roleName:
             roles.find((role) => role.id === values.value.roleId)?.name || "",
         });
