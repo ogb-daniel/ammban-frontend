@@ -117,6 +117,7 @@ export type Product = {
   price: number;
   quantity: number;
   categoryName: string;
+  productCode?: string;
 };
 
 export type ProductCategory = {

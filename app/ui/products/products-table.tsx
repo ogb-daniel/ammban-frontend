@@ -66,6 +66,12 @@ const productColumns: ColumnDef<Product>[] = [
       className: "line-clamp-1",
     },
   },
+  {
+    accessorKey: "productCode",
+    header: "Product Code",
+    cell: (info) => (info ? info?.getValue() : ""),
+    enableSorting: true,
+  },
 ];
 const categoryColumns: ColumnDef<ProductCategory>[] = [
   {

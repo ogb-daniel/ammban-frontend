@@ -39,6 +39,7 @@ export default function CreateProductForm() {
       categoryId: 0,
       price: 0,
       quantity: 0,
+      productCode: "",
     },
     onSubmit: async (values) => {
       console.log(values);
@@ -188,6 +189,29 @@ export default function CreateProductForm() {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(Number(e.target.value))}
+                  className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                />
+              </>
+            )}
+          />
+        </div>
+        <div className="mt-6 md:w-1/2 ">
+          <form.Field
+            name="productCode"
+            // eslint-disable-next-line react/no-children-prop
+            children={(field) => (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Product Code
+                </label>
+                <input
+                  type="text"
+                  name={field.name}
+                  placeholder="Product Code"
+                  id={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
                   className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
               </>
