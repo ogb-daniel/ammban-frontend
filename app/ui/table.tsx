@@ -8,14 +8,34 @@ import {
   Row,
   SortingState,
   getSortedRowModel,
+  getFilteredRowModel,
+  FilterFn,
 } from "@tanstack/react-table";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { CardLayout, CompactLayout, ListLayout } from "./table/mobile-layouts";
+import SearchBar from "./search-bar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import { CgSortAz } from "react-icons/cg";
+import { FaArrowRightLong } from "react-icons/fa6";
+
 export type Action<T> = {
   element: React.ReactNode;
   onClick: (row: T) => void;
   label: string;
 };
+
+export type CategoryOption = {
+  name: string;
+  description: string;
+};
+
 type TableProps<T> = {
   data: T[];
   columns: ColumnDef<T, unknown>[];
@@ -25,13 +45,38 @@ type TableProps<T> = {
   actions?: Action<T>[]; // New prop for actions
   mobileLayout?: "list" | "card" | "compact" | "custom"; // Add this prop
   customMobileComponent?: React.ReactNode; // Add this for fully custom mobile layouts
+  setFilteredData?: (data: T[]) => void;
+  categoryFilter?: {
+    options: CategoryOption[];
+    selected: string;
+    onSelect: (category: string) => void;
+  };
+  sortOptions?: string[];
 };
 
 type ColumnMeta = {
   icon?: React.ReactNode;
+  className?: string;
+};
+
+// Custom global filter function that handles arrays
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const globalFilterFn: FilterFn<any> = (row, columnId, filterValue) => {
+  const searchValue = String(filterValue).toLowerCase();
+  const cellValue = row.getValue(columnId);
+
+  // Handle array values (like roleNames)
+  if (Array.isArray(cellValue)) {
+    return cellValue.some((item) =>
+      String(item).toLowerCase().includes(searchValue)
+    );
+  }
+
+  // Handle regular string/number values
+  return String(cellValue).toLowerCase().includes(searchValue);
 };
 const Table = <T extends object>({
-  data,
+  data = [],
   columns,
   title,
   rowsPerPageOptions = [10, 20, 50],
@@ -39,6 +84,9 @@ const Table = <T extends object>({
   actions,
   mobileLayout = "list",
   customMobileComponent,
+  setFilteredData,
+  categoryFilter,
+  sortOptions,
 }: TableProps<T>) => {
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -46,6 +94,47 @@ const Table = <T extends object>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [globalFilter, setGlobalFilter] = useState();
+  const [selectedSort, setSelectedSort] = useState<string>("Sort");
+
+  // Filter data based on selected category
+  const filteredData = React.useMemo(() => {
+    if (!categoryFilter || categoryFilter.selected === "All Categories") {
+      return data;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return data.filter(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item: any) => item.categoryName === categoryFilter.selected
+    );
+  }, [data, categoryFilter]);
+
+  // Sort filtered data based on selected sort option
+  const sortedData = React.useMemo(() => {
+    if (!selectedSort || selectedSort === "Sort") {
+      return filteredData;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sortedArray = [...filteredData] as any[];
+
+    if (selectedSort === "Price: Low to High") {
+      return sortedArray.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (selectedSort === "Price: High to Low") {
+      return sortedArray.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (selectedSort === "Name: A-Z") {
+      return sortedArray.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "")
+      );
+    } else if (selectedSort === "Name: Z-A") {
+      return sortedArray.sort((a, b) =>
+        (b.name || "").localeCompare(a.name || "")
+      );
+    }
+
+    return filteredData;
+  }, [filteredData, selectedSort]);
+
   const allColumns = React.useMemo(() => {
     if (!actions?.length) return columns;
 
@@ -72,12 +161,13 @@ const Table = <T extends object>({
     ] as ColumnDef<T, unknown>[];
   }, [columns, actions]);
   const table = useReactTable({
-    data,
+    data: sortedData,
     columns: allColumns,
     state: {
       pagination,
       rowSelection,
       sorting,
+      globalFilter,
     },
     enableRowSelection: true,
     enableSorting: true, // Enable global sorting
@@ -87,6 +177,12 @@ const Table = <T extends object>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
+    getFilteredRowModel: getFilteredRowModel(),
+
+    onGlobalFilterChange: setGlobalFilter,
+    enableGlobalFilter: true, // Enable global filtering
+    globalFilterFn: globalFilterFn,
+    getColumnCanGlobalFilter: () => true,
   });
   // Call onSelectedRowsChange when selection changes
   React.useEffect(() => {
@@ -120,6 +216,14 @@ const Table = <T extends object>({
         return <ListLayout key={visualIndex} row={row} actions={actions} />;
     }
   };
+  React.useEffect(() => {
+    if (setFilteredData) {
+      const filteredRows = table
+        .getFilteredRowModel()
+        .rows.map((row) => row.original);
+      setFilteredData(filteredRows);
+    }
+  }, [table, setFilteredData, globalFilter]);
   return (
     <section>
       <div className="bg-white border-2 border-gray-100 rounded-lg">
@@ -127,15 +231,103 @@ const Table = <T extends object>({
           {title}
         </h2>
         <div className="overflow-x-auto">
+          <div className="flex items-center justify-between px-8 mt-1 mb-4 gap-4">
+            <div className="flex items-center gap-2 font-bold">
+              {categoryFilter && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 font-bold"
+                    >
+                      {categoryFilter.selected}{" "}
+                      <ChevronDown className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[500px] p-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <DropdownMenuItem
+                        className="flex items-start justify-between p-3 cursor-pointer hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200"
+                        onClick={() => categoryFilter.onSelect("All Categories")}
+                      >
+                        <div className="flex-1">
+                          <div className=" text-gray-900 font-semibold">
+                            All Categories
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Show all products
+                          </div>
+                        </div>
+                        <FaArrowRightLong className="w-4 h-4 text-primary ml-2" />
+                      </DropdownMenuItem>
+                      {categoryFilter.options.map((option) => (
+                        <DropdownMenuItem
+                          key={option.name}
+                          className="flex items-start justify-between p-3 cursor-pointer hover:bg-gray-50 rounded-lg border border-transparent hover:border-gray-200"
+                          onClick={() => categoryFilter.onSelect(option.name)}
+                        >
+                          <div className="flex-1">
+                            <div className=" text-gray-900 font-semibold">
+                              {option.name}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {option.description}
+                            </div>
+                          </div>
+                          <FaArrowRightLong className="w-4 h-4 text-primary ml-2" />
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {sortOptions && sortOptions.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-gray-300 text-gray-700 font-bold"
+                    >
+                      {selectedSort} <CgSortAz className="w-4 h-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-48">
+                    <DropdownMenuItem
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={() => setSelectedSort("Sort")}
+                    >
+                      Clear Sort
+                    </DropdownMenuItem>
+                    {sortOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option}
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => setSelectedSort(option)}
+                      >
+                        {option}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+
+            <SearchBar
+              onChange={(e) => table?.setGlobalFilter(String(e?.target?.value))}
+              placeholder="Search for id, name, product"
+              className="flex-1 max-w-md"
+            />
+          </div>
           <table className="hidden md:table min-w-full table-fixed border-collapse">
             <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table?.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   <th className="p-2 text-left pt-4 pb-2 font-semibold text-[10px] pl-8">
                     <input
                       type="checkbox"
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
+                      checked={table?.getIsAllRowsSelected()}
+                      onChange={table?.getToggleAllRowsSelectedHandler()}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
                   </th>
@@ -145,7 +337,7 @@ const Table = <T extends object>({
                       <th
                         key={header.id}
                         className={`p-2 text-left pt-4 pb-2 font-semibold text-[10px] ${
-                          index === headerGroup.headers.length - 1 && "pr-8"
+                          index === headerGroup.headers?.length - 1 && "pr-8"
                         } ${canSort ? "cursor-pointer select-none" : ""}`}
                         onClick={
                           canSort
@@ -180,7 +372,7 @@ const Table = <T extends object>({
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row, visualIndex) => (
+              {table?.getRowModel().rows.map((row, visualIndex) => (
                 <tr
                   key={row.id}
                   className={`${
@@ -199,13 +391,19 @@ const Table = <T extends object>({
                     <td
                       key={cell.id}
                       className={`p-2 py-6 text-sm ${
-                        index === row.getVisibleCells().length - 1 && "pr-8"
-                      }`}
+                        index === row.getVisibleCells()?.length - 1 && "pr-8"
+                      } `}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      <div
+                        className={`${
+                          (cell.column.columnDef.meta as ColumnMeta)?.className
+                        } overflow-hidden`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </div>
                     </td>
                   ))}
                 </tr>
@@ -224,19 +422,19 @@ const Table = <T extends object>({
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm font-medium">
-          {table.getState().pagination.pageIndex + 1}-
+          {table?.getState().pagination.pageIndex + 1}-
           {Math.min(
-            (table.getState().pagination.pageIndex + 1) *
-              table.getState().pagination.pageSize,
-            data.length
+            (table?.getState().pagination.pageIndex + 1) *
+              table?.getState().pagination.pageSize,
+            sortedData?.length
           )}{" "}
-          of {data.length}
+          of {sortedData?.length}
         </div>
         <div className="text-sm font-medium">
           Rows per page:
           <select
             className="ml-2 p-1 border rounded bg-primary text-white"
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            onChange={(e) => table?.setPageSize(Number(e.target.value))}
           >
             {rowsPerPageOptions.map((size) => (
               <option key={size} value={size}>
@@ -249,15 +447,15 @@ const Table = <T extends object>({
         <div className="flex items-center">
           <button
             className="p-1 px-3 border rounded mr-2"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => table?.previousPage()}
+            disabled={!table?.getCanPreviousPage()}
           >
             Previous
           </button>
           <button
             className="p-1 px-3 border rounded"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => table?.nextPage()}
+            disabled={!table?.getCanNextPage()}
           >
             Next
           </button>

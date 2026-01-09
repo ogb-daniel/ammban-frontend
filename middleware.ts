@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-const publicRoutes = ["/signup", "/"];
+const publicRoutes = [
+  "/signup",
+  "/",
+  "/forgot-password",
+  "/faqs",
+  "/verify-account",
+];
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("accessToken")?.value;
   const role = request.cookies.get("role")?.value;
@@ -29,11 +35,8 @@ export function middleware(request: NextRequest) {
   // Redirect logged-in users from public routes to their dashboard
   if (isPublicRoute && token) {
     console.log(role);
-    if (role === "admin") {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    } else {
-      return NextResponse.redirect(new URL("/agent/dashboard", request.url));
-    }
+
+    return NextResponse.redirect(new URL(`${role}/dashboard`, request.url));
   }
 
   // Role-based protection
@@ -42,6 +45,12 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith("/agent") && role !== "agent") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+  if (pathname.startsWith("/agency") && role !== "agency") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+  if (pathname.startsWith("/aggregator") && role !== "aggregator") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 

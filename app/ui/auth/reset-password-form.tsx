@@ -3,18 +3,17 @@ import React from "react";
 import { useForm } from "@tanstack/react-form";
 import * as z from "zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
+import { resetPassword } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
 
-// Email and phone number validation schema
-const emailOrPhoneSchema = z.union([
-  z.string().email("Invalid email address"), // Validate email
-  z.string().regex(/^\d{10,12}$/, "Invalid phone number"), // Validate phone number (10 digits)
-]);
+const emailOrPhoneSchema = z.string().email("Invalid email address"); // Validate email
 const formSchema = z
   .object({
-    contact: emailOrPhoneSchema,
-    password: z
+    email: emailOrPhoneSchema,
+    newPassword: z
       .string()
       .min(8, "Password must be at least 8 characters long")
       .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -23,25 +22,40 @@ const formSchema = z
         /[@$!%*?&#]/,
         "Password must contain at least one special character"
       ),
-    otp: z.string().nonempty("OTP is required"),
+    resetToken: z.string().nonempty("Token is required"),
 
     confirmPassword: z.string().nonempty("Please confirm your password"),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 export default function ResetPasswordForm() {
+  const [submitting, setSubmitting] = React.useState(false);
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
-      contact: "",
-      otp: "",
-      password: "",
+      email: "",
+      resetToken: "",
+      newPassword: "",
       confirmPassword: "",
     },
-    onSubmit: (values) => {
-      console.log(values);
-      // Handle form submission
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      try {
+        const response = await resetPassword(values.value);
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+        if (!response.result.success) {
+          toast.error(response.result.message);
+          return;
+        }
+        router.push(HOME.url);
+      } finally {
+        setSubmitting(false);
+      }
     },
     validators: {
       onChange: formSchema,
@@ -60,7 +74,7 @@ export default function ResetPasswordForm() {
       <div>
         {/* A type-safe field component*/}
         <form.Field
-          name="contact"
+          name="email"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
             // Avoid hasty abstractions. Render props are great!
@@ -70,14 +84,14 @@ export default function ResetPasswordForm() {
                   className="block text-sm font-medium"
                   htmlFor={field.name}
                 >
-                  Email address / Phone number
+                  Email address
                 </label>
                 <input
                   id={field.name}
                   className={`form-input-field`}
                   name={field.name}
                   value={field.state.value}
-                  placeholder="Enter your email address or phone number"
+                  placeholder="Enter your email address"
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -89,18 +103,18 @@ export default function ResetPasswordForm() {
       </div>
       <div>
         <form.Field
-          name="otp"
+          name="resetToken"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => (
             <>
-              <label className="block text-sm font-medium">OTP</label>
+              <label className="block text-sm font-medium">Token</label>
               <input
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
                 className={`form-input-field`}
                 onBlur={field.handleBlur}
-                placeholder="Enter the OTP sent to your number"
+                placeholder="Enter the token sent to your email"
                 onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldInfo field={field} />
@@ -111,7 +125,7 @@ export default function ResetPasswordForm() {
       <div>
         {/* A type-safe field component*/}
         <form.Field
-          name="password"
+          name="newPassword"
           // eslint-disable-next-line react/no-children-prop
           children={(field) => {
             // Avoid hasty abstractions. Render props are great!
@@ -171,8 +185,8 @@ export default function ResetPasswordForm() {
         />
       </div>
 
-      <button type="submit" className="btn-primary mt-10">
-        Submit
+      <button type="submit" className="btn-primary mt-10" disabled={submitting}>
+        {submitting ? "Submitting..." : "Submit"}
       </button>
       <div className=" text-center text-primary btn">
         <Link href={HOME.url}>Back to Login</Link>

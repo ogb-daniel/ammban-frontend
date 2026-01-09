@@ -1,50 +1,64 @@
 "use client";
 import React from "react";
 import { useForm } from "@tanstack/react-form";
-import * as z from "zod";
-import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { states } from "@/app/lib/static-data";
-import { ADMIN_USERS } from "@/app/lib/routes";
 import { useRouter } from "next/navigation";
 import FieldInfo from "../auth/field-info";
-import { User } from "@/stores/admin-store";
-import { useAdminStore } from "@/providers/admin-store-provider";
-
-const formSchema = z.object({
-  firstName: z.string().nonempty("First name is required"),
-  lastName: z.string().nonempty("Last name is required"),
-  phoneNumber: z.string().nonempty("Phone number is required"),
-  email: z.string().email("Invalid email address"),
-  address: z.string().nonempty("Address is required"),
-  state: z.string().nonempty("State is required"),
-  dateOfBirth: z.string().nonempty("Date of birth is required"),
-  gender: z.string().nonempty("Gender is required"),
-});
+import { EditUserInformationSchema, States, User } from "@/app/lib/definitions";
+import { getAllStates, updateUser } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
+import CircleLoader from "../circle-loader";
 
 export default function EditUserForm({ user }: { user: User }) {
-  const { editUser } = useAdminStore((state) => state);
+  // const { editUser } = useAdminStore((state) => state);
+  const [, setStates] = React.useState<States[] | null>([]);
+  const [submitting, setSubmitting] = React.useState(false);
+  React.useEffect(() => {
+    (async () => {
+      const response = await getAllStates();
+      if (response.success) {
+        setStates(response.result);
+      }
+    })();
+  }, []);
   const router = useRouter();
-
+  console.log(user);
   const form = useForm({
     defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      address: user.address,
-      state: user.state,
+      firstName: user.fullName.split(" ")[0],
+      lastName: user.fullName.split(" ")[1],
+
+      // phoneNumber: user.phoneNumber,
+      email: user.emailAddress,
+      // address: user.address,
+      // state: user.state,
       dateOfBirth: "",
-      gender: user.gender,
+      // gender: user.gender,
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      setSubmitting(true);
       console.log(values);
+
+      try {
+        const response = await updateUser({
+          ...user,
+          ...values.value,
+          surname: values.value.lastName,
+          fullName: values.value.firstName + " " + values.value.lastName,
+          name: values.value.firstName,
+        });
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+      } finally {
+        setSubmitting(false);
+      }
       // Handle form submission
-      editUser(user.id, { ...user, ...values.value });
-      router.push(ADMIN_USERS.url);
+      router.push(`/${user?.role}/users`);
     },
     validators: {
-      onChange: formSchema,
+      onChange: EditUserInformationSchema,
     },
   });
 
@@ -121,7 +135,7 @@ export default function EditUserForm({ user }: { user: User }) {
             }}
           />
         </div>
-        <div>
+        {/* <div>
           <form.Field name="phoneNumber">
             {(field) => (
               <>
@@ -144,7 +158,7 @@ export default function EditUserForm({ user }: { user: User }) {
               </>
             )}
           </form.Field>
-        </div>
+        </div> */}
         <div>
           {/* A type-safe field component*/}
           <form.Field
@@ -176,8 +190,7 @@ export default function EditUserForm({ user }: { user: User }) {
             }}
           />
         </div>
-        <div>
-          {/* A type-safe field component*/}
+        {/* <div>
           <form.Field
             name="address"
             // eslint-disable-next-line react/no-children-prop
@@ -205,9 +218,8 @@ export default function EditUserForm({ user }: { user: User }) {
               );
             }}
           />
-        </div>
-        <div>
-          {/* A type-safe field component*/}
+        </div> */}
+        {/* <div>
           <form.Field
             name="state"
             // eslint-disable-next-line react/no-children-prop
@@ -230,9 +242,9 @@ export default function EditUserForm({ user }: { user: User }) {
                     className={`form-input-field`}
                   >
                     <option value="">Select your state</option>
-                    {states.map((state) => (
-                      <option key={state} value={state}>
-                        {state}
+                    {states?.map((state) => (
+                      <option key={state.id} value={state.id}>
+                        {state.stateName}
                       </option>
                     ))}
                   </select>
@@ -242,7 +254,7 @@ export default function EditUserForm({ user }: { user: User }) {
               );
             }}
           />
-        </div>
+        </div> */}
 
         <div>
           {/* A type-safe field component*/}
@@ -274,8 +286,7 @@ export default function EditUserForm({ user }: { user: User }) {
             }}
           />
         </div>
-        <div>
-          {/* A type-safe field component*/}
+        {/* <div>
           <form.Field
             name="gender"
             // eslint-disable-next-line react/no-children-prop
@@ -308,10 +319,20 @@ export default function EditUserForm({ user }: { user: User }) {
               );
             }}
           />
-        </div>
+        </div> */}
 
-        <button type="submit" className="btn-primary mt-10">
-          Update
+        <button
+          type="submit"
+          className="btn-primary mt-10"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Update"
+          )}
         </button>
       </div>
     </form>

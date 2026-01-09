@@ -1,22 +1,16 @@
-"use client";
-import { use } from "react";
-
-import { useAdminStore } from "@/providers/admin-store-provider";
 import { notFound } from "next/navigation";
 import EditProductForm from "@/app/ui/products/edit-product-form";
+import { getProduct } from "@/app/lib/actions/product";
 // export const metadata: Metadata = {
 //   title: "Dashboard",
 // };
-export default function ViewProduct({
+export default async function ViewProduct({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const id = use(params).id;
-  const { products } = useAdminStore((state) => state);
-  const product = products.find((product) => product.id === id);
-
-  if (!product) {
+  const response = await getProduct(parseInt((await params).id));
+  if (!response.success || !response.result.payload) {
     notFound();
   }
   return (
@@ -25,7 +19,7 @@ export default function ViewProduct({
         <h1 className="font-semibold ">View Product</h1>
       </div>
       <div className=" p-6">
-        <EditProductForm product={product} />
+        <EditProductForm product={response.result.payload} />
       </div>
     </main>
   );

@@ -5,12 +5,10 @@ import * as z from "zod";
 import Link from "next/link";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
+import { generatePasswordResetToken } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
 
-// Email and phone number validation schema
-const emailOrPhoneSchema = z.union([
-  z.string().email("Invalid email address"), // Validate email
-  z.string().regex(/^\d{10,12}$/, "Invalid phone number"), // Validate phone number (10 digits)
-]);
+const emailOrPhoneSchema = z.string().email("Invalid email address"); // Validate email
 const formSchema = z.object({
   contact: emailOrPhoneSchema,
 });
@@ -19,14 +17,25 @@ export default function SendForgotPasswordForm({
 }: {
   setHasSentResetRequest: (value: boolean) => void;
 }) {
+  const [submitting, setSubmitting] = React.useState(false);
   const form = useForm({
     defaultValues: {
       contact: "",
     },
-    onSubmit: (values) => {
-      console.log(values);
-      setHasSentResetRequest(true);
-      // Handle form submission
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      try {
+        const response = await generatePasswordResetToken({
+          Email: values.value.contact,
+        });
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+        setHasSentResetRequest(true);
+      } finally {
+        setSubmitting(false);
+      }
     },
     validators: {
       onChange: formSchema,
@@ -55,13 +64,13 @@ export default function SendForgotPasswordForm({
                   className="block text-sm font-medium"
                   htmlFor={field.name}
                 >
-                  Email address / Phone number
+                  Email address
                 </label>
                 <input
                   id={field.name}
                   className={`form-input-field`}
                   name={field.name}
-                  placeholder="Enter your email address or phone number"
+                  placeholder="Enter your email address"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -73,8 +82,8 @@ export default function SendForgotPasswordForm({
         />
       </div>
 
-      <button type="submit" className="btn-primary mt-10">
-        Submit
+      <button type="submit" className="btn-primary mt-10" disabled={submitting}>
+        {submitting ? "Submitting..." : "Submit"}
       </button>
       <div className="text-center text-primary btn">
         <Link href={HOME.url}>Back to Login</Link>

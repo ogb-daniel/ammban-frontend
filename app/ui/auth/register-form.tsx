@@ -3,22 +3,43 @@ import React, { useActionState, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { MdOutlineLock } from "react-icons/md";
-import { states } from "@/app/lib/static-data";
 import { HOME } from "@/app/lib/routes";
 import FieldInfo from "./field-info";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { signup } from "@/app/actions/auth";
-import { SignupFormSchema } from "@/app/lib/definitions";
+import { signup } from "@/app/lib/actions/auth";
+import { SignupFormSchema, States } from "@/app/lib/definitions";
 import { toast } from "react-toastify";
+import { getAllStates } from "@/app/lib/actions/user";
+import { Upload } from "lucide-react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 export default function RegistrationForm() {
   const [state, action, pending] = useActionState(signup, undefined);
-  console.log(state);
+  const [states, setStates] = React.useState<States[] | null>([]);
+  const [governmentId, setGovernmentId] = React.useState<
+    File | undefined | null
+  >(null);
+  const [selfie, setSelfie] = React.useState<File | undefined | null>(null);
+  const [proofOfAddress, setProofOfAddress] = React.useState<
+    File | undefined | null
+  >(null);
+  const searchParams = useSearchParams();
 
+  const referrerCode = searchParams.get("referrerCode") || "";
+
+  React.useEffect(() => {
+    (async () => {
+      const response = await getAllStates();
+      if (response.success) {
+        setStates(response.result);
+      }
+    })();
+  }, []);
   const form = useForm({
     defaultValues: {
-      referralCode: "",
+      referralCode: referrerCode || "",
       firstName: "",
       lastName: "",
       phoneNumber: "",
@@ -30,6 +51,9 @@ export default function RegistrationForm() {
       gender: 0,
       password: "",
       confirmPassword: "",
+      governmentId: null,
+      selfie: null,
+      proofOfAddress: null,
     },
     onSubmit: (values) => {
       console.log(values);
@@ -48,12 +72,45 @@ export default function RegistrationForm() {
   }, [state]);
   const handleAction = async (formData: FormData) => {
     Object.entries(form.state.values).forEach(([key, value]) => {
-      formData.append(key, String(value));
+      if (
+        key !== "governmentId" &&
+        key !== "selfie" &&
+        key !== "proofOfAddress"
+      ) {
+        formData.append(key, String(value));
+      }
     });
+    if (governmentId) {
+      formData.append("governmentId", governmentId);
+    }
+    if (selfie) {
+      formData.append("selfie", selfie);
+    }
+    if (proofOfAddress) {
+      formData.append("proofOfAddress", proofOfAddress);
+    }
 
     return action(formData);
   };
 
+  const handleGovernmentIdUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    setGovernmentId(file);
+  };
+
+  const handleSelfieUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setSelfie(file);
+  };
+
+  const handleProofOfAddressUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    setProofOfAddress(file);
+  };
   return (
     <form action={handleAction} className="max-w-lg mx-auto  space-y-4 mt-9">
       <div>
@@ -282,9 +339,9 @@ export default function RegistrationForm() {
                   className={`form-input-field`}
                 >
                   <option value="">Select your state</option>
-                  {states.map((state, index) => (
-                    <option key={state} value={index}>
-                      {state}
+                  {states?.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.stateName}
                     </option>
                   ))}
                 </select>
@@ -423,7 +480,135 @@ export default function RegistrationForm() {
           }}
         />
       </div>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <p className="font-medium">Government-Issued ID</p>
+          <p className="text-sm text-gray-600">
+            Upload a clear image of your government-issued ID for identity
+            verification
+          </p>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {governmentId && (
+              <div className="w-full mb-2">
+                {governmentId.type.startsWith("image/") ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(governmentId)}
+                      alt="Government ID"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{governmentId.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleGovernmentIdUpload}
+            />
+          </label>
+        </div>
 
+        <div className="space-y-2">
+          <p className="font-medium">Selfie Photo</p>
+          <p className="text-sm text-gray-600">
+            Upload a clear selfie photo for identity verification
+          </p>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {selfie && (
+              <div className="w-full mb-2">
+                {selfie.type.startsWith("image/") ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(selfie)}
+                      alt="Selfie"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{selfie.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleSelfieUpload}
+            />
+          </label>
+        </div>
+
+        <div className="space-y-2">
+          <p className="font-medium">Proof of Address</p>
+          <p className="text-sm text-gray-600">
+            Upload a utility bill, bank statement, or other document showing
+            your address
+          </p>
+          <label className="border-2 border-dashed rounded-lg p-6 text-center flex flex-col items-center cursor-pointer">
+            {proofOfAddress && (
+              <div className="w-full mb-2">
+                {proofOfAddress.type.startsWith("image/") ? (
+                  <div className="w-full h-32 relative">
+                    <Image
+                      src={URL.createObjectURL(proofOfAddress)}
+                      alt="Proof of Address"
+                      fill
+                      className="object-cover border rounded"
+                      sizes="200px"
+                    />
+                  </div>
+                ) : (
+                  <div className="p-2 bg-gray-100 rounded border">
+                    <p className="text-sm font-medium">{proofOfAddress.name}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <Upload className="text-gray-500 w-6 h-6 mb-2" />
+            <p>
+              <span className="text-primary font-medium">Click to upload</span>{" "}
+              or drag and drop
+            </p>
+            <p className="text-sm text-gray-500">
+              PNG, JPG or PDF (max. 800 x 400px)
+            </p>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*,.pdf"
+              onChange={handleProofOfAddressUpload}
+            />
+          </label>
+        </div>
+      </div>
       <button className="btn-primary mt-10" disabled={pending}>
         Create Account
       </button>

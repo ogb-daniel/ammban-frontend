@@ -1,18 +1,23 @@
-import ProductsAction from "@/app/ui/products/products-action";
-import ProductsTable from "@/app/ui/products/products-table";
+import { getAllProducts } from "@/app/lib/actions/product";
+import ProductsContainer from "@/app/ui/products/products-container";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Dashboard",
+  title: "Products",
 };
-export default function Products() {
+export default async function Products() {
+  const limit = 100;
+  const products = await getAllProducts({ MaxResultCount: limit });
+
   return (
     <main>
       <div className="bg-white px-10 t-3 md:pt-7 pb-3 md:border-b-2 md:border-gray-100 hidden md:block">
         <h1 className="font-semibold">Products</h1>
       </div>
       <div className=" p-6">
-        <ProductsTable />
-        <ProductsAction />
+        <ProductsContainer
+          products={products?.result?.payload?.items || []}
+          limit={limit}
+        />
       </div>
     </main>
   );

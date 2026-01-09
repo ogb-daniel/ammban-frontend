@@ -1,11 +1,12 @@
 "use client";
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { Price, Transaction } from "@/stores/admin-store";
+import { Price } from "@/stores/admin-store";
 import { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 import Table from "../table";
 import moment from "moment";
 import TransactionRowCard from "./transaction-row-card";
+import { Transaction } from "@/app/lib/definitions";
 
 export const transactionColumns: ColumnDef<Transaction>[] = [
   {

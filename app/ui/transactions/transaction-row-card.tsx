@@ -3,7 +3,7 @@ import { flexRender } from "@tanstack/react-table";
 import React from "react";
 import { Action } from "../table";
 import { BiCard } from "react-icons/bi";
-import { Transaction } from "@/stores/admin-store";
+import { Transaction } from "@/app/lib/definitions";
 
 const TransactionRowCard = ({
   row,
@@ -13,7 +13,7 @@ const TransactionRowCard = ({
 }) => {
   const cells = row.getVisibleCells();
   const transaction = row.original;
-  const baseColor = transaction.type === "income" ? "#05c168" : "#FF5A65";
+  const baseColor = transaction ? "#05c168" : "#FF5A65";
 
   return (
     <div className="flex items-center gap-4 p-4 border-b last:border-b-0">

@@ -4,12 +4,19 @@ import { MdOutlineSearch } from "react-icons/md";
 
 type SearchBarProps = {
   placeholder: string;
-  onChange: (value: string) => void;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  value?: string;
+  className?: string;
 };
 
-const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onChange }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  placeholder,
+  onChange,
+  value,
+  className = "",
+}) => {
   return (
-    <div className="">
+    <div className={`${className}`}>
       <label htmlFor="search">
         <div className="flex items-center ">
           <div className="border rounded-l-lg py-[10px] pl-4 border-r-0 text-gray-500">
@@ -17,10 +24,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onChange }) => {
           </div>
           <input
             id="search"
-            type="text"
             className="w-full border border-l-0 rounded-r-lg py-2 px-4 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder={placeholder}
-            onChange={(e) => onChange(e.target.value)}
+            value={value}
+            onChange={onChange}
           />
         </div>
       </label>

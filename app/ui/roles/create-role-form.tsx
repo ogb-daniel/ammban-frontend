@@ -1,28 +1,29 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { useAdminStore } from "@/providers/admin-store-provider";
 import { useRouter } from "next/navigation";
-import clsx from "clsx";
 import Switch from "../switch";
+import { createRole, getPermissions } from "@/app/lib/actions/role";
+import { Permission } from "@/app/lib/definitions";
+import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 // Sample Permissions Data
-const permissionsList = [
-  "View Customer’s Information",
-  "Edit Customer’s Information",
-  "Manage User Accounts",
-  "Access Financial Reports",
-  "Modify Insurance Policies",
-];
+
 export default function CreateRoleForm() {
-  const { roles, createRole } = useAdminStore((state) => state);
+  const { createRole: createRoleFromStore } = useAdminStore((state) => state);
+  const [permissionsList, setPermissionsList] = useState<Permission[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
   // State for permission toggles
   const [permissions, setPermissions] = useState(
     permissionsList.reduce((acc, permission) => {
-      acc[permission] = false;
+      acc[permission.name] = false;
       return acc;
     }, {} as Record<string, boolean>)
   );
+  const { user } = useUserStore((state) => state);
 
   const handleToggle = (permission: string) => {
     setPermissions((prev) => ({
@@ -32,31 +33,47 @@ export default function CreateRoleForm() {
   };
 
   // State for selected color
-  const [selectedColor, setSelectedColor] = useState<string>("");
 
   const form = useForm({
     defaultValues: {
-      title: "",
+      name: "",
+      displayName: "",
       description: "",
-      color: "",
-      permissions: [],
-      id: (roles.length + 1).toString(),
+      grantedPermissions: [],
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      setSubmitting(true);
       const roleData = {
         ...values.value,
-        permissions: Object.keys(permissions).filter(
+        grantedPermissions: Object.keys(permissions).filter(
           (perm) => permissions[perm]
         ),
-        color: selectedColor,
+        normalizedName: values.value.name,
       };
 
       console.log("Role Data:", roleData);
       // Handle form submission
-      createRole(roleData);
-      router.back();
+      try {
+        const response = await createRole(roleData);
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+        createRoleFromStore(response.result);
+      } finally {
+        setSubmitting(false);
+      }
+      router.replace(`/${user?.role}/roles`);
     },
   });
+  useEffect(() => {
+    (async () => {
+      const response = await getPermissions();
+      if (response.success) {
+        setPermissionsList(response?.result?.items);
+      }
+    })();
+  }, []);
   return (
     <form
       onSubmit={(e) => {
@@ -69,17 +86,40 @@ export default function CreateRoleForm() {
       <div className="flex flex-col bg-white p-8 rounded-3xl">
         <div className="md:w-1/2">
           <form.Field
-            name="title"
+            name="name"
             // eslint-disable-next-line react/no-children-prop
             children={(field) => (
               <>
                 <label className="block text-sm font-medium text-gray-700">
-                  Title
+                  Name
                 </label>
                 <input
                   type="text"
                   name={field.name}
                   placeholder="Name Of Role"
+                  id={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="mt-2 block w-full border px-5 py-4 border-gray-300 rounded-2xl focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                />
+              </>
+            )}
+          />
+        </div>
+        <div className="md:w-1/2 mt-6">
+          <form.Field
+            name="displayName"
+            // eslint-disable-next-line react/no-children-prop
+            children={(field) => (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Display name
+                </label>
+                <input
+                  type="text"
+                  name={field.name}
+                  placeholder="Display name"
                   id={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -113,7 +153,7 @@ export default function CreateRoleForm() {
           />
         </div>
         {/* Color Picker */}
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700">
             Color
           </label>
@@ -140,7 +180,7 @@ export default function CreateRoleForm() {
               />
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Permissions List with Switches */}
         <div className="mt-6">
@@ -148,24 +188,24 @@ export default function CreateRoleForm() {
             Permissions
           </label>
           <div className="mt-2 space-y-4">
-            {permissionsList.map((permission) => (
+            {permissionsList.map((permission, index) => (
               <div
-                key={permission}
+                key={index}
                 className="flex items-start flex-col lg:flex-row lg:space-x-3 p-2 border rounded-lg bg-gray-50"
               >
                 <Switch
-                  checked={permissions[permission]}
+                  checked={permissions[permission.name]}
                   onCheckedChange={(e) => {
                     e.preventDefault();
-                    handleToggle(permission);
+                    handleToggle(permission.name);
                   }}
                 />
                 <div>
-                  <p className="text-sm font-medium">{permission}</p>
+                  <p className="text-sm font-medium">
+                    {permission.displayName}
+                  </p>
                   <p className="text-xs text-gray-500">
-                    We offer a range of insurance options including life,
-                    health, home, auto, and business insurance, tailored to meet
-                    your unique needs.
+                    {permission.description}
                   </p>
                 </div>
               </div>
@@ -175,10 +215,17 @@ export default function CreateRoleForm() {
       </div>
       <div className="md:w-1/2 mt-8 mx-auto">
         <button
+          disabled={submitting}
           type="submit"
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white btn-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Role
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Role"
+          )}
         </button>
       </div>
     </form>

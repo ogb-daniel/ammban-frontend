@@ -18,29 +18,3 @@ export const FAQS = {
 export const VERIFY_ACCOUNT = {
   url: "/verify-account",
 };
-export const ADMIN_DASHBOARD = {
-  url: "/admin/dashboard",
-};
-export const ADMIN_PROFILE = {
-  url: `/admin/profile`,
-};
-export const ADMIN_ROLES = {
-  url: `/admin/roles`,
-};
-export const ADMIN_USERS = {
-  url: `/admin/users`,
-};
-export const ADMIN_PRODUCTS = {
-  url: `/admin/products`,
-};
-export const ADMIN_COMMISSION = {
-  url: `/admin/commission`,
-};
-
-export const ADMIN_TRANSACTIONS = {
-  url: "/admin/transactions",
-};
-
-export const AGENT_DASHBOARD = {
-  url: "/agent/dashboard",
-};

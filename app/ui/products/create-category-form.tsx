@@ -1,27 +1,43 @@
 "use client";
 import React from "react";
 import { useForm } from "@tanstack/react-form";
-import { useAdminStore } from "@/providers/admin-store-provider";
-import styles from "@/app/ui/products/products.module.css";
 import { useRouter } from "next/navigation";
+import { createProductCategory } from "@/app/lib/actions/product";
+import { toast } from "react-toastify";
+import styles from "./products.module.css";
+import { industryList } from "@/app/lib/static-data";
+import { useUserStore } from "@/providers/user-store-provider";
+import CircleLoader from "../circle-loader";
 
 export default function CreateCategoryForm() {
-  const { createCategory, categories } = useAdminStore((state) => state);
   const router = useRouter();
-  console.log(categories);
+  const [submitting, setSubmitting] = React.useState(false);
+  const { user } = useUserStore((state) => state);
 
   const form = useForm({
     defaultValues: {
       name: "",
       description: "",
       industry: "",
-      id: (categories.length + 1).toString(),
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
-      createCategory(values.value);
+      setSubmitting(true);
+      try {
+        const response = await createProductCategory(values.value);
+        if (!response.success) {
+          toast.error(response.error.message);
+          return;
+        }
+        if (response.result.responseCode !== 200) {
+          toast.error(response.result.message);
+          return;
+        }
+      } finally {
+        setSubmitting(false);
+      }
       // Handle form submission
-      router.back();
+      router.replace(`/${user?.role}/products`);
     },
   });
   return (
@@ -79,6 +95,7 @@ export default function CreateCategoryForm() {
             )}
           />
         </div>
+
         <div className="md:w-1/2 mt-6">
           <form.Field
             name="industry"
@@ -99,9 +116,11 @@ export default function CreateCategoryForm() {
                   <option className="" value="">
                     Select your Industry
                   </option>
-                  <option value="tech">Tech</option>
-                  <option value="health">Health</option>
-                  <option value="finance">Finance</option>
+                  {industryList.map((industry) => (
+                    <option key={industry} value={industry}>
+                      {industry}
+                    </option>
+                  ))}
                 </select>
               </>
             )}
@@ -111,9 +130,16 @@ export default function CreateCategoryForm() {
       <div className="md:w-1/2 mt-8 mx-auto">
         <button
           type="submit"
+          disabled={submitting}
           className=" w-full px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
-          Create Category
+          {submitting ? (
+            <>
+              <CircleLoader />
+            </>
+          ) : (
+            "Create Category"
+          )}
         </button>
       </div>
     </form>

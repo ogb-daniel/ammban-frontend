@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { JSX } from "react";
 import { BsArrowRight } from "react-icons/bs";
 
@@ -5,10 +6,11 @@ type DashboardCardProps = {
   title: string;
   value: string | number;
   icon: JSX.Element;
-  change: string;
+  change?: string;
   duration: string;
   bgColor: string;
   textColor: string;
+  link: string;
 };
 
 const DashboardCard: React.FC<DashboardCardProps> = ({
@@ -19,14 +21,16 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   duration,
   bgColor,
   textColor,
+  link,
 }) => {
   return (
-    <div
+    <Link
+      href={link}
       className={`flex flex-col justify-between p-4 rounded-lg ${bgColor} border-2 shadow border-gray-100 `}
     >
       <div>
         <div className="flex justify-between items-center">
-          {icon} <BsArrowRight />
+          {icon} {link !== "#" ? <BsArrowRight /> : null}
         </div>
         <div className="flex gap-2 items-center mt-2">
           <span className={`text-2xl font-bold ${textColor} inline-block`}>
@@ -34,7 +38,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           </span>
           <span
             className={`text-sm font-medium ${
-              change.includes("-") ? "text-red-500" : "text-green-500"
+              change?.includes("-") ? "text-red-500" : "text-green-500"
             }`}
           >
             {change}
@@ -48,7 +52,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
           {duration}
         </span>
       </div>
-    </div>
+    </Link>
   );
 };
 

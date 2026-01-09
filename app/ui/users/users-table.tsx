@@ -2,12 +2,10 @@
 import React, { useState } from "react";
 import Table from "../table";
 import { ColumnDef } from "@tanstack/react-table";
-import { MdCheckBox, MdEdit } from "react-icons/md";
+import { MdCheckBox, MdEdit, MdPermIdentity } from "react-icons/md";
 import { FaTransgender, FaTrash, FaUser } from "react-icons/fa";
-import { ADMIN_USERS } from "@/app/lib/routes";
-import { User } from "@/stores/admin-store";
 import { useRouter } from "next/navigation";
-import { PiPhoneFill } from "react-icons/pi";
+import { PiExportBold, PiPhoneFill } from "react-icons/pi";
 import { FaLocationDot } from "react-icons/fa6";
 import {
   DropdownMenu,
@@ -16,22 +14,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { UserCog, UserCheck, ChevronDown } from "lucide-react";
+import { UserCog, UserCheck, ChevronDown, Eye } from "lucide-react";
 import RoleAssignmentModal from "../roles/role-assign-modal";
-import { useAdminStore } from "@/providers/admin-store-provider";
+import DownlineModal from "./downline-modal";
 import { toTitleCase } from "@/lib/utils";
+import { User } from "@/app/lib/definitions";
+import Swal from "sweetalert2";
+import { deleteUser } from "@/app/lib/actions/user";
+import { toast } from "react-toastify";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { useUserStore } from "@/providers/user-store-provider";
 
 const userColumns: ColumnDef<User>[] = [
   {
-    accessorKey: "",
+    accessorKey: "fullName",
     header: "Name",
     cell: (info) => (
       <div>
-        <p className="text-sm font-medium">
-          {info.row.original.firstName} {info.row.original.lastName}
-        </p>
+        <p className="text-sm font-medium">{info.row.original.fullName}</p>
         <p className="text-xs font-medium text-gray-500">
-          {info.row.original.email}
+          {info.row.original.emailAddress}
         </p>
       </div>
     ),
@@ -59,45 +61,49 @@ const userColumns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: "roleNames",
+    header: "Role",
+    cell: (info) => info.getValue(),
+    enableSorting: true,
+
+    meta: {
+      icon: <MdPermIdentity className="text-gray-500" />,
+    },
+  },
+  {
     accessorKey: "gender",
     header: "Gender",
-    cell: (info) => toTitleCase(info.getValue() as string),
+    cell: (info) => toTitleCase(info.getValue() === 0 ? "Male" : "Female"),
     enableSorting: true,
     meta: {
       icon: <FaTransgender className="text-gray-500" />,
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isActive",
     header: "Status",
-    cell: (info) => <Status value={info.getValue() as string} />,
+    cell: (info) => <Status value={info.getValue() as boolean} />,
     enableSorting: true,
     meta: {
       icon: <MdCheckBox className="text-gray-500" />,
     },
   },
 ];
-const Status = ({ value }: { value: string }) => {
+const Status = ({ value }: { value: boolean }) => {
   return (
     <span
       className={`text-sm font-medium min-w-[80px] justify-center w-full  broder py-1 px-2 flex items-center gap-1 rounded-sm ${
-        value === "Active"
+        value
           ? "text-[#14CA74] bg-[#05C16833] border-[#05C16880]"
-          : value === "Pending"
-          ? "text-[#A3A3A3] bg-[#AEB9E133] border-[#AEB9E133]"
           : "text-[#FF5A65] bg-[#FF5A6533] border-[#FF5A6533]"
       }`}
     >
       <span
         className={`w-1 h-1 inline-block rounded-full ${
-          value === "Active"
-            ? "bg-[#14CA74]"
-            : value === "Pending"
-            ? "bg-[#A3A3A3]"
-            : "bg-[#FF5A65]"
+          value ? "bg-[#14CA74]" : "bg-[#FF5A65]"
         } `}
       ></span>
-      {value as string}
+      {value ? "Active" : "Inactive"}
     </span>
   );
 };
@@ -109,6 +115,7 @@ function ManageUsersDropdown({
   selected: string;
   setSelected: (value: string) => void;
 }) {
+  const { user } = useUserStore((state) => state);
   const handleSelect = (value: string) => {
     setSelected(value);
     console.log("Selected:", value); // You can use this value for further logic
@@ -127,41 +134,77 @@ function ManageUsersDropdown({
         >
           <UserCog size={16} /> Manage Users
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className="flex items-center gap-2"
-          onClick={() => handleSelect("Assign Users")}
-        >
-          <UserCheck size={16} /> Assign Users
-        </DropdownMenuItem>
+        {user?.role === "admin" && (
+          <DropdownMenuItem
+            className="flex items-center gap-2"
+            onClick={() => handleSelect("Assign Users")}
+          >
+            <UserCheck size={16} /> Assign Users
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-const UsersTable = () => {
+const UsersTable = ({ users }: { users: User[] }) => {
   const router = useRouter();
-  const { users } = useAdminStore((state) => state);
+  const { deleteUser: deleteUserFromStore } = useAdminStore((state) => state);
   const [selected, setSelected] = useState("Manage Users");
   const [isOpen, setIsOpen] = useState(false);
+  const [isDownlineModalOpen, setIsDownlineModalOpen] = useState(false);
+  const [filteredUsers, setFilteredUsers] = useState(users);
+  const { user: currentUser } = useUserStore((state) => state);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const actions =
     selected === "Manage Users"
       ? [
           {
+            element: <Eye className="w-4 h-4 text-[#094794]" />,
+            onClick: (user: User) => {
+              setSelectedUser(user);
+              setIsDownlineModalOpen(true);
+            },
+            label: "View Downline",
+          },
+          {
             element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
             onClick: (user: User) => {
-              router.push(`${ADMIN_USERS.url}/${user.id}`);
+              router.push(`/${currentUser?.role}/users/${user.id}`);
             },
             label: "Edit User",
           },
           {
             element: <FaTrash className="w-4 h-4 text-red-500" />,
             onClick: (user: User) => {
-              // Handle delete action
-              if (confirm("Are you sure you want to delete this User?")) {
-                // Add delete logic here
-                console.log("Delete User:", user);
-              }
+              Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm your action.",
+                showCancelButton: true,
+                cancelButtonText: "No, Cancel",
+                confirmButtonColor: "#094794",
+                confirmButtonText: "Yes, Confirm",
+                reverseButtons: true,
+                customClass: {
+                  cancelButton: "text-primary bg-white border border-primary",
+                  actions: "flex-row gap-2",
+                },
+                buttonsStyling: true,
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                  return deleteUser(user.id);
+                },
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const response = result.value;
+                  if (response.success) {
+                    deleteUserFromStore(user.id);
+                    toast.success("User deleted successfully");
+                  } else {
+                    toast.error(response.error.message);
+                  }
+                }
+              });
             },
             label: "Delete User",
           },
@@ -180,6 +223,8 @@ const UsersTable = () => {
             label: "Edit User",
           },
         ];
+  console.log(filteredUsers);
+
   return (
     <div className="space-y-2">
       <RoleAssignmentModal
@@ -187,12 +232,61 @@ const UsersTable = () => {
         onRequestClose={() => setIsOpen(false)}
         user={selectedUser as User}
       />
-      <ManageUsersDropdown selected={selected} setSelected={setSelected} />
+      <DownlineModal
+        isOpen={isDownlineModalOpen}
+        onRequestClose={() => setIsDownlineModalOpen(false)}
+        user={selectedUser as User}
+      />
+      <div className="flex items-center justify-between">
+        <ManageUsersDropdown selected={selected} setSelected={setSelected} />
+        <Button
+          variant="default"
+          className="bg-primary text-white"
+          onClick={() => {
+            // Export filtered users to CSV
+            const csvContent =
+              "data:text/csv;charset=utf-8," +
+              [
+                [
+                  "Full Name",
+                  "Email",
+                  "Phone",
+                  "State",
+                  "Roles",
+                  "Gender",
+                  "Status",
+                ],
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...filteredUsers.map((user: any) => [
+                  user?.fullName,
+                  user?.emailAddress,
+                  user?.phoneNumber,
+                  user?.state,
+                  user?.roleNames,
+                  user?.gender === 0 ? "Male" : "Female",
+                  user?.isActive ? "Active" : "Inactive",
+                ]),
+              ]
+                .map((row) => row?.join(","))
+                ?.join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "users.csv");
+            document.body.appendChild(link);
+            link.click();
+          }}
+        >
+          Export Users
+          <PiExportBold className="w-4 h-4" />
+        </Button>
+      </div>
       <Table<User>
         data={users}
         columns={userColumns}
         title="All Users"
         actions={actions}
+        setFilteredData={setFilteredUsers}
       />
     </div>
   );

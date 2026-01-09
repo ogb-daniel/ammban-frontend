@@ -1,24 +1,17 @@
 "use client";
 import React from "react";
-import { FaUserSecret } from "react-icons/fa";
 
 type Props = {
   title: string;
   description: string;
-  color: string;
   onClick?: () => void;
 };
 
-export default function RoleCard({
-  title,
-  description,
-  color,
-  onClick,
-}: Props) {
+export default function RoleCard({ title, description, onClick }: Props) {
   return (
     <div className="rounded-[20px] bg-white p-4 grid grid-cols-1  lg:grid-cols-3 items-center justify-between gap-4">
       <div className="flex items-center gap-5">
-        <div
+        {/* <div
           className="w-[60px] h-[60px] p-4 flex items-center justify-center rounded-[20px]"
           style={{
             color,
@@ -32,15 +25,17 @@ export default function RoleCard({
           }}
         >
           {<FaUserSecret />}
-        </div>
+        </div> */}
         <p className="font-medium">{title}</p>
       </div>
       <p
-        className="text-xs"
+        className="text-xs line-clamp-1"
         style={{
           color: "#718EBF",
         }}
-      >{`${(description as string).substring(0, 50)}...`}</p>
+      >
+        {`${description}`}
+      </p>
 
       <button
         className="rounded-full py-[9px] px-[30px] border font-medium"

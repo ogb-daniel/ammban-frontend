@@ -1,22 +1,16 @@
-"use client";
-import { use } from "react";
-
 import EditRoleForm from "@/app/ui/roles/edit-role-form";
-import { useAdminStore } from "@/providers/admin-store-provider";
 import { notFound } from "next/navigation";
+import { getRole } from "@/app/lib/actions/role";
 // export const metadata: Metadata = {
 //   title: "Dashboard",
 // };
-export default function ViewRole({
+export default async function ViewRole({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const id = use(params).id;
-  const { roles } = useAdminStore((state) => state);
-  const role = roles.find((role) => role.id === id);
-
-  if (!role) {
+  const response = await getRole(parseInt((await params).id));
+  if (!response.success || !response.result) {
     notFound();
   }
   return (
@@ -25,7 +19,7 @@ export default function ViewRole({
         <h1 className="font-semibold ">View Role</h1>
       </div>
       <div className=" p-6">
-        <EditRoleForm role={role} />
+        <EditRoleForm role={response.result} />
       </div>
     </main>
   );

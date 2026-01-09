@@ -1,30 +1,37 @@
 "use client";
-import { useAdminStore } from "@/providers/admin-store-provider";
-import React from "react";
+import React, { useEffect } from "react";
 import RoleCard from "./role-card";
 import { useRouter } from "next/navigation";
-import { ADMIN_ROLES } from "@/app/lib/routes";
+import { Role } from "@/app/lib/definitions";
+import { useAdminStore } from "@/providers/admin-store-provider";
+import { useUserStore } from "@/providers/user-store-provider";
 
-export default function AllRoles({}) {
-  const { roles } = useAdminStore((state) => state);
+export default function AllRoles({ roles }: { roles: Role[] }) {
+  const { initializeRoles, roles: storeRoles } = useAdminStore(
+    (state) => state
+  );
+  const { user } = useUserStore((state) => state);
+
+  useEffect(() => {
+    initializeRoles(roles);
+  }, []);
   const router = useRouter();
   return (
     <section className="space-y-5">
-      {roles.map((role) => (
+      {storeRoles.map((role) => (
         <RoleCard
           key={role.id}
-          title={role.title}
+          title={role.displayName}
           description={role.description}
-          color={role.color}
           onClick={() => {
-            router.push(`${ADMIN_ROLES.url}/${role.id}`);
+            router.push(`/${user?.role}/roles/${role.id}`);
           }}
         />
       ))}
       <div className="md:w-1/2 mx-auto mt-10">
         <button
           className="btn-primary "
-          onClick={() => router.push(`${ADMIN_ROLES.url}/create-role`)}
+          onClick={() => router.push(`/${user?.role}/roles/create-role`)}
         >
           Create Role
         </button>

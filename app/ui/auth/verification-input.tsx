@@ -19,7 +19,7 @@ const VerificationCodeInput: React.FC<VerificationCodeInputProps> = ({
   ) => {
     const value = e.target.value;
 
-    if (value.length > 1) return; // Allow only single digit
+    if (value?.length > 1) return; // Allow only single digit
     if (!/^\d?$/.test(value)) return; // Only allow numeric input
 
     onChange(index, value);

@@ -1,17 +1,15 @@
 "use client";
 
 import { useAdminStore } from "@/providers/admin-store-provider";
-import { Transaction } from "@/stores/admin-store";
 import React from "react";
 import Table from "../table";
 import { transactionColumns } from "./all-transactions";
 import TransactionRowCard from "./transaction-row-card";
+import { Transaction } from "@/app/lib/definitions";
 
 const Outflow = () => {
   const { transactions } = useAdminStore((state) => state);
-  const outflows = transactions.filter(
-    (transaction) => transaction.source === "outflow"
-  );
+  const outflows = transactions.filter((transaction) => transaction);
   return (
     <Table<Transaction>
       data={outflows}

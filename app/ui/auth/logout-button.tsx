@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserStore } from "@/providers/user-store-provider";
-import { logout } from "@/app/actions/auth";
+import { logout } from "@/app/lib/actions/auth";
 import { HOME } from "@/app/lib/routes";
 import { MdLogout } from "react-icons/md";
 import clsx from "clsx";

@@ -1,15 +1,17 @@
 "use client";
-import { ADMIN_USERS } from "@/app/lib/routes";
+import { useUserStore } from "@/providers/user-store-provider";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function UsersAction() {
   const router = useRouter();
+  const { user } = useUserStore((state) => state);
+
   return (
     <div className="flex max-w-lg mx-auto gap-6 mt-4">
       <button
         className="btn-primary"
-        onClick={() => router.push(`${ADMIN_USERS.url}/create-user`)}
+        onClick={() => router.push(`/${user?.role}/users/create-user`)}
       >
         Create User
       </button>

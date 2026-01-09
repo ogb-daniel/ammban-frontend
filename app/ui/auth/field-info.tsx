@@ -9,7 +9,7 @@ export default function FieldInfo({
 }) {
   return (
     <>
-      {field.state.meta.isTouched && field.state.meta.errors.length ? (
+      {field.state.meta.isTouched && field.state.meta.errors?.length ? (
         <span className={`form-error-text flex gap-2 items-start`}>
           <MdError />{" "}
           <span className="flex-1">{field.state.meta.errors.join(", ")}</span>

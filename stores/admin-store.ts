@@ -1,56 +1,20 @@
 // src/stores/counter-store.ts
+import {
+  Commission,
+  CommissionPercentage,
+  Product,
+  Role,
+  Transaction,
+  User,
+  WithdrawalHistory,
+} from "@/app/lib/definitions";
 import { createStore } from "zustand/vanilla";
 
 type Category = {
   name: string;
   description: string;
   industry: string;
-  id: string;
-};
-export type Transaction = {
-  description: string;
-  type: string;
-  date: Date;
-  amount: Price;
-  receipt: string;
-  id: string;
-  source: string;
-};
-
-export type Product = {
-  name: string;
-  description: string;
-  category: string;
-  price: Price;
-  id: string;
-};
-export type User = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  state: string;
-  gender: string;
-  status?: string;
-  id: string;
-  role?: string;
-};
-
-export type Commission = {
-  productName: string;
-  description: string;
-  role: string;
-  percentage: number;
-  id: string;
-};
-
-export type Role = {
-  title: string;
-  description: string;
-  color: string;
-  permissions: string[];
-  id: string;
+  id: number;
 };
 
 export type Price = {
@@ -70,7 +34,7 @@ export type Admin = {
   address: string;
   state: string;
   gender: string;
-  id: string;
+  id: number;
   role?: string;
 };
 
@@ -79,132 +43,46 @@ export type AdminState = {
   products: Product[];
   roles: Role[];
   commissions: Commission[];
+  commissionsPercentage: CommissionPercentage[];
   users: User[];
   admin: Admin;
   transactions: Transaction[];
+  walletTransactions: WithdrawalHistory[];
 };
 
 export type AdminActions = {
+  initializeUsers: (users: User[]) => void;
+  initializeCategories: (categories: Category[]) => void;
+  initializeProducts: (products: Product[]) => void;
+  initializeRoles: (roles: Role[]) => void;
+  initializeCommissions: (commissions: Commission[]) => void;
+  initializeCommissionsPercentage: (
+    commissionsPercentage: CommissionPercentage[]
+  ) => void;
+  initializeTransactions: (transactions: Transaction[]) => void;
+  initializeWalletTransactions: (transactions: WithdrawalHistory[]) => void;
   createCategory: (category: Category) => void;
   createProduct: (product: Product) => void;
   createRole: (role: Role) => void;
   createCommission: (commission: Commission) => void;
   createUser: (user: User) => void;
-  editRole: (id: string, role: Role) => void;
-  editProduct: (id: string, product: Product) => void;
-  editCommission: (id: string, commission: Commission) => void;
-  editUser: (id: string, user: User) => void;
+  editRole: (id: number, role: Role) => void;
+  editProduct: (id: number, product: Product) => void;
+  editCommission: (id: number, commission: Commission) => void;
+  editUser: (id: number, user: User) => void;
+  deleteUser: (id: number) => void;
+  deleteProduct: (id: number) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
 export const initAdminStore = (): AdminState => {
   return {
     categories: [],
-    products: [
-      {
-        id: "1",
-        name: "AXA PASS",
-        category: "INSURANCE",
-        price: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-      {
-        id: "2",
-        name: "BAXA PASS",
-        category: "ANDURANCE",
-        price: {
-          currency: "NGN",
-          amount: 1000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-      {
-        id: "3",
-        name: "CAXA PASS",
-        category: "ENDURANCE",
-        price: {
-          currency: "NGN",
-          amount: 5000,
-        },
-        description:
-          "Provides coverage for medical expenses, including doctor visits, hospital stays, medications, and preventive care.",
-      },
-    ],
-    roles: [
-      {
-        title: "Admin",
-        description: "Full access to all features",
-        color: "#CC9600",
-        permissions: [
-          "View Customer’s Information",
-          "Edit Customer’s Information",
-        ],
-        id: "1",
-      },
-      {
-        title: "Agent",
-        description: "Limited access to features",
-        color: "#0033CC",
-        permissions: ["View Customer’s Information"],
-        id: "2",
-      },
-      {
-        title: "Aggregators",
-        description: "Limited access to features",
-        color: "#CC0048",
-        permissions: ["View Customer’s Information"],
-        id: "3",
-      },
-      {
-        title: "Agent",
-        description: "Limited access to features",
-        color: "#1AB2A8",
-        permissions: ["View Customer’s Information"],
-        id: "4",
-      },
-      {
-        title: "Agent",
-        description: "Limited access to features",
-        color: "#030940",
-        permissions: ["View Customer’s Information"],
-        id: "5",
-      },
-      {
-        title: "Agent",
-        description: "Limited access to features",
-        color: "#1AB2A8",
-        permissions: ["View Customer’s Information"],
-        id: "6",
-      },
-    ],
-    commissions: [
-      {
-        productName: "AXA PASS",
-        description: "Provides coverage for medical expenses",
-        role: "Admin",
-        percentage: 25,
-        id: "1",
-      },
-    ],
-    users: [
-      {
-        firstName: "David",
-        lastName: "Ogbe",
-        email: "david@google.com",
-        phoneNumber: "(234) 907 - 1274 - 515",
-        state: "Lagos (Nigeria)",
-        address: "12, Opebi Street, Lagos",
-        gender: "male",
-        status: "Active",
-        id: "1",
-        role: "Admin",
-      },
-    ],
+    roles: [],
+    products: [],
+    commissions: [],
+    commissionsPercentage: [],
+    users: [],
     admin: {
       firstName: "David",
       lastName: "Ogbe",
@@ -217,35 +95,11 @@ export const initAdminStore = (): AdminState => {
       state: "Lagos (Nigeria)",
       address: "12, Opebi Street, Lagos",
       gender: "male",
-      id: "1",
+      id: 1,
       role: "Admin",
     },
-    transactions: [
-      {
-        description: "AXA PASS",
-        type: "AXA PASS",
-        date: new Date(),
-        amount: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        receipt: "https://www.google.com",
-        id: "1",
-        source: "income",
-      },
-      {
-        description: "AXA PASS",
-        type: "AXA PASS",
-        date: new Date(),
-        amount: {
-          currency: "NGN",
-          amount: 10000,
-        },
-        receipt: "https://www.google.com",
-        id: "2",
-        source: "outflow",
-      },
-    ],
+    transactions: [],
+    walletTransactions: [],
   };
 };
 export const defaultInitState: AdminState = {
@@ -254,6 +108,7 @@ export const defaultInitState: AdminState = {
   roles: [],
   users: [],
   commissions: [],
+  commissionsPercentage: [],
   admin: {
     firstName: "",
     lastName: "",
@@ -266,15 +121,50 @@ export const defaultInitState: AdminState = {
     state: "",
     address: "",
     gender: "",
-    id: "",
+    id: 0,
     role: "",
   },
   transactions: [],
+  walletTransactions: [],
 };
 
 export const createAdminStore = (initState: AdminState = defaultInitState) => {
   return createStore<AdminStore>()((set) => ({
     ...initState,
+    initializeUsers: (users: User[]) =>
+      set(() => ({
+        users: users,
+      })),
+    initializeCategories: (categories: Category[]) =>
+      set(() => ({
+        categories: categories,
+      })),
+    initializeProducts: (products: Product[]) =>
+      set(() => ({
+        products: products,
+      })),
+    initializeRoles: (roles: Role[]) =>
+      set(() => ({
+        roles: roles,
+      })),
+    initializeCommissions: (commissions: Commission[]) =>
+      set(() => ({
+        commissions: commissions,
+      })),
+    initializeCommissionsPercentage: (
+      commissionsPercentage: CommissionPercentage[]
+    ) =>
+      set(() => ({
+        commissionsPercentage: commissionsPercentage,
+      })),
+    initializeTransactions: (transactions: Transaction[]) =>
+      set(() => ({
+        transactions: transactions,
+      })),
+    initializeWalletTransactions: (transactions: WithdrawalHistory[]) =>
+      set(() => ({
+        walletTransactions: transactions,
+      })),
     createCategory: (category) =>
       set((state) => ({
         categories: [...state.categories, category],
@@ -305,7 +195,6 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
       set((state) => ({
         commissions: [...state.commissions, commission],
       })),
-
     createUser: (user) =>
       set((state) => ({
         users: [...state.users, user],
@@ -313,6 +202,14 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
     editUser: (id, user) =>
       set((state) => ({
         users: state.users.map((u) => (u.id === id ? user : u)),
+      })),
+    deleteUser: (id) =>
+      set((state) => ({
+        users: state.users.filter((u) => u.id !== id),
+      })),
+    deleteProduct: (id) =>
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== id),
       })),
   }));
 };
