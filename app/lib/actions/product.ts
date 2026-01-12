@@ -13,7 +13,7 @@ import {
 } from "../definitions";
 import api from "../api/axios";
 
-export const getProduct = async (id: number): Promise<GetProductResponse> => {
+export const getProduct = async (id: string): Promise<GetProductResponse> => {
   try {
     const response = await api.get<GetProductResponse>(
       `/api/services/app/ProductService/GetById?id=${id}`
