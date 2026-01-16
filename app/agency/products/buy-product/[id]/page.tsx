@@ -10,7 +10,7 @@ export default async function BuyProduct({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const response = await getProduct(parseInt((await params).id));
+  const response = await getProduct((await params).id);
   if (!response.success || !response.result.payload) {
     notFound();
   }

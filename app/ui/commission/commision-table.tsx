@@ -49,7 +49,7 @@ const CommissionTable = () => {
     <Table<CommissionPercentage>
       data={commissionsPercentage}
       columns={commissionColumns}
-      title="All Commissions"
+      title=""
       actions={[]}
     />
   );

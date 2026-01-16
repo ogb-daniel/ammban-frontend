@@ -25,8 +25,7 @@ export default function CreateCommissionForm() {
         } else {
           toast.error("Failed to fetch roles");
         }
-      } catch (error) {
-        console.error("Error fetching roles:", error);
+      } catch {
         toast.error("Error fetching roles");
       } finally {
       }

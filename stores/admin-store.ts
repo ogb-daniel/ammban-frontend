@@ -67,11 +67,11 @@ export type AdminActions = {
   createCommission: (commission: Commission) => void;
   createUser: (user: User) => void;
   editRole: (id: number, role: Role) => void;
-  editProduct: (id: number, product: Product) => void;
+  editProduct: (id: string, product: Product) => void;
   editCommission: (id: number, commission: Commission) => void;
   editUser: (id: number, user: User) => void;
   deleteUser: (id: number) => void;
-  deleteProduct: (id: number) => void;
+  deleteProduct: (id: string) => void;
 };
 
 export type AdminStore = AdminState & AdminActions;
@@ -209,7 +209,7 @@ export const createAdminStore = (initState: AdminState = defaultInitState) => {
       })),
     deleteProduct: (id) =>
       set((state) => ({
-        products: state.products.filter((p) => p.id !== id),
+        products: state.products.filter((p) => p.id !== id.toString()),
       })),
   }));
 };

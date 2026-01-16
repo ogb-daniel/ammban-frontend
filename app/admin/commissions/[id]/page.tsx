@@ -17,7 +17,7 @@ export default function ViewCommission({
   const commission = commissions.find(
     (commission) => commission.id === parseInt(id)
   );
-  console.log(commissions);
+  //console.log(commissions);
 
   if (!commission) {
     notFound();

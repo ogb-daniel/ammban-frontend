@@ -13,7 +13,7 @@ import {
 } from "../definitions";
 import api from "../api/axios";
 
-export const getProduct = async (id: number): Promise<GetProductResponse> => {
+export const getProduct = async (id: string): Promise<GetProductResponse> => {
   try {
     const response = await api.get<GetProductResponse>(
       `/api/services/app/ProductService/GetById?id=${id}`
@@ -86,7 +86,7 @@ export const createProduct = async (
 };
 
 export const updateProduct = async (
-  id: number,
+  id: string,
   body: CreateProductBody
 ): Promise<CreateProductResponse> => {
   try {
@@ -111,7 +111,7 @@ export const updateProduct = async (
 };
 
 export const deleteProduct = async (
-  id: number
+  id: string
 ): Promise<DeleteProductResponse> => {
   try {
     const response = await api.delete<DeleteProductResponse>(
