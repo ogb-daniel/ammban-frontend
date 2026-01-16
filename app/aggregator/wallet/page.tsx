@@ -19,7 +19,7 @@ export default async function Wallet() {
     return (
       <main>
         <div className="bg-white px-10 t-3 md:pt-7 pb-3 md:border-b-2 md:border-gray-100 hidden md:block">
-          <h1 className="font-semibold">Transactions</h1>
+          <h1 className="font-semibold">Wallet</h1>
         </div>
         <div className="p-6 text-center">
           <p className="text-red-500">

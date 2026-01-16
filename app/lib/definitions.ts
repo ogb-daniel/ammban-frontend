@@ -111,7 +111,7 @@ export type Commission = {
 };
 
 export type Product = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   price: number;
@@ -677,7 +677,7 @@ export interface SyncTransactionBody {
   narration: string;
   amount: number;
   isTrial: boolean;
-  productId: number;
+  productId: string;
   firstName: string;
   lastName: string;
   phoneNumber: string;

@@ -106,11 +106,10 @@ const categoryColumns: ColumnDef<ProductCategory>[] = [
 const Status = ({ value }: { value: number }) => {
   return (
     <span
-      className={`text-sm font-medium min-w-[80px] justify-center w-full  broder py-1 px-2 flex items-center gap-1 rounded-sm ${
-        value >= 1
+      className={`text-sm font-medium min-w-[80px] justify-center w-full  broder py-1 px-2 flex items-center gap-1 rounded-sm ${value >= 1
           ? "text-[#14CA74] bg-[#05C16833] border-[#05C16880]"
           : "text-[#FF5A65] bg-[#FF5A6533] border-[#FF5A6533]"
-      }`}
+        }`}
     >
       {value >= 1 ? "Available" : "Out of Stock"}
     </span>
@@ -131,11 +130,10 @@ function TabSwitcher({
         <button
           key={tab}
           onClick={() => setSelected(tab)}
-          className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${
-            selected === tab
+          className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${selected === tab
               ? "bg-[#d9edff] text-primary shadow-sm font-bold"
               : "text-gray-600 hover:text-primary"
-          }`}
+            }`}
         >
           {tab}
         </button>
@@ -201,61 +199,61 @@ const ProductsTable = ({
   const actions =
     user?.role === "admin"
       ? [
-          {
-            element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
-            onClick: (product: Product) => {
-              router.push(`/${user?.role}/products/${product.id}`);
-            },
-            label: "Edit Product",
+        {
+          element: <MdEdit className="w-4 h-4 text-[#0B1739]" />,
+          onClick: (product: Product) => {
+            router.push(`/${user?.role}/products/${product.id}`);
           },
-          {
-            element: <FaTrash className="w-4 h-4 text-red-500" />,
-            onClick: (product: Product) => {
-              Swal.fire({
-                title: "Are you sure?",
-                text: "Please confirm your action.",
-                showCancelButton: true,
-                cancelButtonText: "No, Cancel",
-                confirmButtonColor: "#094794",
-                confirmButtonText: "Yes, Confirm",
-                reverseButtons: true,
-                customClass: {
-                  cancelButton: "text-primary bg-white border border-primary",
-                  actions: "flex-row gap-2",
-                },
-                buttonsStyling: true,
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                  return deleteProduct(product.id);
-                },
-              }).then(async (result) => {
-                if (result.isConfirmed) {
-                  const response = result.value;
-                  if (response.success) {
-                    deleteProductFromStore(product.id);
-                    toast.success("Product deleted successfully");
-                  } else {
-                    toast.error(response.error.message);
-                  }
+          label: "Edit Product",
+        },
+        {
+          element: <FaTrash className="w-4 h-4 text-red-500" />,
+          onClick: (product: Product) => {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "Please confirm your action.",
+              showCancelButton: true,
+              cancelButtonText: "No, Cancel",
+              confirmButtonColor: "#094794",
+              confirmButtonText: "Yes, Confirm",
+              reverseButtons: true,
+              customClass: {
+                cancelButton: "text-primary bg-white border border-primary",
+                actions: "flex-row gap-2",
+              },
+              buttonsStyling: true,
+              showLoaderOnConfirm: true,
+              preConfirm: () => {
+                return deleteProduct(product.id);
+              },
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                const response = result.value;
+                if (response.success) {
+                  deleteProductFromStore(product.id);
+                  toast.success("Product deleted successfully");
+                } else {
+                  toast.error(response.error.message);
                 }
-              });
-            },
-            label: "Delete Product",
+              }
+            });
           },
-        ]
+          label: "Delete Product",
+        },
+      ]
       : [
-          {
-            element: (
-              <button className="border rounded-md py-1 px-2 text-primary border-primary">
-                Purchase Product
-              </button>
-            ),
-            onClick: async (product: Product) => {
-              router.push(`/${user?.role}/products/buy-product/${product.id}`);
-            },
-            label: "Purchase Product",
+        {
+          element: (
+            <button className="border rounded-md py-1 px-2 text-primary border-primary">
+              Purchase Product
+            </button>
+          ),
+          onClick: async (product: Product) => {
+            router.push(`/${user?.role}/products/buy-product/${product.id}`);
           },
-        ];
+          label: "Purchase Product",
+        },
+      ];
 
   const categoryActions = [
     {
@@ -354,8 +352,8 @@ const ProductsTable = ({
                   ? "All Products"
                   : "All Transactions"
                 : selected === "Products"
-                ? "All Products"
-                : "All Product Categories"
+                  ? "All Products"
+                  : "All Product Categories"
             }
             actions={actions}
             categoryFilter={{
@@ -383,8 +381,8 @@ const ProductsTable = ({
                 ? "All Products"
                 : "All Transactions"
               : selected === "Products"
-              ? "All Products"
-              : "All Product Categories"
+                ? "All Products"
+                : "All Product Categories"
           }
           actions={actions}
           categoryFilter={{

@@ -49,10 +49,34 @@ export default function ProductsContainer({
     });
   }, [initializeProducts, limit, skip, storeProducts]);
 
-  return (
-    <div className="space-y-6">
-      <ProductsTable transactions={transactions} categories={categories} />
-      <ProductsAction />
+ return (
+  <section className="space-y-4">
+    {/* Page Header */}
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm text-gray-500">
+          Manage product catalog, categories, and availability.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ProductsAction />
+      </div>
     </div>
-  );
+
+    {/* Main content card */}
+    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <ProductsTable transactions={transactions} categories={categories} />
+    </div>
+  </section>
+);
+
+
+
+  // return (
+  //   <div className="space-y-6">
+  //     <ProductsTable transactions={transactions} categories={categories} />
+  //     <ProductsAction />
+  //   </div>
+  // );
 }

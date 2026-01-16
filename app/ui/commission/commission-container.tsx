@@ -48,9 +48,29 @@ export default function CommissionContainer({
   }, [initializeCommissionsPercentage, limit, skip, storeCommissions]);
 
   return (
-    <div className="space-y-6">
-      <CommissionTable />
+  <section className="space-y-4">
+    {/* Page Header */}
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm text-gray-500">
+          Manage commission percentages by role and customer type.
+        </p>
+      </div>
+
       <CommissionAction />
     </div>
-  );
+
+    {/* Table card */}
+    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <CommissionTable />
+    </div>
+  </section>
+);
+
+  // return (
+  //   <div className="space-y-6">
+  //     <CommissionTable />
+  //     <CommissionAction />
+  //   </div>
+  // );
 }
