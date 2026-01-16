@@ -86,7 +86,7 @@ export const createProduct = async (
 };
 
 export const updateProduct = async (
-  id: number,
+  id: string,
   body: CreateProductBody
 ): Promise<CreateProductResponse> => {
   try {
@@ -111,7 +111,7 @@ export const updateProduct = async (
 };
 
 export const deleteProduct = async (
-  id: number
+  id: string
 ): Promise<DeleteProductResponse> => {
   try {
     const response = await api.delete<DeleteProductResponse>(

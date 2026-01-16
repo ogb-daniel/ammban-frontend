@@ -1,0 +1,42 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  build_dir: 'dist' # change this if your build folder is different
+
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    steps:
+    - checkout: self
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        npm install
+        npm run build
+      displayName: 'Install dependencies and build app'
+
+    - script: |
+        cd $(build_dir)
+        zip -r $(System.DefaultWorkingDirectory)/app.zip .
+      displayName: 'Zip build folder'
+
+    - task: CmdLine@2
+      displayName: 'Deploy using ZipDeploy'
+      inputs:
+        script: |
+          echo "Current directory: $(pwd)"
+          echo "Listing files:"
+          ls -lh $(System.DefaultWorkingDirectory)
+          echo "Uploading app.zip..."
+          curl -X POST -u "$AZURE_PUBLISH_USERNAME:$AZURE_PUBLISH_PASSWORD" \
+            --data-binary @$(System.DefaultWorkingDirectory)/app.zip \
+            https://ammban-frontend-d3ate5f4h4h5h3gx.scm.uksouth-01.azurewebsites.net/api/zipdeploy

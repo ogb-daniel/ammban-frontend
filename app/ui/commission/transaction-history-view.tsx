@@ -26,7 +26,7 @@ export default function CommissionsView({
 
     setUser({ ...user!, commissionEarnings });
   }, []);
-  console.log(user);
+    console.log(user);
 
   return (
     <div className="p-6">

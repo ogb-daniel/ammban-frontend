@@ -41,7 +41,7 @@ export default function EditProductForm({ product }: { product: Product }) {
     },
     onSubmit: async (values) => {
       setSubmitting(true);
-      console.log(values);
+       console.log(values);
       try {
         const response = await updateProduct(product.id, values.value);
         if (!response.success) {
