@@ -70,7 +70,7 @@ export default function AgentDashboard({
       duration: "30d",
       bgColor: "bg-teal-50",
       textColor: "text-teal-500",
-      link: `/${user?.role}/commissions`,
+      link: `/${user?.role}/wallet`,
     },
   ];
   return (

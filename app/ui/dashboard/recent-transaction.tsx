@@ -14,7 +14,7 @@ export default function RecentTransactions() {
         <h2 className="text-lg font-semibold">Recent Transactions</h2>
         <Link
           className="text-primary font-semibold"
-          href={`/${user?.role}/commissions`}
+          href={`/${user?.role}/wallet`}
         >
           View All
         </Link>
