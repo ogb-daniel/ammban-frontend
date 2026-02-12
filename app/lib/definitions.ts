@@ -219,7 +219,7 @@ export interface LoginResponse extends ApiResponse<{
     encryptedAccessToken: string;
     expireInSeconds: number;
     refreshToken: string;
-  refreshTokenExpireInSeconds: number;
+    refreshTokenExpireInSeconds: number;
 
     userId: number;
   };
@@ -307,6 +307,7 @@ export interface RefreshTokenResponse extends ApiResponse<{
   refreshToken: string;
   encryptedAccessToken: string;
   expireInSeconds: number;
+  refreshTokenExpireInSeconds: number;
   userId: number;
 }> {
   result: {
@@ -314,6 +315,7 @@ export interface RefreshTokenResponse extends ApiResponse<{
     refreshToken: string;
     encryptedAccessToken: string;
     expireInSeconds: number;
+    refreshTokenExpireInSeconds: number;
     userId: number;
   };
 }

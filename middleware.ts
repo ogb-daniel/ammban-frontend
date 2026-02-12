@@ -14,11 +14,6 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isPublicRoute = publicRoutes.includes(pathname);
-  console.log("token", token);
-  console.log("refreshToken", refreshToken);
-  console.log("role", role);
-  console.log("pathname", pathname);
-  console.log("isPublicRoute", isPublicRoute);
 
   if (!token && refreshToken && !isPublicRoute) {
     try {

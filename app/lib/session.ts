@@ -2,6 +2,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { User } from "./definitions";
+import { refreshToken } from "./actions/user";
 
 export async function createSession(
   accessToken: string,
@@ -61,4 +62,32 @@ export async function getSession() {
     user,
     refreshToken,
   };
+}
+
+export async function refreshSession() {
+  const cookieStore = await cookies();
+  const oldRefreshToken = cookieStore.get("refreshToken")?.value;
+  const role = cookieStore.get("role")!.value;
+  const user = JSON.parse(cookieStore.get("user")!.value);
+  if (oldRefreshToken) {
+    const refreshResponse = await refreshToken({
+      refreshToken: oldRefreshToken,
+    });
+    if (refreshResponse?.result?.accessToken) {
+      const {
+        accessToken,
+        refreshToken: newRefreshToken,
+        expireInSeconds,
+        refreshTokenExpireInSeconds,
+      } = refreshResponse.result;
+      await createSession(
+        accessToken,
+        expireInSeconds,
+        role,
+        user,
+        newRefreshToken,
+        refreshTokenExpireInSeconds,
+      );
+    }
+  }
 }

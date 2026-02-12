@@ -6,6 +6,7 @@ import { montserrat } from "./ui/fonts";
 import { ToastContainer } from "react-toastify";
 import { UserStoreProvider } from "@/providers/user-store-provider";
 import { LoadingProvider } from "./providers/loading-provider";
+import SessionManager from "./ui/session-manager";
 
 export const metadata: Metadata = {
   title: {
@@ -24,13 +25,15 @@ export default function RootLayout({
       <body
         className={`${montserrat.className} antialiased text-black bg-white`}
       >
-        <LoadingProvider>
-          <UserStoreProvider>
-            {children}
-            <div id="modals"></div>
-          </UserStoreProvider>
-          <ToastContainer />
-        </LoadingProvider>
+        <SessionManager>
+          <LoadingProvider>
+            <UserStoreProvider>
+              {children}
+              <div id="modals"></div>
+            </UserStoreProvider>
+            <ToastContainer />
+          </LoadingProvider>
+        </SessionManager>
       </body>
     </html>
   );
