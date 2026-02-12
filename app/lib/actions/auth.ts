@@ -59,7 +59,7 @@ export async function signup(state: FormState, formData: FormData) {
     console.log(formData);
     const documentUploadResponse = await uploadDocument(
       userId.toString(),
-      formData
+      formData,
     );
     if (!documentUploadResponse.success) {
       return {
@@ -101,7 +101,7 @@ export async function login(state: FormState, formData: FormData) {
     }
 
     const response2 = await getCurrentLoginInformation(
-      response.result.accessToken
+      response.result.accessToken,
     );
     const balance = await getAccountBalance(response.result.accessToken);
     const user = response2.result.user;
@@ -110,7 +110,9 @@ export async function login(state: FormState, formData: FormData) {
       response.result.accessToken,
       response.result.expireInSeconds,
       role,
-      user
+      user,
+      response.result.refreshToken,
+      response.result.refreshTokenExpireInSeconds,
     );
     return {
       user: {
@@ -161,7 +163,7 @@ export const verifyEmail = async (body: { code: string }) => {
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   return response.json();
@@ -173,7 +175,7 @@ const uploadDocument = async (userId: string, formData: FormData) => {
     {
       method: "POST",
       body: formData,
-    }
+    },
   );
 
   return response.json();
@@ -207,7 +209,7 @@ const signin = async (body: ILoginBody): Promise<LoginResponse> => {
 // }
 
 export const getCurrentLoginInformation = async (
-  accessToken: string
+  accessToken: string,
 ): Promise<GetCurrentLoginInformationsResponse> => {
   const response = await fetch(
     `${baseUrl}/api/services/app/Session/GetCurrentLoginInformations`,
@@ -216,13 +218,13 @@ export const getCurrentLoginInformation = async (
         Authorization: `Bearer ${accessToken}`,
       },
       cache: "no-store",
-    }
+    },
   );
 
   return response.json();
 };
 export const getAccountBalance = async (
-  accessToken: string
+  accessToken: string,
 ): Promise<GetAccountBalanceResponse> => {
   const response = await fetch(
     `${baseUrl}/api/services/app/PaymentService/AccountBalance`,
@@ -232,7 +234,7 @@ export const getAccountBalance = async (
       },
       method: "POST",
       cache: "no-store",
-    }
+    },
   );
 
   return response.json();

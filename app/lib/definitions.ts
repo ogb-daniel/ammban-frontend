@@ -19,7 +19,7 @@ export const SignupFormSchema = z
       .regex(/[0-9]/, "Password must contain at least one number")
       .regex(
         /[@$!%*?&#]/,
-        "Password must contain at least one special character"
+        "Password must contain at least one special character",
       ),
     confirmPassword: z.string().nonempty("Please confirm your password"),
     governmentId: z.any().nullable(),
@@ -205,17 +205,22 @@ export interface ILoginBody {
   rememberClient: boolean;
 }
 
-export interface LoginResponse
-  extends ApiResponse<{
-    accessToken: string;
-    encryptedAccessToken: string;
-    expireInSeconds: number;
-    userId: number;
-  }> {
+export interface LoginResponse extends ApiResponse<{
+  accessToken: string;
+  encryptedAccessToken: string;
+  expireInSeconds: number;
+  refreshToken: string;
+  refreshTokenExpireInSeconds: number;
+
+  userId: number;
+}> {
   result: {
     accessToken: string;
     encryptedAccessToken: string;
     expireInSeconds: number;
+    refreshToken: string;
+  refreshTokenExpireInSeconds: number;
+
     userId: number;
   };
 }
@@ -223,8 +228,10 @@ export interface LoginResponse
 export interface GetUserResponse extends ApiResponse<User> {
   result: User;
 }
-export interface GetAllUsersResponse
-  extends ApiResponse<{ items: User[]; totalCount: number }> {
+export interface GetAllUsersResponse extends ApiResponse<{
+  items: User[];
+  totalCount: number;
+}> {
   result: {
     items: User[];
     totalCount: number;
@@ -285,12 +292,30 @@ export interface SetupPinBody {
 export interface VerifyPinBody {
   pin: string;
 }
+export interface RefreshTokenBody {
+  refreshToken: string;
+}
 
 export interface SetupPinResponse extends ApiResponse<null> {
   result: null;
 }
 export interface VerifyPinResponse extends ApiResponse<boolean> {
   result: boolean;
+}
+export interface RefreshTokenResponse extends ApiResponse<{
+  accessToken: string;
+  refreshToken: string;
+  encryptedAccessToken: string;
+  expireInSeconds: number;
+  userId: number;
+}> {
+  result: {
+    accessToken: string;
+    refreshToken: string;
+    encryptedAccessToken: string;
+    expireInSeconds: number;
+    userId: number;
+  };
 }
 export interface SetupCommissionPercentageBody {
   roleId: number;
@@ -299,12 +324,11 @@ export interface SetupCommissionPercentageBody {
   customerType: number;
 }
 
-export interface GetAllCommissionPercentagesResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: { totalCount: number; items: CommissionPercentage[] };
-  }> {
+export interface GetAllCommissionPercentagesResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: { totalCount: number; items: CommissionPercentage[] };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -315,12 +339,11 @@ export interface GetAllCommissionPercentagesResponse
   };
 }
 
-export interface GetAllCommissionsResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: { totalCount: number; items: Commission[] };
-  }> {
+export interface GetAllCommissionsResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: { totalCount: number; items: Commission[] };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -339,24 +362,22 @@ export interface CreateProductBody {
   quantity: number;
 }
 
-export interface CreateProductResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: Product;
-  }> {
+export interface CreateProductResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: Product;
+}> {
   result: {
     responseCode: number;
     message: string;
     payload: Product;
   };
 }
-export interface DeleteProductResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: null;
-  }> {
+export interface DeleteProductResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: null;
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -364,12 +385,11 @@ export interface DeleteProductResponse
   };
 }
 
-export interface GetAllProductsResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: { totalCount: number; items: Product[] };
-  }> {
+export interface GetAllProductsResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: { totalCount: number; items: Product[] };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -380,12 +400,11 @@ export interface GetAllProductsResponse
   };
 }
 
-export interface GetProductResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: Product;
-  }> {
+export interface GetProductResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: Product;
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -399,12 +418,11 @@ export interface CreateProductCategoryBody {
   industry: string;
 }
 
-export interface CreateProductCategoryResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: ProductCategory;
-  }> {
+export interface CreateProductCategoryResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: ProductCategory;
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -412,12 +430,11 @@ export interface CreateProductCategoryResponse
   };
 }
 
-export interface DeleteProductCategoryResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: null;
-  }> {
+export interface DeleteProductCategoryResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: null;
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -425,12 +442,11 @@ export interface DeleteProductCategoryResponse
   };
 }
 
-export interface GetAllProductCategoriesResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: { totalCount: number; items: ProductCategory[] };
-  }> {
+export interface GetAllProductCategoriesResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: { totalCount: number; items: ProductCategory[] };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -441,12 +457,11 @@ export interface GetAllProductCategoriesResponse
   };
 }
 
-export interface GetProductCategoryResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: ProductCategory;
-  }> {
+export interface GetProductCategoryResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: ProductCategory;
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -454,8 +469,17 @@ export interface GetProductCategoryResponse
   };
 }
 
-export interface GetRolesResponse
-  extends ApiResponse<{
+export interface GetRolesResponse extends ApiResponse<{
+  items: {
+    name: string;
+    displayName: string;
+    isStatic: boolean;
+    isDefault: boolean;
+    creationTime: string;
+    id: number;
+  }[];
+}> {
+  result: {
     items: {
       name: string;
       displayName: string;
@@ -464,28 +488,17 @@ export interface GetRolesResponse
       creationTime: string;
       id: number;
     }[];
-  }> {
-  result: {
-    items: {
-      name: string;
-      displayName: string;
-      isStatic: boolean;
-      isDefault: boolean;
-      creationTime: string;
-      id: number;
-    }[];
   };
 }
 
-export interface GetPermissionsResponse
-  extends ApiResponse<{
-    items: {
-      name: string;
-      displayName: string;
-      description: string;
-      id: number;
-    }[];
-  }> {
+export interface GetPermissionsResponse extends ApiResponse<{
+  items: {
+    name: string;
+    displayName: string;
+    description: string;
+    id: number;
+  }[];
+}> {
   result: {
     items: {
       name: string;
@@ -496,8 +509,22 @@ export interface GetPermissionsResponse
   };
 }
 
-export interface GetRoleForEditResponse
-  extends ApiResponse<{
+export interface GetRoleForEditResponse extends ApiResponse<{
+  role: {
+    id: number;
+    name: string;
+    displayName: string;
+    description: string;
+    isStatic: boolean;
+  };
+  permissions: {
+    name: string;
+    displayName: string;
+    description: string;
+  }[];
+  grantedPermissionNames: string[];
+}> {
+  result: {
     role: {
       id: number;
       name: string;
@@ -511,41 +538,24 @@ export interface GetRoleForEditResponse
       description: string;
     }[];
     grantedPermissionNames: string[];
-  }> {
-  result: {
-    role: {
-      id: number;
-      name: string;
-      displayName: string;
-      description: string;
-      isStatic: boolean;
-    };
-    permissions: {
-      name: string;
-      displayName: string;
-      description: string;
-    }[];
-    grantedPermissionNames: string[];
   };
 }
 
-export interface GetAllRolesResponse
-  extends ApiResponse<{
-    items: Role[];
-    totalCount: number;
-  }> {
+export interface GetAllRolesResponse extends ApiResponse<{
+  items: Role[];
+  totalCount: number;
+}> {
   result: {
     items: Role[];
     totalCount: number;
   };
 }
 
-export interface GetAllTransactionLimitsResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: { totalCount: number; items: TransactionLimit[] };
-  }> {
+export interface GetAllTransactionLimitsResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: { totalCount: number; items: TransactionLimit[] };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -561,25 +571,23 @@ export interface ValidateTransactionBody {
   transactionAmount: number;
 }
 
-export interface GetCurrentLoginInformationsResponse
-  extends ApiResponse<{
-    user: User;
-  }> {
+export interface GetCurrentLoginInformationsResponse extends ApiResponse<{
+  user: User;
+}> {
   result: {
     user: User;
   };
 }
 
-export interface GetAccountBalanceResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: {
-      availableBalance: number;
-      accountNumber: string;
-      accountName: string;
-    };
-  }> {
+export interface GetAccountBalanceResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: {
+    availableBalance: number;
+    accountNumber: string;
+    accountName: string;
+  };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -603,23 +611,22 @@ export interface WithdrawCommissionRequestBody {
   amount: number;
 }
 
-export interface WithdrawFundsResponse
-  extends ApiResponse<{
-    requestSuccessful: boolean;
-    responseMessage: string;
-    responseCode: number;
-    responseBody: {
-      reference: string;
-      amount: number;
-      status: string;
-      dateCreated: string;
-      totalFee: number;
-      destinationBankName: string;
-      destinationAccountNumber: string;
-      destinationAccountName: string;
-      destinationBankCode: string;
-    };
-  }> {
+export interface WithdrawFundsResponse extends ApiResponse<{
+  requestSuccessful: boolean;
+  responseMessage: string;
+  responseCode: number;
+  responseBody: {
+    reference: string;
+    amount: number;
+    status: string;
+    dateCreated: string;
+    totalFee: number;
+    destinationBankName: string;
+    destinationAccountNumber: string;
+    destinationAccountName: string;
+    destinationBankCode: string;
+  };
+}> {
   result: {
     requestSuccessful: boolean;
     responseMessage: string;
@@ -637,12 +644,11 @@ export interface WithdrawFundsResponse
     };
   };
 }
-export interface WithdrawCommissionResponse
-  extends ApiResponse<{
-    message: string;
-    payload: string;
-    responseCode: number;
-  }> {
+export interface WithdrawCommissionResponse extends ApiResponse<{
+  message: string;
+  payload: string;
+  responseCode: number;
+}> {
   result: {
     message: string;
     payload: string;
@@ -650,17 +656,16 @@ export interface WithdrawCommissionResponse
   };
 }
 
-export interface DepositFundsResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: {
-      accountName: string;
-      accountNumber: string;
-      bankName: string;
-      bankCode: string;
-    };
-  }> {
+export interface DepositFundsResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    bankCode: string;
+  };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -688,17 +693,16 @@ export interface SyncTransactionBody {
   gender: string;
 }
 
-export interface SyncTransactionResponse
-  extends ApiResponse<{
-    status: boolean;
-    message: string;
-    data: {
-      effectiveDate: string;
-      expiryDate: string;
-      customerID: string;
-      transactionID: string;
-    };
-  }> {
+export interface SyncTransactionResponse extends ApiResponse<{
+  status: boolean;
+  message: string;
+  data: {
+    effectiveDate: string;
+    expiryDate: string;
+    customerID: string;
+    transactionID: string;
+  };
+}> {
   result: {
     status: boolean;
     message: string;
@@ -710,17 +714,16 @@ export interface SyncTransactionResponse
     };
   };
 }
-export interface SyncStatusResponse
-  extends ApiResponse<{
-    status: boolean;
-    message: string;
-    data: {
-      effectiveDate: string;
-      expiryDate: string;
-      trackNumber: string;
-      transactionID: string;
-    };
-  }> {
+export interface SyncStatusResponse extends ApiResponse<{
+  status: boolean;
+  message: string;
+  data: {
+    effectiveDate: string;
+    expiryDate: string;
+    trackNumber: string;
+    transactionID: string;
+  };
+}> {
   result: {
     status: boolean;
     message: string;
@@ -733,103 +736,99 @@ export interface SyncStatusResponse
   };
 }
 
-export interface GetTransactionHistoryResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: {
-      totalCount: number;
-      items: {
-        productName: string;
-        customerName: string;
-        phoneNumber: string;
-        status: number;
-        amount: number;
-      }[];
-    };
-  }> {
-  result: {
-    responseCode: number;
-    message: string;
-    payload: {
-      totalCount: number;
-      items: {
-        productName: string;
-        customerName: string;
-        phoneNumber: string;
-        status: number;
-        amount: number;
-      }[];
-    };
-  };
-}
-export interface GetWalletTransactionHistoryResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: WithdrawalHistory[];
-  }> {
-  result: {
-    responseCode: number;
-    message: string;
-    payload: WithdrawalHistory[];
-  };
-}
-
-export interface GetTransactionReceiptResponse
-  extends ApiResponse<{
-    transactionDate: string;
-    productName: string;
-    amount: number;
-    sellerName: string;
-    buyerName: string;
-  }> {
-  result: {
-    transactionDate: string;
-    productName: string;
-    amount: number;
-    sellerName: string;
-    buyerName: string;
-  };
-}
-export interface CheckExistingCustomerResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: {
-      id: number;
-      creationTime: string;
-      creatorUserId: number;
-      lastModificationTime: string;
-      lastModifierUserId: number;
-      isDeleted: boolean;
-      deleterUserId: number;
-      deletionTime: string;
-      narration: string;
-      amount: number;
-      isTrial: boolean;
-      productId: number;
-      payStatus: string;
-      transactionDate: string;
-      customerID: string;
-      transactionID: string;
-      serviceID: string;
-      sellerUserId: number;
-      payType: string;
-      status: number;
-      effectiveDate: string;
-      expiryDate: string;
-      firstName: string;
-      lastName: string;
+export interface GetTransactionHistoryResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: {
+    totalCount: number;
+    items: {
+      productName: string;
+      customerName: string;
       phoneNumber: string;
-      email: string;
-      address: string;
-      state: string;
-      gender: string;
-      dateOfBirth: string;
-      productCategory: string;
+      status: number;
+      amount: number;
+    }[];
+  };
+}> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: {
+      totalCount: number;
+      items: {
+        productName: string;
+        customerName: string;
+        phoneNumber: string;
+        status: number;
+        amount: number;
+      }[];
     };
-  }> {
+  };
+}
+export interface GetWalletTransactionHistoryResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: WithdrawalHistory[];
+}> {
+  result: {
+    responseCode: number;
+    message: string;
+    payload: WithdrawalHistory[];
+  };
+}
+
+export interface GetTransactionReceiptResponse extends ApiResponse<{
+  transactionDate: string;
+  productName: string;
+  amount: number;
+  sellerName: string;
+  buyerName: string;
+}> {
+  result: {
+    transactionDate: string;
+    productName: string;
+    amount: number;
+    sellerName: string;
+    buyerName: string;
+  };
+}
+export interface CheckExistingCustomerResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: {
+    id: number;
+    creationTime: string;
+    creatorUserId: number;
+    lastModificationTime: string;
+    lastModifierUserId: number;
+    isDeleted: boolean;
+    deleterUserId: number;
+    deletionTime: string;
+    narration: string;
+    amount: number;
+    isTrial: boolean;
+    productId: number;
+    payStatus: string;
+    transactionDate: string;
+    customerID: string;
+    transactionID: string;
+    serviceID: string;
+    sellerUserId: number;
+    payType: string;
+    status: number;
+    effectiveDate: string;
+    expiryDate: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+    address: string;
+    state: string;
+    gender: string;
+    dateOfBirth: string;
+    productCategory: string;
+  };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -876,15 +875,14 @@ export interface WalletAccountDetails {
   bankCode: string;
 }
 
-export interface CommissionsEarnedResponse
-  extends ApiResponse<{
-    responseCode: number;
-    message: string;
-    payload: {
-      amount: number;
-      userId: string;
-    };
-  }> {
+export interface CommissionsEarnedResponse extends ApiResponse<{
+  responseCode: number;
+  message: string;
+  payload: {
+    amount: number;
+    userId: string;
+  };
+}> {
   result: {
     responseCode: number;
     message: string;
@@ -895,13 +893,12 @@ export interface CommissionsEarnedResponse
   };
 }
 
-export interface GetReferredUsersResponse
-  extends ApiResponse<{
-    totalUsers: number;
-    totalActiveUsers: number;
-    totalInActiveUsers: number;
-    referredUsers: User[];
-  }> {
+export interface GetReferredUsersResponse extends ApiResponse<{
+  totalUsers: number;
+  totalActiveUsers: number;
+  totalInActiveUsers: number;
+  referredUsers: User[];
+}> {
   result: {
     totalUsers: number;
     totalActiveUsers: number;
@@ -910,18 +907,35 @@ export interface GetReferredUsersResponse
   };
 }
 
-export interface TotalSalesResponse
-  extends ApiResponse<{
-    totalSales: number;
-    amount: number;
-  }> {
+export interface TotalSalesResponse extends ApiResponse<{
+  totalSales: number;
+  amount: number;
+}> {
   result: {
     totalSales: number;
     amount: number;
   };
 }
-export interface TotalSalesByAgentsResponse
-  extends ApiResponse<{
+export interface TotalSalesByAgentsResponse extends ApiResponse<{
+  totalSales: number;
+  totalAggregators: number;
+  totalAgents: number;
+  transactionAmount: number;
+  aggregatedBreakdown: {
+    aggregatorId: number;
+    aggregatorName: string;
+    agentCount: number;
+    salesCount: number;
+    salesAmount: number;
+    agentBreakdown: {
+      agentId: number;
+      agentName: string;
+      transactionCount: number;
+      transactionAmount: number;
+    }[];
+  }[];
+}> {
+  result: {
     totalSales: number;
     totalAggregators: number;
     totalAgents: number;
@@ -939,44 +953,23 @@ export interface TotalSalesByAgentsResponse
         transactionAmount: number;
       }[];
     }[];
-  }> {
-  result: {
-    totalSales: number;
-    totalAggregators: number;
-    totalAgents: number;
-    transactionAmount: number;
-    aggregatedBreakdown: {
-      aggregatorId: number;
-      aggregatorName: string;
-      agentCount: number;
-      salesCount: number;
-      salesAmount: number;
-      agentBreakdown: {
-        agentId: number;
-        agentName: string;
-        transactionCount: number;
-        transactionAmount: number;
-      }[];
-    }[];
   };
 }
-export interface TotalSalesNationalResponse
-  extends ApiResponse<{
-    totalSales: number;
-    amount: number;
-  }> {
+export interface TotalSalesNationalResponse extends ApiResponse<{
+  totalSales: number;
+  amount: number;
+}> {
   result: {
     totalSales: number;
     amount: number;
   };
 }
-export interface DownlinesResponse
-  extends ApiResponse<{
-    totalUsers: number;
-    totalActiveUsers: number;
-    totalInActiveUsers: number;
-    referredUsers: User[];
-  }> {
+export interface DownlinesResponse extends ApiResponse<{
+  totalUsers: number;
+  totalActiveUsers: number;
+  totalInActiveUsers: number;
+  referredUsers: User[];
+}> {
   result: {
     totalUsers: number;
     totalActiveUsers: number;
@@ -985,30 +978,28 @@ export interface DownlinesResponse
   };
 }
 
-export interface MonthlyReferralResponse
-  extends ApiResponse<
-    [
-      {
-        month: string;
-        count: number;
-      }
-    ]
-  > {
+export interface MonthlyReferralResponse extends ApiResponse<
+  [
+    {
+      month: string;
+      count: number;
+    },
+  ]
+> {
   result: [
     {
       month: string;
       count: number;
-    }
+    },
   ];
 }
 
-export interface GetUserDocumentResponse
-  extends ApiResponse<{
-    fileName: string;
-    fileType: string;
-    fileUrl: string;
-    fileContent: string;
-  }> {
+export interface GetUserDocumentResponse extends ApiResponse<{
+  fileName: string;
+  fileType: string;
+  fileUrl: string;
+  fileContent: string;
+}> {
   result: {
     fileName: string;
     fileType: string;

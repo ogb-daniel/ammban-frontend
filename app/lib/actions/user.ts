@@ -9,6 +9,8 @@ import {
   GetUserDocumentResponse,
   GetUserResponse,
   GetUserRolesResponse,
+  RefreshTokenBody,
+  RefreshTokenResponse,
   ResetPasswordBody,
   SetupPinBody,
   SetupPinResponse,
@@ -21,7 +23,7 @@ import api from "../api/axios";
 export const getUser = async (id: number): Promise<GetUserResponse> => {
   try {
     const response = await api.get<GetUserResponse>(
-      `/api/services/app/User/Get?Id=${id}`
+      `/api/services/app/User/Get?Id=${id}`,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,7 +52,7 @@ export const getAllUsers = async (params: {
       `/api/services/app/User/GetAll`,
       {
         params,
-      }
+      },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,12 +71,12 @@ export const getAllUsers = async (params: {
 };
 
 export const createUser = async (
-  body: CreateUserBody
+  body: CreateUserBody,
 ): Promise<CreateUserResponse> => {
   try {
     const response = await api.post<CreateUserResponse>(
       `/api/services/app/User/Create`,
-      body
+      body,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,12 +99,12 @@ export const updateUser = async (
     id: number;
     fullName: string;
     surname: string;
-  }
+  },
 ): Promise<CreateUserResponse> => {
   try {
     const response = await api.put<CreateUserResponse>(
       `/api/services/app/User/Update`,
-      body
+      body,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,7 +125,7 @@ export const updateUser = async (
 export const deleteUser = async (id: number): Promise<DeleteUserResponse> => {
   try {
     const response = await api.delete<DeleteUserResponse>(
-      `/api/services/app/User/Delete?Id=${id}`
+      `/api/services/app/User/Delete?Id=${id}`,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -145,7 +147,7 @@ export const approveUser = async (id: number): Promise<ApiResponse<null>> => {
   try {
     const response = await api.post<ApiResponse<null>>(
       `/api/services/app/User/Approve`,
-      { id }
+      { id },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -164,12 +166,12 @@ export const approveUser = async (id: number): Promise<ApiResponse<null>> => {
 };
 
 export const disapproveUser = async (
-  id: number
+  id: number,
 ): Promise<ApiResponse<null>> => {
   try {
     const response = await api.post<ApiResponse<null>>(
       `/api/services/app/User/DisApprove`,
-      { id }
+      { id },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,7 +197,7 @@ export const assignRole = async (params: {
     const response = await api.post<ApiResponse<null>>(
       `/api/services/app/User/AssignRoleToUser`,
       {},
-      { params }
+      { params },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -216,7 +218,7 @@ export const assignRole = async (params: {
 export const getRoles = async (): Promise<GetUserRolesResponse> => {
   try {
     const response = await api.get<GetUserRolesResponse>(
-      `/api/services/app/User/GetRoles`
+      `/api/services/app/User/GetRoles`,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,12 +237,12 @@ export const getRoles = async (): Promise<GetUserRolesResponse> => {
 };
 
 export const changePassword = async (
-  body: ChangePasswordBody
+  body: ChangePasswordBody,
 ): Promise<ApiResponse<string>> => {
   try {
     const response = await api.post<ApiResponse<string>>(
       `/api/services/app/User/ChangePassword`,
-      body
+      body,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -266,7 +268,7 @@ export const generatePasswordResetToken = async (params: {
       {},
       {
         params,
-      }
+      },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -285,7 +287,7 @@ export const generatePasswordResetToken = async (params: {
 };
 
 export const resetPassword = async (
-  body: ResetPasswordBody
+  body: ResetPasswordBody,
 ): Promise<
   ApiResponse<{
     success: boolean;
@@ -320,7 +322,7 @@ export const resetPassword = async (
 export const getAllStates = async (): Promise<ApiResponse<States[]>> => {
   try {
     const response = await api.get<ApiResponse<States[]>>(
-      `/api/services/app/Account/GetAllStates`
+      `/api/services/app/Account/GetAllStates`,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -340,11 +342,11 @@ export const getAllStates = async (): Promise<ApiResponse<States[]>> => {
 
 export const getUserDocument = async (
   userId: string,
-  documentType: string
+  documentType: string,
 ): Promise<GetUserDocumentResponse> => {
   try {
     const response = await api.get<GetUserDocumentResponse>(
-      `/api/services/app/Account/GetUserDocument?userId=${userId}&documentType=${documentType}`
+      `/api/services/app/Account/GetUserDocument?userId=${userId}&documentType=${documentType}`,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -363,12 +365,12 @@ export const getUserDocument = async (
 };
 
 export const verifyUserDocument = async (
-  userId: string
+  userId: string,
 ): Promise<ApiResponse<{ success: boolean }>> => {
   try {
     const response = await api.post<ApiResponse<{ success: boolean }>>(
       `/api/services/app/User/VerifyUserDocument`,
-      { id: userId }
+      { id: userId },
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -387,12 +389,12 @@ export const verifyUserDocument = async (
 };
 
 export const setupPin = async (
-  body: SetupPinBody
+  body: SetupPinBody,
 ): Promise<SetupPinResponse> => {
   try {
     const response = await api.post<ApiResponse<null>>(
       `/api/services/app/SecurityPin/Setup`,
-      body
+      body,
     );
     return response.data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -411,11 +413,37 @@ export const setupPin = async (
 };
 
 export const verifyPin = async (
-  params: VerifyPinBody
+  params: VerifyPinBody,
 ): Promise<VerifyPinResponse> => {
   try {
     const response = await api.post<VerifyPinResponse>(
-      `/api/services/app/SecurityPin/Verify?pin=${params.pin}`
+      `/api/services/app/SecurityPin/Verify?pin=${params.pin}`,
+    );
+    console.log(response);
+
+    return response.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error verifying pin:", error);
+    return (
+      error?.response?.data || {
+        success: false,
+        error: {
+          message: error?.response?.data?.error?.message || error?.message,
+          details: error?.response?.data?.error?.details,
+        },
+      }
+    );
+  }
+};
+
+export const refreshToken = async (
+  body: RefreshTokenBody,
+): Promise<RefreshTokenResponse> => {
+  try {
+    const response = await api.post<RefreshTokenResponse>(
+      `/api/TokenAuth/Refresh`,
+      body,
     );
     console.log(response);
 

@@ -7,7 +7,9 @@ export async function createSession(
   accessToken: string,
   expireInSeconds: number,
   role: string,
-  user: User
+  user: User,
+  refreshToken: string,
+  refreshTokenExpireInSeconds: number,
 ) {
   const cookieStore = await cookies();
 
@@ -19,17 +21,23 @@ export async function createSession(
     path: "/",
   });
 
+  cookieStore.set("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: refreshTokenExpireInSeconds,
+    sameSite: "lax",
+    path: "/",
+  });
+
   cookieStore.set("role", role, {
     // NOT httpOnly so you can read on client if needed
     secure: process.env.NODE_ENV === "production",
-    maxAge: expireInSeconds,
     path: "/",
   });
   if (user) {
     cookieStore.set("user", JSON.stringify(user), {
       // NOT httpOnly so you can read on client if needed
       secure: process.env.NODE_ENV === "production",
-      maxAge: expireInSeconds,
       path: "/",
     });
   }
@@ -38,16 +46,19 @@ export async function createSession(
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
 }
 
 export async function getSession() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
+  const refreshToken = cookieStore.get("refreshToken")?.value;
   const role = cookieStore.get("role")?.value;
   const user = cookieStore.get("user")?.value;
   return {
     accessToken,
     role,
     user,
+    refreshToken,
   };
 }
