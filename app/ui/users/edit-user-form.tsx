@@ -8,9 +8,11 @@ import { EditUserInformationSchema, States, User } from "@/app/lib/definitions";
 import { getAllStates, updateUser } from "@/app/lib/actions/user";
 import { toast } from "react-toastify";
 import CircleLoader from "../circle-loader";
+import { useUserStore } from "@/providers/user-store-provider";
 
 export default function EditUserForm({ user }: { user: User }) {
   // const { editUser } = useAdminStore((state) => state);
+  const { user: currentUser } = useUserStore((state) => state);
   const [, setStates] = React.useState<States[] | null>([]);
   const [submitting, setSubmitting] = React.useState(false);
   React.useEffect(() => {
@@ -55,7 +57,7 @@ export default function EditUserForm({ user }: { user: User }) {
         setSubmitting(false);
       }
       // Handle form submission
-      router.push(`/${user?.role}/users`);
+      router.push(`/${currentUser?.role}/users`);
     },
     validators: {
       onChange: EditUserInformationSchema,
